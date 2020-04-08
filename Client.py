@@ -40,10 +40,10 @@ def main():
     CpuDetail = CpuDetails()
     MemoryDetail = MemoryDetails()
     print(MemoryDetail.ram_usage())
-    req = requests.post('http://127.0.0.1:5000', json={"running processes": ProcessDetail.get_running_processes(), "CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage()})
+    req = requests.post('http://127.0.0.1:5000', json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage(), "MAC address: ": computer_mac_address()})
     print(req.json())
     while True:
-        req = requests.post('http://127.0.0.1:5000', json={"CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
+        req = requests.post('http://127.0.0.1:5000', json={"running processes": ProcessDetail.get_running_processes(), "CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
 
 
 if __name__ == "__main__":
