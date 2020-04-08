@@ -25,9 +25,12 @@ class ProcessDetails:
     def __init__(self):
         pass
     def get_running_processes(self):
-        running_programs = []
+        running_programs = ""
         for running_program in psutil.process_iter():
-            running_programs.append(running_program.name())
+            if len(running_programs) == 0:
+                running_programs = running_program
+            else:
+                running_programs = running_programs + ',' + running_program
         return running_programs
 
 
