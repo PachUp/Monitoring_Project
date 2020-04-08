@@ -9,7 +9,7 @@ import requests
 class CpuDetails:
     def __init__(self):
         pass
-    def utilization_procentage(self):
+    def cpu_utilization_procentage(self):
         return psutil.cpu_percent(interval=5)
     def cpu_type(self):
         return platform.processor()
@@ -42,6 +42,8 @@ def main():
     print(MemoryDetail.ram_usage())
     req = requests.post('http://127.0.0.1:5000', json={"running processes": ProcessDetail.get_running_processes(), "CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage()})
     print(req.json())
+    while True:
+        req = requests.post('http://127.0.0.1:5000', json={"CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
 
 
 if __name__ == "__main__":
