@@ -2,11 +2,13 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 
+item_counter = 0
+
 
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users12.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users77.db'
     db = SQLAlchemy(app)
 
     class Todo(db.Model):
@@ -19,12 +21,12 @@ def main():
         memory_usage_procentage = db.Column(db.FLOAT)
     db.create_all()
     print(Todo.query.all() is None)
-    if len(Todo.query.all()) > 0:
+    if len(Todo.query.all()) >= 0:
         new_computer = Todo()
         @app.route('/computers/0', methods=['POST', 'GET'])
         def no_one_in_db():
+            global item_counter
             if request.method == 'POST':
-                item_counter = 0
                 js = request.get_json()
                 for item in js.values():
                     if item_counter == 0:
@@ -39,10 +41,15 @@ def main():
                         new_computer.cpu_usage_procentage = item
                     if item_counter == 5:
                         new_computer.memory_usage_procentage = item
+                        item_counter = 2
                     item_counter = item_counter + 1
                 db.session.add(new_computer)
                 db.session.commit()
                 print(Todo.query.filter(Todo.id).all())
+                print(Todo.query.filter(Todo.id).all()[0].mac_address)
+                print(Todo.query.filter(Todo.id).all()[0].cpu_usage_procentage)
+                print(Todo.query.filter(Todo.id).all()[0].memory_usage_procentage)
+                print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 return ""
             else:
                 return ""
