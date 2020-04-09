@@ -2,8 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 
-item_counter = 0
-
+item_counter = 1
 
 def main():
     app = Flask(__name__)
@@ -34,42 +33,45 @@ def main():
                             return str(Todo.query.filter(Todo.id).all()[i].id)
                         else:
                             print("Not found!")
+                            new_id = len(Todo.query.all())
         else:
             return ""
 
-    if len(Todo.query.all()) == 0:
-        new_computer = Todo() #new user caswe
-        @app.route('/computers/0', methods=['POST', 'GET'])
-        def no_one_in_db():
+    if len(Todo.query.all()) >= 0:
+        @app.route('/computers/<int:id>', methods=['POST', 'GET'])
+        def no_one_in_db(id):
             global item_counter
+            computer = Todo.query.get_or_404(id) #new user case
             if request.method == 'POST':
                 js = request.get_json()
                 for item in js.values(): #new user case
-                    if item_counter == 0:
-                        new_computer.mac_address = item
                     if item_counter == 1:
-                        new_computer.cpu_type = item
+                        computer.cpu_type = item
                     if item_counter == 2:
-                        new_computer.ram_usage = item
+                        computer.ram_usage = item
                     if item_counter == 3:
-                        new_computer.running_processes = item
+                        computer.running_processes = item
                     if item_counter == 4:
-                        new_computer.cpu_usage_procentage = item
+                        computer.cpu_usage_procentage = item
                     if item_counter == 5:
-                        new_computer.memory_usage_procentage = item
+                        computer.memory_usage_procentage = item
                         item_counter = 2
                     item_counter = item_counter + 1
-                db.session.add(new_computer)
-                db.session.commit()
-                print(Todo.query.filter(Todo.id).all())
-                print(Todo.query.filter(Todo.id).all()[0].mac_address)
-                print(Todo.query.filter(Todo.id).all()[0].cpu_usage_procentage)
-                print(Todo.query.filter(Todo.id).all()[0].memory_usage_procentage)
-                print(Todo.query.filter(Todo.id).all()[0].running_processes)
-                return redirect('/')
+                #db.session.add(new_computer)
+                #db.session.commit()
+                #print(Todo.query.filter(Todo.id).all())
+                #print(Todo.query.filter(Todo.id).all()[0].mac_address)
+                #print(Todo.query.filter(Todo.id).all()[0].cpu_usage_procentage)
+                #print(Todo.query.filter(Todo.id).all()[0].memory_usage_procentage)
+                #print(Todo.query.filter(Todo.id).all()[0].running_processes)
+                #print(computer.mac_address)
+                print(computer.cpu_usage_procentage)
+                url = '/computers/' + str(id)
+                print(url)
+                return redirect(url)
             else:
                 try:
-                    return str(Todo.query.filter(Todo.id).all()[0].cpu_usage_procentage)
+                    return str(computer.cpu_usage_procentage)
                 except:
                     return ""
 
