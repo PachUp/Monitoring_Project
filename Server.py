@@ -3,11 +3,14 @@ from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 
 item_counter = 1
+new_id = -1
+new_mac_address = ""
+
 
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users76.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users98.db'
     db = SQLAlchemy(app)
 
     class Todo(db.Model):
@@ -23,6 +26,7 @@ def main():
     @app.route('/computers/check_exist', methods=['POST', 'GET'])
     def check_if_user_exists():
         if request.method == 'POST':
+            global new_mac_address
             js = request.get_json()
             print(js)
             if js is not None:
@@ -31,9 +35,11 @@ def main():
                         if mac_address == Todo.query.filter(Todo.id).all()[i].mac_address:
                             print("True!")
                             return str(Todo.query.filter(Todo.id).all()[i].id)
-                        else:
-                            print("Not found!")
-                            new_id = len(Todo.query.all())
+                    new_mac_address = mac_address
+                    print("Not found!")
+                    return redirect('/computers/add')
+            else:
+                print("Empty? wtf")
         else:
             return ""
 
@@ -76,7 +82,21 @@ def main():
                 try:
                     return str(computer.cpu_usage_procentage)
                 except:
-                    return ""
+                    return "There is a problem with loading your data :("
+    @app.route('/computers/add')
+    def new_computer():
+        try:
+            new_id = len(Todo.query.all()) + 1
+        except:
+            new_id = 1
+        print(new_mac_address)
+        print(new_id)
+        new_user = Todo(mac_address=new_mac_address, id=new_id)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect('/computers/check_exist', code=307)
+
+
 
     @app.route('/')
     def index():
