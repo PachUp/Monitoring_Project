@@ -45,19 +45,21 @@ def main():
     index = 0
     status_code = 200
     page_content = ""
-    req_link = 'http://127.0.0.1:5000/computers/'
-    page = requests.get(req_link + str(index))
+    req_link = 'http://127.0.0.1:5000/computers/check_exist'
+    page = requests.get(req_link)
     page_content = page.content.decode()
     status_code = page.status_code
     print(status_code == 200)
     print(status_code)
     print(page_content)
     if status_code == 200:
-        send_all_req = req_link + str(index)
-        req = requests.post(send_all_req, json={"MAC address: ": computer_mac_address()})
-        req = requests.post(send_all_req, json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage()})
-        while True:
-            req = requests.post(send_all_req, json={"running processes": ProcessDetail.get_running_processes(), "CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
+        send_all_req = req_link
+        req = requests.post('http://127.0.0.1:5000/computers/check_exist', json={"MAC address: ": computer_mac_address()})
+        id = req.content.decode()
+        send_all_req = send_all_req + str(id)
+        #req = requests.post(send_all_req, json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage()})
+        #while True:
+        #    req = requests.post(send_all_req, json={"running processes": ProcessDetail.get_running_processes(), "CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
 
 
 if __name__ == "__main__":

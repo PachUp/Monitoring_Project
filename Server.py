@@ -8,7 +8,7 @@ item_counter = 0
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users77.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users76.db'
     db = SQLAlchemy(app)
 
     class Todo(db.Model):
@@ -21,14 +21,30 @@ def main():
         memory_usage_procentage = db.Column(db.FLOAT)
     db.create_all()
     print(Todo.query.all() is None)
-    if len(Todo.query.all()) >= 0:
-        new_computer = Todo()
+    @app.route('/computers/check_exist', methods=['POST', 'GET'])
+    def check_if_user_exists():
+        if request.method == 'POST':
+            js = request.get_json()
+            print(js)
+            if js is not None:
+                for mac_address in js.values():
+                    for i in range(len(Todo.query.all())):
+                        if mac_address == Todo.query.filter(Todo.id).all()[i].mac_address:
+                            print("True!")
+                            return str(Todo.query.filter(Todo.id).all()[i].id)
+                        else:
+                            print("Not found!")
+        else:
+            return ""
+
+    if len(Todo.query.all()) == 0:
+        new_computer = Todo() #new user caswe
         @app.route('/computers/0', methods=['POST', 'GET'])
         def no_one_in_db():
             global item_counter
             if request.method == 'POST':
                 js = request.get_json()
-                for item in js.values():
+                for item in js.values(): #new user case
                     if item_counter == 0:
                         new_computer.mac_address = item
                     if item_counter == 1:
@@ -50,9 +66,12 @@ def main():
                 print(Todo.query.filter(Todo.id).all()[0].cpu_usage_procentage)
                 print(Todo.query.filter(Todo.id).all()[0].memory_usage_procentage)
                 print(Todo.query.filter(Todo.id).all()[0].running_processes)
-                return ""
+                return redirect('/')
             else:
-                return ""
+                try:
+                    return str(Todo.query.filter(Todo.id).all()[0].cpu_usage_procentage)
+                except:
+                    return ""
 
     @app.route('/')
     def index():
