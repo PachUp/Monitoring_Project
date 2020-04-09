@@ -28,9 +28,9 @@ class ProcessDetails:
         running_programs = ""
         for running_program in psutil.process_iter():
             if len(running_programs) == 0:
-                running_programs = running_program
+                running_programs = running_program.name()
             else:
-                running_programs = running_programs + ',' + running_program
+                running_programs = running_programs + ',' + running_program.name()
         return running_programs
 
 
@@ -42,11 +42,22 @@ def main():
     ProcessDetail = ProcessDetails()
     CpuDetail = CpuDetails()
     MemoryDetail = MemoryDetails()
-    print(MemoryDetail.ram_usage())
-    req = requests.post('http://127.0.0.1:5000', json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage(), "MAC address: ": computer_mac_address()})
-    print(req.json())
-    while True:
-        req = requests.post('http://127.0.0.1:5000', json={"running processes": ProcessDetail.get_running_processes(), "CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
+    index = 0
+    status_code = 200
+    page_content = ""
+    req_link = 'http://127.0.0.1:5000/computers/'
+    page = requests.get(req_link + str(index))
+    page_content = page.content.decode()
+    status_code = page.status_code
+    print(status_code == 200)
+    print(status_code)
+    print(page_content)
+    if status_code == 200:
+        send_all_req = req_link + str(index)
+        req = requests.post(send_all_req, json={"MAC address: ": computer_mac_address()})
+        req = requests.post(send_all_req, json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage()})
+        while True:
+            req = requests.post(send_all_req, json={"running processes": ProcessDetail.get_running_processes(), "CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
 
 
 if __name__ == "__main__":
