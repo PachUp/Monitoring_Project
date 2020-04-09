@@ -47,14 +47,19 @@ def main():
                 for item in js.values(): #new user case
                     if item_counter == 1:
                         computer.cpu_type = item
+                        db.session.commit()
                     if item_counter == 2:
                         computer.ram_usage = item
+                        db.session.commit()
                     if item_counter == 3:
                         computer.running_processes = item
+                        db.session.commit()
                     if item_counter == 4:
                         computer.cpu_usage_procentage = item
+                        db.session.commit()
                     if item_counter == 5:
                         computer.memory_usage_procentage = item
+                        db.session.commit()
                         item_counter = 2
                     item_counter = item_counter + 1
                 #db.session.add(new_computer)
@@ -65,10 +70,8 @@ def main():
                 #print(Todo.query.filter(Todo.id).all()[0].memory_usage_procentage)
                 #print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 #print(computer.mac_address)
-                print(computer.cpu_usage_procentage)
                 url = '/computers/' + str(id)
-                print(url)
-                return redirect(url)
+                return redirect('/')
             else:
                 try:
                     return str(computer.cpu_usage_procentage)
