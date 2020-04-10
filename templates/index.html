@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block head%}
+<title> Main Page </title>
+<link rel="stylesheet type="text/css" href="{{ url_for('static', filename='css/index.css') }}"/>
+{% endblock %}
+
+
+{% block body%}
+<h1> Hello manager! </h1>
+<p>Go to /computers/</p>
+<p>To see all the computers that are connected</p>
+<p>I know I am a css specialist uh?</p>
+<div class = "computers_link"> <a href="http://127.0.0.1:5000/computers">You can also click here</a></div>
+{% endblock %}

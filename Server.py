@@ -23,7 +23,8 @@ def main():
         memory_usage_procentage = db.Column(db.FLOAT)
     db.create_all()
     print(Todo.query.all() is None)
-    @app.route('/computers/check_exist', methods=['POST', 'GET'])
+    #verify_login
+    @app.route('/computers/verify_login', methods=['POST', 'GET'])
     def check_if_user_exists():
         if request.method == 'POST':
             global new_mac_address
@@ -94,13 +95,13 @@ def main():
         new_user = Todo(mac_address=new_mac_address, id=new_id)
         db.session.add(new_user)
         db.session.commit()
-        return redirect('/computers/check_exist', code=307)
+        return redirect('/computers/verify_login', code=307)
 
 
 
     @app.route('/')
     def index():
-        return "Hello world!"
+        return render_template('index.html')
 
     app.run(debug=True)
 

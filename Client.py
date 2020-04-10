@@ -45,7 +45,7 @@ def main():
     index = 0
     status_code = 200
     page_content = ""
-    req_link = 'http://127.0.0.1:5000/computers/check_exist'
+    req_link = 'http://127.0.0.1:5000/computers/verify_login'
     page = requests.get(req_link)
     page_content = page.content.decode()
     status_code = page.status_code
@@ -54,7 +54,7 @@ def main():
     print(page_content)
     if status_code == 200:
         send_all_req = "http://127.0.0.1:5000/computers/"
-        req = requests.post('http://127.0.0.1:5000/computers/check_exist', json={"MAC address: ": computer_mac_address()})
+        req = requests.post('http://127.0.0.1:5000/computers/verify_login', json={"MAC address: ": computer_mac_address()})
         id = req.content.decode()
         send_all_req = send_all_req + str(id)
         req = requests.post(send_all_req, json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage()})
