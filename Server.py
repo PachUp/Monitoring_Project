@@ -75,8 +75,9 @@ def main():
                 #print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 #print(computer.mac_address)
                 url = '/computers/' + str(id)
-                return "" # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                return redirect('/') # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
             else:
+                print(computer.cpu_usage_procentage)
                 return render_template('show_computer_data.html', computer=computer)
     @app.route('/computers/add')
     def new_computer():
@@ -99,7 +100,6 @@ def main():
             all_computers_on_the_server.append(Todo.query.all()[i].id)
         print(all_computers_on_the_server)
         return render_template('show_all_computers.html', computer_list =all_computers_on_the_server)
-
     @app.route('/')
     def index():
         return render_template('index.html')

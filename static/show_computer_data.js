@@ -1,3 +1,4 @@
 <script>
-alert("Hello")
+    document.getElementById("demo").innerHTML = "Nothing"
+
 </script>

@@ -3,13 +3,11 @@
 
 {% block head%}
 <title> original </title>
-<script type="text/javascript" src="{{ url_for('static', filename='show_computer_data.js') }}"></script>
 {% endblock %}
 
 {% block body%}
-
-<div class="content">
-    <p id ="demo">id: </p>
+<div id="content">
+    <p>id: </p>
     <p>{{computer.id}}</p>
     <br>
     <p>mac address: </p>
@@ -28,4 +26,11 @@
     <p>{{computer.memory_usage_procentage}}</p>
     <br>
 </div>
+<script>
+$(document).ready(function(){
+    setInterval(function(){
+        $('#content').load("single_computer_data.html")
+    }, 5000);
+});
+</script>
 {% endblock %}
