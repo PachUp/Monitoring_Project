@@ -3,6 +3,7 @@
 
 {% block head%}
 <title> original </title>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
 {% endblock %}
 
 {% block body%}
@@ -26,11 +27,12 @@
     <p>{{computer.memory_usage_procentage}}</p>
     <br>
 </div>
+
 <script>
-$(document).ready(function(){
-    setInterval(function(){
-        $('#content').load("single_computer_data.html")
-    }, 5000);
-});
+    $(document).ready(function(){
+        setTimeout(function(){
+            $('#content').load("1")
+        }, 5000);
+    });
 </script>
 {% endblock %}

@@ -10,7 +10,7 @@ new_mac_address = ""
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users125.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users126.db'
     db = SQLAlchemy(app)
 
     class Todo(db.Model):
