@@ -3,12 +3,13 @@
 
 {% block head%}
 <title> computers </title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/show_all_computers.css') }}"/>
 {% endblock %}
 
 
 {% block body%}
 {% for computer in computer_list %}
-<a href = "/computers/{{computer}}">computer# {{computer}}</a>
-<br>
+<a class=link href = "/computers/{{computer}}">computer# {{computer}}</a>
+<br>    
 {%endfor%}
 {% endblock %}
