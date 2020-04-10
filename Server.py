@@ -10,7 +10,7 @@ new_mac_address = ""
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users98.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users105.db'
     db = SQLAlchemy(app)
 
     class Todo(db.Model):
@@ -78,12 +78,9 @@ def main():
                 #print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 #print(computer.mac_address)
                 url = '/computers/' + str(id)
-                return redirect('/')
+                return "" # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
             else:
-                try:
-                    return str(computer.cpu_usage_procentage)
-                except:
-                    return "There is a problem with loading your data :("
+                return render_template('show_computer_data.html', computer=computer)
     @app.route('/computers/add')
     def new_computer():
         try:
@@ -97,7 +94,14 @@ def main():
         db.session.commit()
         return redirect('/computers/verify_login', code=307)
 
-
+    @app.route('/computers')
+    def show_all_computers():
+        print(len(Todo.query.all()))
+        all_computers_on_the_server = []
+        for i in range(len(Todo.query.all())):
+            all_computers_on_the_server.append(Todo.query.all()[i].id)
+        print(all_computers_on_the_server)
+        return render_template('show_all_computers.html', computer_list =all_computers_on_the_server)
 
     @app.route('/')
     def index():

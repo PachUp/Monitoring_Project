@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+
+{% block head%}
+<title> computers </title>
+{% endblock %}
+
+
+{% block body%}
+{% for computer in computer_list %}
+<a href = "/computers/{{computer}}">computer# {{computer}}</a>
+<br>
+{%endfor%}
+{% endblock %}

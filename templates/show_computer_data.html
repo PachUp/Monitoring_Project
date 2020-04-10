@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+
+{% block head%}
+<title> original </title>
+{% endblock %}
+
+{% block body%}
+
+<div class="content">
+    <p>id: </p>
+    <p>{{computer.id}}</p>
+    <br>
+    <p>mac address: </p>
+    <p>{{computer.mac_address}}</p>
+    <br>
+    <p>ram usage: </p>
+    <p>{{computer.ram_usage}}</p>
+    <br>
+    <p>running processes: </p>
+    <p>{{computer.running_processes}}</p>
+    <br>
+    <p>cpu usage procentage: </p>
+    <p>{{computer.cpu_usage_procentage}}</p>
+    <br>
+    <p>memory usage procentage: </p>
+    <p>{{computer.memory_usage_procentage}}</p>
+    <br>
+</div>
+{% endblock %}
