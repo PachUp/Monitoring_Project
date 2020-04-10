@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 
-item_counter = 1
+
 new_id = -1
 new_mac_address = ""
 
@@ -10,7 +10,7 @@ new_mac_address = ""
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users105.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users125.db'
     db = SQLAlchemy(app)
 
     class Todo(db.Model):
@@ -47,28 +47,25 @@ def main():
     if len(Todo.query.all()) >= 0:
         @app.route('/computers/<int:id>', methods=['POST', 'GET'])
         def no_one_in_db(id):
-            global item_counter
-            computer = Todo.query.get_or_404(id) #new user case
+            computer = Todo.query.get_or_404(id)
             if request.method == 'POST':
                 js = request.get_json()
-                for item in js.values(): #new user case
-                    if item_counter == 1:
+                for name, item in js.items():
+                    if name == "CPU type:":
                         computer.cpu_type = item
                         db.session.commit()
-                    if item_counter == 2:
+                    if name == "Ram usage: ":
                         computer.ram_usage = item
                         db.session.commit()
-                    if item_counter == 3:
+                    if name == "running processes":
                         computer.running_processes = item
                         db.session.commit()
-                    if item_counter == 4:
+                    if name == "CPU usage procentage":
                         computer.cpu_usage_procentage = item
                         db.session.commit()
-                    if item_counter == 5:
+                    if name == "Memory usage procentage":
                         computer.memory_usage_procentage = item
                         db.session.commit()
-                        item_counter = 2
-                    item_counter = item_counter + 1
                 #db.session.add(new_computer)
                 #db.session.commit()
                 #print(Todo.query.filter(Todo.id).all())
@@ -107,7 +104,7 @@ def main():
     def index():
         return render_template('index.html')
 
-    app.run(debug=True)
+    app.run(debug=True,host='192.168.1.181')
 
 
 if __name__ == "__main__":

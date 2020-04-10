@@ -3,12 +3,13 @@
 
 {% block head%}
 <title> original </title>
+<script type="text/javascript" src="{{ url_for('static', filename='show_computer_data.js') }}"></script>
 {% endblock %}
 
 {% block body%}
 
 <div class="content">
-    <p>id: </p>
+    <p id ="demo">id: </p>
     <p>{{computer.id}}</p>
     <br>
     <p>mac address: </p>
