@@ -3,9 +3,41 @@ h1{
     text-align: center;
 }
 p{
-    font-family: sans-serif;
+    font-family: unset;
     text-align: center;
 }
 .computers_link{
     text-align: center;
+}
+body {
+    background-color: lightblue;
+  }
+  
+a {
+    background:
+       linear-gradient(
+         to bottom, var(--mainColor) 0%,
+         var(--mainColor) 100%
+       );
+      background-position: 0 100%;
+      background-repeat: repeat-x;
+      background-size: 4px 4px;
+    color: #000;
+    text-decoration: none;
+    transition: background-size .2s;
+  }
+  
+  a:hover {
+    background-size: 4px 50px;
+  }
+:root {
+  --mainColor: #ff9800;
+}
+
+body {
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
+  height: 100vh;
+  justify-content: center;
 }
