@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 new_id = -1
 new_mac_address = ""
-
+change = 5000
 
 def main():
     app = Flask(__name__)
@@ -87,7 +87,16 @@ def main():
                 return redirect('/') # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
             else:
                 print(computer.cpu_usage_procentage)
-                return render_template('show_computer_data.html', computer=computer)
+                try:
+                    global change
+                    url = request.url
+                    change = url.split('=')[1]
+                    change = int(change)
+                    change = change * 1000
+                    change = str(change)
+                except:
+                    pass
+                return render_template('show_computer_data.html', computer=computer, timer=change)
     @app.route('/computers/add')
     def new_computer():
         try:
@@ -113,7 +122,7 @@ def main():
     def index():
         return render_template('index.html')
 
-    app.run(debug=True,host='192.168.1.181')
+    app.run(debug=False,host='192.168.1.181')
 
 
 if __name__ == "__main__":

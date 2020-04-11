@@ -10,11 +10,17 @@
 {% block body%}
 <div id="content">
     <div class="dropdown">
-        <button class="dropbtn">Dropdown</button>
+        <button class="dropbtn">Change live update timer ( min=5 )</button>
         <div class="dropdown-content">
-          <a href="#">Link 1</a>
-          <a href="#">Link 2</a>
-          <a href="#">Link 3</a>
+            <form action="/computers/{{computer.id}}" method="GET">
+                <input name="content" id="content" type = "submit" value="5" class="button"></input>
+                <br>
+                <input name="content" id="content" type = "submit" value="6" class="button"></input>
+                <br>
+                <input name="content" id="content" type = "submit" value="7" class="button"></input>
+                <br>
+                <input type="text" value="">
+            </form>
         </div>
       </div>
     
@@ -42,7 +48,7 @@
     $(document).ready(function(){
         setTimeout(function(){
             $('#content').load("{{computer.id}}")
-        }, 5000);
+        }, "{{timer}}");
     });
 </script>
 {% endblock %}

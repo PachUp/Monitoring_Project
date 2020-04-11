@@ -10,7 +10,7 @@ body {
     height: 100vh;
     justify-content: center;
   }
-  /* css dropdown start */
+  /* css dropdown and botton and text filed start */
 .dropbtn {
   background-color: #4CAF50;
   color: white;
@@ -50,4 +50,31 @@ body {
 .dropdown:hover .dropbtn {
   background-color: #3e8e41;
 }
-/* css dropdown end */
+.button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    width: 280px;
+  }
+  input[type=text] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 3px solid #ccc;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+  }
+  
+  input[type=text]:focus {
+    border: 3px solid #555;
+  }
+/* css dropdown and botton and text filed end */
