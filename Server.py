@@ -86,16 +86,21 @@ def main():
                 url = '/computers/' + str(id)
                 return redirect('/') # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
             else:
-                print(computer.cpu_usage_procentage)
                 try:
                     global change
                     url = request.url
                     change = url.split('=')[1]
+                    print(change)
+                    if change == "":
+                        change = 5
                     change = int(change)
                     change = change * 1000
+                    if change < 5000:
+                        change = 5000
                     change = str(change)
                 except:
                     pass
+                print(change)
                 return render_template('show_computer_data.html', computer=computer, timer=change)
     @app.route('/computers/add')
     def new_computer():
