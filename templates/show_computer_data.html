@@ -4,10 +4,20 @@
 {% block head%}
 <title> original </title>
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/show_computer_data.css') }}"/>
 {% endblock %}
 
 {% block body%}
 <div id="content">
+    <div class="dropdown">
+        <button class="dropbtn">Dropdown</button>
+        <div class="dropdown-content">
+          <a href="#">Link 1</a>
+          <a href="#">Link 2</a>
+          <a href="#">Link 3</a>
+        </div>
+      </div>
+    
     <p>id: </p>
     <p>{{computer.id}}</p>
     <br>
@@ -18,7 +28,7 @@
     <p>{{computer.ram_usage}}</p>
     <br>
     <p>running processes: </p>
-    <p>{{computer.running_processes}}</p>
+    <div class="scroll">{{computer.running_processes}}</div>
     <br>
     <p>cpu usage procentage: </p>
     <p>{{computer.cpu_usage_procentage}}</p>

@@ -58,7 +58,16 @@ def main():
                         computer.ram_usage = item
                         db.session.commit()
                     if name == "running processes":
-                        computer.running_processes = item
+                        c_item = item.split(',')
+                        count = 0
+                        new_item = ""
+                        for i in c_item:
+                            new_item = new_item + i + "," 
+                            if count%5 == 0:
+                                new_item = new_item + '\n'
+                            count = count + 1
+                        print(new_item)
+                        computer.running_processes = new_item
                         db.session.commit()
                     if name == "CPU usage procentage":
                         computer.cpu_usage_procentage = item
