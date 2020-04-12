@@ -3,12 +3,19 @@
 
 {% block head%}
 <title> original </title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/show_computer_data.css') }}"/>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 {% endblock %}
 
 {% block body%}
+  
 <div id="content">
+    <div class="alert alert-primary" role="alert">
+        Welcome this is computer number {{computer.id}}.
+      </div>
     <div class="dropdown">
         <button class="dropbtn">Change live update timer ( min=5 )</button>
         <div class="dropdown-content">
@@ -25,32 +32,60 @@
             </form>
         </div>
       </div>
+    <br>
+    <br>
+    <br>
     
-    <p>id: </p>
-    <p>{{computer.id}}</p>
+    <div class="boxes">
+    <button type="button" class="btn btn-primary" id="box">
+        id:  <span class="badge badge-light">{{computer.id}}</span>
+      </button>
     <br>
-    <p>mac address: </p>
-    <p>{{computer.mac_address}}</p>
     <br>
-    <p>ram usage: </p>
-    <p>{{computer.ram_usage}}</p>
+    <br>
+    <button type="button" class="btn btn-primary">
+        mac address:  <span class="badge badge-light">{{computer.mac_address}}</span>
+      </button>
+    <br>
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary">
+        ram usage:  <span class="badge badge-light">{{computer.ram_usage}}</span>
+      </button>
+    <br>
+    <br>
     <br>
     <p>running processes: </p>
     <div class="scroll">{{computer.running_processes}}</div>
     <br>
-    <p>cpu usage procentage: </p>
-    <p>{{computer.cpu_usage_procentage}}</p>
     <br>
-    <p>memory usage procentage: </p>
-    <p>{{computer.memory_usage_procentage}}</p>
     <br>
+    <button type="button" class="btn btn-primary">
+        cpu usage procentage:  <span class="badge badge-light">{{computer.cpu_usage_procentage}}</span>
+      </button>
+    <br>
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary">
+        memory usage procentage:  <span class="badge badge-light">{{computer.memory_usage_procentage}}</span>
+      </button>
+    <br>
+    <br>
+    <br>
+    <span id="log">{{computer.cpu_usage_procentage}}</span>
 </div>
-
+  </div>
 <script>
+  var x= 0;
+function increment() {
+  $("#log").text("{{computer.cpu_usage_procentage}}");
+}
     $(document).ready(function(){
-        setTimeout(function(){
-            $('#content').load("{{computer.id}}")
-        }, "{{timer}}");
+      setInterval(
+  function() 
+  { $("#log").text("{{computer.cpu_usage_procentage}}"); 
+  x = x + 1;}, 5000);
     });
 </script>
-{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>{% endblock %}

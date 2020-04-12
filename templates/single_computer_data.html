@@ -7,6 +7,62 @@
 
 {% block body%}
 <div id="content">
-    <p>id: </p>
+    <div class="alert alert-primary" role="alert">
+        Welcome this is computer number {{computer.id}}.
+      </div>
+    <div class="dropdown">
+        <button class="dropbtn">Change live update timer ( min=5 )</button>
+        <div class="dropdown-content">
+            <form action="/computers/{{computer.id}}" method="GET">
+                <input name="content" id="content" type = "submit" value="5" class="button"></input>
+                <br>
+                <input name="content" id="content" type = "submit" value="6" class="button"></input>
+                <br>
+                <input name="content" id="content" type = "submit" value="7" class="button"></input>
+                <br>
+            </form>
+            <form action="/computers/{{computer.id}}" method="GET">
+                <input name="content" id="content" type="text" value="">
+            </form>
+        </div>
+      </div>
+    <br>
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary">
+        id:  <span class="badge badge-light">{{computer.id}}</span>
+      </button>
+    <br>
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary">
+        mac address:  <span class="badge badge-light">{{computer.mac_address}}</span>
+      </button>
+    <br>
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary">
+        ram usage:  <span class="badge badge-light">{{computer.ram_usage}}</span>
+      </button>
+    <br>
+    <br>
+    <br>
+    <p>running processes: </p>
+    <div class="scroll">{{computer.running_processes}}</div>
+    <br>
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary">
+        cpu usage procentage:  <span class="badge badge-light">{{computer.cpu_usage_procentage}}</span>
+      </button>
+    <br>
+    <br>
+    <br>
+    <button type="button" class="btn btn-primary">
+        memory usage procentage:  <span class="badge badge-light">{{computer.memory_usage_procentage}}</span>
+      </button>
+    <br>
+    <br>
+    <br>
 </div>
 {% endblock %}

@@ -91,7 +91,7 @@ def main():
                     url = request.url
                     change = url.split('=')[1]
                     print(change)
-                    if change == "":
+                    if change == "" or not change.isdigit():
                         change = 5
                     change = int(change)
                     change = change * 1000
@@ -126,8 +126,7 @@ def main():
     @app.route('/')
     def index():
         return render_template('index.html')
-
-    app.run(debug=False,host='192.168.1.181')
+    app.run(debug=True,host='192.168.1.181')
 
 
 if __name__ == "__main__":
