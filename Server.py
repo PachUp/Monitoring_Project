@@ -1,11 +1,14 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
+import requests
 
 
 new_id = -1
 new_mac_address = ""
 change = 5000
+js = ""
+
 
 def main():
     app = Flask(__name__)
@@ -47,6 +50,9 @@ def main():
     if len(Todo.query.all()) >= 0:
         @app.route('/computers/<int:id>', methods=['POST', 'GET'])
         def no_one_in_db(id):
+            return render_template('get_json.html', id=id)
+            """
+            global js
             computer = Todo.query.get_or_404(id)
             if request.method == 'POST':
                 js = request.get_json()
@@ -66,7 +72,6 @@ def main():
                             if count%5 == 0:
                                 new_item = new_item + '\n'
                             count = count + 1
-                        print(new_item)
                         computer.running_processes = new_item
                         db.session.commit()
                     if name == "CPU usage procentage":
@@ -84,7 +89,12 @@ def main():
                 #print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 #print(computer.mac_address)
                 url = '/computers/' + str(id)
-                return redirect('/') # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                print(computer.cpu_usage_procentage)
+                print(js)
+                
+                # return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                #return render_template('get_json.html', json_request = js)
+                
             else:
                 try:
                     global change
@@ -101,7 +111,10 @@ def main():
                 except:
                     pass
                 print(change)
-                return render_template('show_computer_data.html', computer=computer, timer=change)
+                print(Todo.query.all())
+                # return render_template('show_computer_data.html', computer=computer, timer=change)
+                return render_template('get_json.html', json_request = js)
+                """
     @app.route('/computers/add')
     def new_computer():
         try:
@@ -114,7 +127,9 @@ def main():
         db.session.add(new_user)
         db.session.commit()
         return redirect('/computers/verify_login', code=307)
-
+    @app.route('/computers/<int:id>/live')
+    def live_info(id):
+        return render_template('damn.html')
     @app.route('/computers')
     def show_all_computers():
         print(len(Todo.query.all()))
@@ -127,7 +142,6 @@ def main():
     def index():
         return render_template('index.html')
     app.run(debug=True,host='192.168.1.181')
-
-
+    
 if __name__ == "__main__":
     main()

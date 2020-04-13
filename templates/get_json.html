@@ -1,0 +1,37 @@
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+<script>
+    
+    var myReq = new XMLHttpRequest();
+    myReq.open("POST", "http://192.168.1.181:5000/computers/2")
+    myReq.onload = function(){
+        if (myReq.readystate == 4) {
+            if (myReq.status == 200) {
+                var myData = myReq.responseXML;
+                console.log(myData);
+                alert(myData);
+            }
+        }
+    }
+    myReq.send()
+    /*
+      $(document).ready(function()
+    {
+    $.ajax({
+        method: "POST",
+        url: "/computers/{{id}}",
+        dataType: 'text',
+        async: true,
+        success: function(data){
+            //var json = $.parseJSON(data);
+            //alert(json.html);
+            console.log("Awsome!")
+            console.log(data)
+        },
+        error: function(error){
+         console.log("Error:");
+         console.log(error);
+    }
+    });
+});
+*/
+</script>

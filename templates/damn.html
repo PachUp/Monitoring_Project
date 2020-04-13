@@ -1,0 +1,14 @@
+<p id="p1">Hello World!</p>
+<script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+<script>
+$(document).ready(function(){
+  $("button").click(function(){
+    $.get("/computers/2", function(data, status){
+      alert("Data: " + data + "\nStatus: " + status);
+      console.log(data)
+      data.find("$log")
+    });
+  });
+});
+</script>
+<button>Send an HTTP GET request to a page and get the result back</button>
