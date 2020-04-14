@@ -44,28 +44,28 @@ def main():
     MemoryDetail = MemoryDetails()
     index = 0
     status_code = 200
-    page_content = ""
-    req_link = 'http://192.168.1.181:5000/computers/verify_login'
-    page = requests.get(req_link)
-    page_content = page.content.decode()
-    status_code = page.status_code
+    response_content = ""
+    address_link = 'http://192.168.1.181:5000/computers/verify_login'
+    response = requests.get(address_link)
+    response_content = response.content.decode()
+    status_code = response.status_code
     print(status_code == 200)
     print(status_code)
-    print(page_content)
+    print(response_content)
     computer_id = ""
-    send_all_req = ""
+    send_request_to = ""
     if status_code == 200:
         while computer_id == "":
-            send_all_req = "http://192.168.1.181:5000/computers/"
-            req = requests.post('http://192.168.1.181:5000/computers/verify_login', json={"MAC address: ": computer_mac_address()})
-            computer_id = req.content.decode()
+            send_request_to = "http://192.168.1.181:5000/computers/"
+            req_id = requests.post('http://192.168.1.181:5000/computers/verify_login', json={"MAC address: ": computer_mac_address()})
+            computer_id = req_id.content.decode()
             print(computer_id)
             print(type(computer_id))
             if computer_id != "":
-                send_all_req = send_all_req + str(computer_id)
-        requests.post(send_all_req, json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage()})
+                send_request_to = send_request_to + str(computer_id)
+        requests.post(send_request_to, json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ":MemoryDetail.ram_usage()})
         while True:
-            requests.post(send_all_req, json={"running processes": ProcessDetail.get_running_processes(), "CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
+            requests.post(send_request_to, json={"running processes": ProcessDetail.get_running_processes(), "CPU usage procentage": CpuDetail.cpu_utilization_procentage(), "Memory usage procentage": MemoryDetail.memory_utilization_procentage()})
 
 
 if __name__ == "__main__":

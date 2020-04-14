@@ -13,25 +13,17 @@
 {% block body%}
   
 <div id="content">
-    <div class="alert alert-primary" role="alert">
-        Welcome this is computer number {{computer.id}}.
-      </div>
-    <div class="dropdown">
-        <button class="dropbtn">Change live update timer ( min=5 )</button>
-        <div class="dropdown-content">
-            <form action="/computers/{{computer.id}}" method="GET">
-                <input name="content" id="content" type = "submit" value="5" class="button"></input>
-                <br>
-                <input name="content" id="content" type = "submit" value="6" class="button"></input>
-                <br>
-                <input name="content" id="content" type = "submit" value="7" class="button"></input>
-                <br>
-            </form>
-            <form action="/computers/{{computer.id}}" method="GET">
-                <input name="content" id="content" type="text" value="">
-            </form>
-        </div>
-      </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Dropdown button
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <button class="dropdown-item" id="5">5fff</button>
+      <a class="dropdown-item" id="6">6</a>
+      <a class="dropdown-item" id="7">7</a>
+      <input id="input" class="dropdown-item">
+    </div>
+  </div>
     <br>
     <br>
     <br>
@@ -55,8 +47,8 @@
     <br>
     <br>
     <br>
-    <p>running processes: </p>
-    <div class="scroll" id="processes">{{computer.running_processes}}</div>
+    <p class="btn btn-primary">running processes: </p>
+    <div class="scroll badge badge-light" id="processes">{{computer.running_processes}}</div>
     <br>
     <br>
     <br>
@@ -67,7 +59,7 @@
     <br>
     <br>
     <button type="button" class="btn btn-primary">
-        memory usage procentage:  <div class="badge badge-light" id="memory">{{computer.memory_usage_procentage}}</div>
+        memory usage procentage:  <span class="badge badge-light" id="memory">{{computer.memory_usage_procentage}}</span>
       </button>
     <br>
     <br>
@@ -76,19 +68,35 @@
 </div>
   </div>
 <script>
-console.log("hello");
+  /* handle dropdown value */
+var timer = 5000;
+/* handle automatic update computer info without refresh */
 $(document).ready(function(){
+      $("span").hide(200).fadeOut(500).fadeIn(800);
+      $(".dropdown-item").click(function(){
+      var id = $(this).attr('id');
+        if (id=="input"){
+          $('#' + id).keypress(function (e) {
+          var key = e.which;
+          if(key == 13) 
+            {
+              timer = $('#' + id).val()
+            }
+          });   
+        }
+      else{
+       timer = $('#' + id).html()
+      }
+  });
       setInterval(function(){
-        $.get("/computers/{{computer.id}}/live",  {"CPU usage procentage" : "{{computer.cpu_usage_procentage}}", "running processes" : "{{computer.running_processes}}", "Memory usage procentage": "{{computer.memory_usage_procentage}}"} ,function(data){
-          console.log(data.JSON) 
-          console.log(data['running processes'])
+        $.get("/computers/{{computer.id}}/live" ,function(data){
           $("#cpu").html(data['CPU usage procentage'])  
           $("#memory").html(data["Memory usage procentage"])
-          $("processes").html(data["running processes"])
-          console.log(data['CPU usage procentage'])
+          $("#processes").html(data["running processes"])
           //var jso = JSON.parse(json);
         });
-      }, 5000);
+        console.log(timer)
+      }, timer);
   });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>

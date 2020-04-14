@@ -52,11 +52,8 @@ def main():
         def no_one_in_db(id):
             global js
             computer = Todo.query.get_or_404(id)
-            return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
-                
             if request.method == 'POST':
                 js = request.get_json()
-                print(js)
                 for name, item in js.items():
                     if name == "CPU type:":
                         computer.cpu_type = item
@@ -90,7 +87,7 @@ def main():
                 #print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 #print(computer.mac_address)
                 url = '/computers/' + str(id)
-                print("POST!!!")
+                print(computer.cpu_usage_procentage)
                 return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 #return render_template('get_json.html', json_request = js)
                 
@@ -115,10 +112,8 @@ def main():
     def live_info(id):
         computer = Todo.query.get_or_404(id)
         if request.method == 'POST':
-            print(request.get_data())
             f = request.get_data
             js = request.get_json()
-            print(js)
             if js is not None:
                 for name, item in js.items():
                     if name == "running processes":
@@ -139,7 +134,6 @@ def main():
                         computer.memory_usage_procentage = item
                         db.session.commit()
             else:
-
                 cpu_usage_procentage = request.form["CPU usage procentage"]
                 memory_usage_procentage = request.form["Memory usage procentage"]
                 running_processes = request.form["running processes"]
@@ -150,11 +144,12 @@ def main():
                 computer.memory_usage_procentage = memory_usage_procentage
                 db.session.commit()
             json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
-            print(computer.cpu_usage_procentage)
+            
             return json_txt
         else:
             
             json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
+            print(computer.cpu_usage_procentage)
             return json_txt
             # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
     @app.route('/computers')
