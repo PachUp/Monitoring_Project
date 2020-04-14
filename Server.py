@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 import requests
-
+import json
 
 new_id = -1
 new_mac_address = ""
@@ -50,12 +50,13 @@ def main():
     if len(Todo.query.all()) >= 0:
         @app.route('/computers/<int:id>', methods=['POST', 'GET'])
         def no_one_in_db(id):
-            return render_template('get_json.html', id=id)
-            """
             global js
             computer = Todo.query.get_or_404(id)
+            return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                
             if request.method == 'POST':
                 js = request.get_json()
+                print(js)
                 for name, item in js.items():
                     if name == "CPU type:":
                         computer.cpu_type = item
@@ -89,32 +90,14 @@ def main():
                 #print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 #print(computer.mac_address)
                 url = '/computers/' + str(id)
-                print(computer.cpu_usage_procentage)
-                print(js)
-                
-                # return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                print("POST!!!")
+                return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 #return render_template('get_json.html', json_request = js)
                 
             else:
-                try:
-                    global change
-                    url = request.url
-                    change = url.split('=')[1]
-                    print(change)
-                    if change == "" or not change.isdigit():
-                        change = 5
-                    change = int(change)
-                    change = change * 1000
-                    if change < 5000:
-                        change = 5000
-                    change = str(change)
-                except:
-                    pass
-                print(change)
-                print(Todo.query.all())
-                # return render_template('show_computer_data.html', computer=computer, timer=change)
-                return render_template('get_json.html', json_request = js)
-                """
+                return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                
+                
     @app.route('/computers/add')
     def new_computer():
         try:
@@ -127,9 +110,53 @@ def main():
         db.session.add(new_user)
         db.session.commit()
         return redirect('/computers/verify_login', code=307)
-    @app.route('/computers/<int:id>/live')
+
+    @app.route('/computers/<int:id>/live', methods=['POST', 'GET'])
     def live_info(id):
-        return render_template('damn.html')
+        computer = Todo.query.get_or_404(id)
+        if request.method == 'POST':
+            print(request.get_data())
+            f = request.get_data
+            js = request.get_json()
+            print(js)
+            if js is not None:
+                for name, item in js.items():
+                    if name == "running processes":
+                        c_item = item.split(',')
+                        count = 0
+                        new_item = ""
+                        for i in c_item:
+                            new_item = new_item + i + "," 
+                            if count%5 == 0:
+                                new_item = new_item + ' '
+                            count = count + 1
+                        computer.running_processes = new_item
+                        db.session.commit()
+                    if name == "CPU usage procentage":
+                        computer.cpu_usage_procentage = item
+                        db.session.commit()
+                    if name == "Memory usage procentage":
+                        computer.memory_usage_procentage = item
+                        db.session.commit()
+            else:
+
+                cpu_usage_procentage = request.form["CPU usage procentage"]
+                memory_usage_procentage = request.form["Memory usage procentage"]
+                running_processes = request.form["running processes"]
+                computer.running_processes = running_processes
+                db.session.commit()
+                computer.cpu_usage_procentage = cpu_usage_procentage
+                db.session.commit()
+                computer.memory_usage_procentage = memory_usage_procentage
+                db.session.commit()
+            json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
+            print(computer.cpu_usage_procentage)
+            return json_txt
+        else:
+            
+            json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
+            return json_txt
+            # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
     @app.route('/computers')
     def show_all_computers():
         print(len(Todo.query.all()))

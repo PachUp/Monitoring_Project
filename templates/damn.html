@@ -1,14 +1,36 @@
-<p id="p1">Hello World!</p>
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
 <script>
-$(document).ready(function(){
-  $("button").click(function(){
-    $.get("/computers/2", function(data, status){
-      alert("Data: " + data + "\nStatus: " + status);
-      console.log(data)
-      data.find("$log")
-    });
-  });
+var something = '{{ jso | safe }}';
+myData = JSON.parse(something);
+console.log(myData);
+myData = JSON.stringify(myData);
+/*
+const xhr = new XMLHttpRequest();
+xhr.setRequestHeader("Content-Type", "application/json"); 
+xhr.open("POST", "1");
+xhr.send(myData)
+*/
+
+$.ajax({
+      type: "POST",
+      url: "http://192.168.1.181:5000/computers/{{computer.id}}",
+      data: myData,
+      contentType: "application/json",
+      success: function (msg) {
+            console.log('success message: ' + msg);
+      },
+      error: function (err) {
+            console.log("err: " + err)
+      }
 });
+
+ $(document).ready(function(){
+      setTimeout(function(){
+            $('#id').load("")
+        }, "{{timer}}");
+      });
+
 </script>
-<button>Send an HTTP GET request to a page and get the result back</button>
+<p>What's up</p>
