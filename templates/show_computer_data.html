@@ -14,7 +14,7 @@
   
 <div id="content">
   <div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button class="btn btn-secondary dropdown-toggle menu" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Dropdown button
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -68,34 +68,54 @@
 </div>
   </div>
 <script>
+function onlyDigits(s) {
+  for (let i = s.length - 1; i >= 0; i--) {
+    var d = s.charCodeAt(i);
+    if (d < 48 || d > 57) return false
+  }
+  return true
+}
   /* handle dropdown value */
 var timer = 5000;
 /* handle automatic update computer info without refresh */
-$(document).ready(function(){
-      $("span").hide(200).fadeOut(500).fadeIn(800);
-      $(".dropdown-item").click(function(){
-      var id = $(this).attr('id');
-        if (id=="input"){
-          $('#' + id).keypress(function (e) {
-          var key = e.which;
-          if(key == 13) 
-            {
-              timer = $('#' + id).val()
+$(".dropdown-item").click(function(){
+  var id = $(this).attr('id');
+    if (id=="input"){
+      $('#' + id).keypress(function (e) {
+      var key = e.which;
+      if(key == 13) 
+        {
+            timer = $('#' + id).val();
+            timer = timer * 1000;
+            console.log(timer);
+            if(isNaN(timer)){
+              timer = 5000;
             }
-          });   
         }
-      else{
-       timer = $('#' + id).html()
-      }
+      });   
+    }
+  else{
+    timer = $('#' + id).html()
+    timer = timer * 1000;
+    if(isNaN(timer)){
+      timer = 5000;
+    }
+  }
+});
+var get_new_data = function(){
+  $.get("/computers/{{computer.id}}/live" ,function(data){
+  $("#cpu").html(data['CPU usage procentage'])  
+  $("#memory").html(data["Memory usage procentage"])
+  $("#processes").html(data["running processes"])
+  //var jso = JSON.parse(json);
+  console.log(timer);
+  setTimeout(get_new_data, timer);
   });
-      setInterval(function(){
-        $.get("/computers/{{computer.id}}/live" ,function(data){
-          $("#cpu").html(data['CPU usage procentage'])  
-          $("#memory").html(data["Memory usage procentage"])
-          $("#processes").html(data["running processes"])
-          //var jso = JSON.parse(json);
-        });
-        console.log(timer)
+}
+$(document).ready(function(){
+  $("span").hide(200).fadeOut(500).fadeIn(800);
+      setTimeout(function(){
+          get_new_data();
       }, timer);
   });
 </script>
