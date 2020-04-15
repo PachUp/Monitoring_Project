@@ -7,18 +7,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/show_computer_data.css') }}"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 {% endblock %}
 
 {% block body%}
   
 <div id="content">
+  <div type="button" class="alert alert-primary alert-dismissible fade show" data-dismiss="alert">
+      Welcome, this is computer number <strong>{{computer.id}}</strong>.
+    </div>
+  </div>
   <div class="dropdown">
     <button class="btn btn-secondary dropdown-toggle menu" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Dropdown button
+      Choose auto refresh time (min is 5)
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <button class="dropdown-item" id="5">5fff</button>
+      <button class="dropdown-item" id="5">5</button>
       <a class="dropdown-item" id="6">6</a>
       <a class="dropdown-item" id="7">7</a>
       <input id="input" class="dropdown-item">
@@ -29,56 +34,54 @@
     <br>
     
     <div class="boxes">
-    <button type="button" class="btn btn-primary" id="box">
-        id:  <span class="badge badge-light">{{computer.id}}</span>
+      <button type="button" class="btn btn-primary" id="box">
+          id:  <span class="badge badge-light">{{computer.id}}</span>
+        </button>
+      <br>
+      <br>
+      <br>
+      <button type="button" class="btn btn-primary">
+          mac address:  <span class="badge badge-light">{{computer.mac_address}}</span>
+        </button>
+      <br>
+      <br>
+      <br>
+      <button type="button" class="btn btn-primary">
+          ram usage:  <span class="badge badge-light">{{computer.ram_usage}}</span>
+        </button>
+      <br>
+      <br>
+      <br>
+      <p class="btn btn-primary">running processes: </p>
+      <div class="scroll add-font" id="processes">{{computer.running_processes}}</div>
+      <br>
+      <br>
+      <br>
+      <button type="button" class="btn btn-primary text-nowrap" style="white-space:nowrap;">
+          cpu usage procentage:  <span class="badge badge-light live text-nowrap" id ="cpu" style="white-space:nowrap;">{{computer.cpu_usage_procentage}}</span>  
+        </button>
+      <div class="progress">
+        <div id="cpu-progress" class="progress-bar bg-danger" role="progressbar" aria-valuenow="{{computer.cpu_usage_procentage}}" aria-valuemin="0" aria-valuemax="100">{{computer.cpu_usage_procentage}}</div>
+      </div>
+      <br>
+      <br>
+      <br>
+      <button type="button" class="btn btn-primary">
+          memory usage procentage:  <span class="badge badge-light live" id="memory">{{computer.memory_usage_procentage}}</span>
       </button>
-    <br>
-    <br>
-    <br>
-    <button type="button" class="btn btn-primary">
-        mac address:  <span class="badge badge-light">{{computer.mac_address}}</span>
-      </button>
-    <br>
-    <br>
-    <br>
-    <button type="button" class="btn btn-primary">
-        ram usage:  <span class="badge badge-light">{{computer.ram_usage}}</span>
-      </button>
-    <br>
-    <br>
-    <br>
-    <p class="btn btn-primary">running processes: </p>
-    <div class="scroll badge badge-light" id="processes">{{computer.running_processes}}</div>
-    <br>
-    <br>
-    <br>
-    <button type="button" class="btn btn-primary">
-        cpu usage procentage:  <span class="badge badge-light"  id ="cpu">{{computer.cpu_usage_procentage}}</span>
-      </button>
-    <br>
-    <br>
-    <br>
-    <button type="button" class="btn btn-primary">
-        memory usage procentage:  <span class="badge badge-light" id="memory">{{computer.memory_usage_procentage}}</span>
-      </button>
-    <br>
-    <br>
-    <br>
-    <span id="log">0</span>
-</div>
+      <div class="progress">
+        <div id="memory-progress" class="progress-bar bg-danger" role="progressbar" aria-valuenow="{{computer.memory_usage_procentage}}" aria-valuemin="0" aria-valuemax="100">{{computer.memory_usage_procentage}}</div>
+      </div>
   </div>
+</div>
 <script>
-function onlyDigits(s) {
-  for (let i = s.length - 1; i >= 0; i--) {
-    var d = s.charCodeAt(i);
-    if (d < 48 || d > 57) return false
-  }
-  return true
-}
   /* handle dropdown value */
 var timer = 5000;
-/* handle automatic update computer info without refresh */
-$(".dropdown-item").click(function(){
+$(".dropdown-toggle").click(function(){
+  $("body").load("/sample/contactus");
+  $(".dropdown-item").fadeOut(1).fadeIn(2000); //animation
+});
+$(".dropdown-item").click(function(){ //make sure if I add another dropdown I need to change the class so they'll have diffrent ones if needed.
   var id = $(this).attr('id');
     if (id=="input"){
       $('#' + id).keypress(function (e) {
@@ -88,36 +91,78 @@ $(".dropdown-item").click(function(){
             timer = $('#' + id).val();
             timer = timer * 1000;
             console.log(timer);
-            if(isNaN(timer)){
+            if(isNaN(timer) || timer < 5000){
               timer = 5000;
             }
+            $('.dropdown-menu').click();
         }
       });   
     }
   else{
     timer = $('#' + id).html()
     timer = timer * 1000;
-    if(isNaN(timer)){
+    if(isNaN(timer)|| timer < 5000){
       timer = 5000;
     }
   }
 });
-var get_new_data = function(){
+  var get_new_data = function(){
   $.get("/computers/{{computer.id}}/live" ,function(data){
-  $("#cpu").html(data['CPU usage procentage'])  
-  $("#memory").html(data["Memory usage procentage"])
-  $("#processes").html(data["running processes"])
-  //var jso = JSON.parse(json);
-  console.log(timer);
-  setTimeout(get_new_data, timer);
+    var before_change = $("#cpu").html();
+    $("#cpu").text(data['CPU usage procentage'])  
+    $("#memory").html(data["Memory usage procentage"])
+    $("#processes").html(data["running processes"])
+    var cpu = data['CPU usage procentage'];
+    //var jso = JSON.parse(json);
+    var cpu_after_change = $("#cpu").html();
+    var memory_after_change = $("#memory").html();
+    if(before_change != cpu_after_change){
+      $(".live").fadeOut(200).fadeIn(200);
+      $('#cpu-progress').attr('aria-valuenow', cpu_after_change).css('width', cpu_after_change + "%").text(cpu_after_change);
+      $('#memory-progress').attr('aria-valuenow', memory_after_change).css('width', memory_after_change + "%").text(memory_after_change);
+    }
+      setTimeout(get_new_data, timer);
   });
 }
+/* handle automatic update computer info without refresh */
 $(document).ready(function(){
-  $("span").hide(200).fadeOut(500).fadeIn(800);
+  $("span").fadeOut(500).fadeIn(800); //animation
       setTimeout(function(){
-          get_new_data();
+          get_new_data(); // creating an interval with settimeout because the timer won't change with a normal interval
       }, timer);
   });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>{% endblock %}
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<style>
+.scroll {
+  background-color: #00d2ff;
+  background-image: linear-gradient(to right, #00d2ff 0%, #3a7bd5 100%);
+}
+.btn-primary{
+  font-family: 'Bebas Neue', cursive;
+}
+.badge-light{
+  font-family: 'Montserrat', sans-serif;
+
+}
+.add-font{
+  font-family: 'Montserrat', sans-serif;
+
+}
+.progress-bar{
+  color: black;
+  font-family: 'Montserrat', sans-serif;
+}
+.progress {
+  width: 500px; 
+  display: inline-block;
+}
+#memory-progress{
+  width: "{{computer.memory_usage_procentage}}%"
+}
+#cpu-progress{
+  width: "{{computer.cpu_usage_procentage}}%"
+}
+</style>
+{% endblock %}

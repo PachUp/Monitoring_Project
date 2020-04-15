@@ -44,7 +44,7 @@ def main():
                     return redirect('/computers/add')
             else:
                 print("Empty? wtf")
-        else:
+        else:   
             return ""
 
     if len(Todo.query.all()) >= 0:
