@@ -62,13 +62,17 @@ def main():
                         computer.ram_usage = item
                         db.session.commit()
                     if name == "running processes":
-                        c_item = item.split(',')
-                        count = 0
                         new_item = ""
-                        for i in c_item:
-                            new_item = new_item + i + "," 
-                            if count%5 == 0:
-                                new_item = new_item + '\n'
+                        count = 0
+                        for i in item:
+                            if count == 0:
+                                pass
+                            else:
+                                new_item = new_item + " name: " + str(i["name"]) + ", memory percent: " + str(i["memory_percent"]) + ", cpu percent: " + str(i["cpu_percent"]) + '\n'
+                                if i["cpu_percent"] > 10:
+                                    print("Bigger: ", end="")
+                                    print(i["name"], end="")
+                                    print(i["cpu_percent"])
                             count = count + 1
                         computer.running_processes = new_item
                         db.session.commit()
@@ -87,7 +91,6 @@ def main():
                 #print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 #print(computer.mac_address)
                 url = '/computers/' + str(id)
-                print(computer.cpu_usage_procentage)
                 return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 #return render_template('get_json.html', json_request = js)
                 
@@ -117,13 +120,12 @@ def main():
             if js is not None:
                 for name, item in js.items():
                     if name == "running processes":
-                        c_item = item.split(',')
-                        count = 0
                         new_item = ""
-                        for i in c_item:
-                            new_item = new_item + i + "," 
-                            if count%5 == 0:
-                                new_item = new_item + ' '
+                        count = 0
+                        for i in item:
+                            if count == 0:
+                                continue
+                            new_item = new_item + " name: " + str(i["name"]) + " memory_percent: " + str(i["memory_percent"]) + " cpu_percent: " + str(i["cpu_percent"]) 
                             count = count + 1
                         computer.running_processes = new_item
                         db.session.commit()
@@ -149,7 +151,7 @@ def main():
         else:
             
             json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
-            print(computer.cpu_usage_procentage)
+            
             return json_txt
             # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
     @app.route('/computers')
