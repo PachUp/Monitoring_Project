@@ -54,6 +54,28 @@
       <br>
       <p class="btn btn-primary">running processes: </p>
       <div class="scroll add-font" id="processes">{{computer.running_processes}}</div>
+      <table class="table table-striped table-dark">
+        <thead>
+          <tr>
+            <th scope="col">PID</th>
+            <th scope="col">Name</th>
+            <th scope="col">CPU</th>
+            <th scope="col">Memory</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set count = namespace(value=0) %}
+          {% for (s_pid, s_name, s_cpu_percent, s_memory_percent) in zip(pid, name, cpu_percent, memory_percent)%}
+          <tr>
+            <td id="task-pid{{ count.value }}">{{s_pid}}</td>
+            <td id="task-name{{ count.value }}">{{s_name}}</td>
+            <td id="task-cpu-percent{{ count.value }}">{{s_cpu_percent}}</td>
+            <td id="task-memory-percent{{ count.value }}">{{s_memory_percent}}</td>
+          </tr>
+          {% set count.value = count.value + 1 %}
+        {% endfor %}
+        </tbody>
+      </table>
       <br>
       <br>
       <br>
@@ -106,6 +128,26 @@ $(".dropdown-item").click(function(){ //make sure if I add another dropdown I ne
     }
   }
 });
+function change_progress_bar_color(cpu_after_change, memory_after_change){
+  if (cpu_after_change <= 25){
+    $('#cpu-progress').attr('aria-valuenow', cpu_after_change).attr('class', 'progress-bar bg-success').css('width', cpu_after_change + "%").text(cpu_after_change);
+  }
+  else if(cpu_after_change >= 25 && cpu_after_change <= 75){
+    $('#cpu-progress').attr('aria-valuenow', cpu_after_change).attr('class', 'progress-bar bg-warning').css('width', cpu_after_change + "%").text(cpu_after_change);
+  }
+  else{
+    $('#cpu-progress').attr('aria-valuenow', cpu_after_change).attr('class', 'progress-bar bg-danger').css('width', cpu_after_change + "%").text(cpu_after_change);
+  }
+  if (memory_after_change <= 25){
+    $('#memory-progress').attr('aria-valuenow', memory_after_change).attr('class', 'progress-bar bg-success').css('width', memory_after_change + "%").text(memory_after_change);
+    }
+    else if(memory_after_change >= 25 && memory_after_change <= 75){
+      $('#memory-progress').attr('aria-valuenow', memory_after_change).attr('class', 'progress-bar bg-warning').css('width', memory_after_change + "%").text(memory_after_change);
+    }
+  else{
+    $('#memory-progress').attr('aria-valuenow', memory_after_change).attr('class', 'progress-bar bg-danger').css('width', memory_after_change + "%").text(memory_after_change);
+  }
+}
   var get_new_data = function(){
   $.get("/computers/{{computer.id}}/live" ,function(data){
     var before_change = $("#cpu").html();
@@ -113,33 +155,31 @@ $(".dropdown-item").click(function(){ //make sure if I add another dropdown I ne
     $("#memory").html(data["Memory usage procentage"]);
     var running_proc = $("#processes").text(data["running processes"]);
     running_proc.html(running_proc.html().replace(/\n/g,'<br/>'));
-    console.log(data["running processes"]);
     var cpu = data['CPU usage procentage'];
+    var task_status_pid = data["task status pid"];
+    task_status_pid = task_status_pid.split("\n");
+    var task_status_name = data["task status name"];
+    task_status_name = task_status_name.split("\n");
+    var task_status_cpu_percent = data["task status cpu percent"];
+    task_status_cpu_percent = task_status_cpu_percent.split("\n");
+    var task_status_memory_percent = data["task status memory percent"];
+    task_status_memory_percent = task_status_memory_percent.split("\n");
+    for(var i = 0; i< task_status_pid.length; i++){
+      $("#task-pid"+i).text(task_status_pid[i]);
+      $("#task-memory-percent"+i).text(task_status_memory_percent[i]);
+      $("#task-name"+i).text(task_status_name[i]);
+      $("#task-cpu-percent"+i).text(task_status_cpu_percent[i]);
+    }
     //var jso = JSON.parse(json);
     var cpu_after_change = $("#cpu").html();
     var memory_after_change = $("#memory").html();
+    var running_programes = $("#processes").html();
+    console.log(running_programes)
     if(before_change != cpu_after_change){
         $(".live").fadeOut(200).fadeIn(200);
         cpu_after_change = parseInt(cpu_after_change);
         memory_after_change = parseInt(memory_after_change);
-        if (cpu_after_change <= 25){
-          $('#cpu-progress').attr('aria-valuenow', cpu_after_change).attr('class', 'progress-bar bg-success').css('width', cpu_after_change + "%").text(cpu_after_change);
-        }
-        else if(cpu_after_change >= 25 && cpu_after_change <= 75){
-          $('#cpu-progress').attr('aria-valuenow', cpu_after_change).attr('class', 'progress-bar bg-warning').css('width', cpu_after_change + "%").text(cpu_after_change);
-        }
-        else{
-          $('#cpu-progress').attr('aria-valuenow', cpu_after_change).attr('class', 'progress-bar bg-danger').css('width', cpu_after_change + "%").text(cpu_after_change);
-        }
-        if (memory_after_change <= 25){
-          $('#memory-progress').attr('aria-valuenow', memory_after_change).attr('class', 'progress-bar bg-success').css('width', memory_after_change + "%").text(memory_after_change);
-          }
-          else if(memory_after_change >= 25 && memory_after_change <= 75){
-            $('#memory-progress').attr('aria-valuenow', memory_after_change).attr('class', 'progress-bar bg-warning').css('width', memory_after_change + "%").text(memory_after_change);
-          }
-        else{
-          $('#memory-progress').attr('aria-valuenow', memory_after_change).attr('class', 'progress-bar bg-danger').css('width', memory_after_change + "%").text(memory_after_change);
-        }
+        change_progress_bar_color(cpu_after_change,memory_after_change);
       }
       setTimeout(get_new_data, timer);
   });
@@ -148,9 +188,11 @@ $(".dropdown-item").click(function(){ //make sure if I add another dropdown I ne
 $(document).ready(function(){
   $("span").fadeOut(500).fadeIn(800); //animation
   var running_proc = $("#processes").text($("#processes").text());
-  console.log(running_proc);
     running_proc.html(running_proc.html().replace(/\n/g,'<br/>'));
     console.log($("#processes").text());
+    var cpu_usage = $("#cpu").text();
+    var memory_usage = $("#memory").text();
+    change_progress_bar_color(cpu_usage,memory_usage);
       setTimeout(function(){
           get_new_data(); // creating an interval with settimeout because the timer won't change with a normal interval
       }, timer);

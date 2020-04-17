@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 import requests
 import json
+import itertools 
 
 new_id = -1
 new_mac_address = ""
@@ -13,7 +14,7 @@ js = ""
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users126.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users151.db'
     db = SQLAlchemy(app)
 
     class Todo(db.Model):
@@ -24,6 +25,10 @@ def main():
         running_processes = db.Column(db.TEXT)
         cpu_usage_procentage = db.Column(db.FLOAT)
         memory_usage_procentage = db.Column(db.FLOAT)
+        task_status_pid = db.Column(db.TEXT)
+        task_status_name = db.Column(db.TEXT)
+        task_status_memory_percent = db.Column(db.TEXT)
+        task_status_cpu_percent = db.Column(db.TEXT)
     db.create_all()
     print(Todo.query.all() is None)
     #verify_login
@@ -51,6 +56,7 @@ def main():
         @app.route('/computers/<int:id>', methods=['POST', 'GET'])
         def no_one_in_db(id):
             global js
+            global f
             computer = Todo.query.get_or_404(id)
             if request.method == 'POST':
                 js = request.get_json()
@@ -64,18 +70,31 @@ def main():
                     if name == "running processes":
                         new_item = ""
                         count = 0
+                        pid = ""
+                        name = ""
+                        memory_percent = ""
+                        cpu_percent = ""
+                        f = item
                         for i in item:
                             if count == 0:
                                 pass
                             else:
-                                new_item = new_item + " name: " + str(i["name"]) + ", memory percent: " + str(i["memory_percent"]) + ", cpu percent: " + str(i["cpu_percent"]) + '\n'
-                                if i["cpu_percent"] > 10:
-                                    print("Bigger: ", end="")
-                                    print(i["name"], end="")
-                                    print(i["cpu_percent"])
+                                pid = pid +  str(i["pid"]) + '\n'
+                                name = name + str(i["name"]) + '\n'
+                                memory_percent = memory_percent + str(i["memory_percent"]) + '\n'
+                                cpu_percent = cpu_percent + str(i["cpu_percent"]) + '\n'
                             count = count + 1
-                        computer.running_processes = new_item
+                        
+                        computer.task_status_pid = pid
                         db.session.commit()
+                        computer.task_status_name = name
+                        db.session.commit()
+                        computer.task_status_cpu_percent = cpu_percent
+                        db.session.commit()
+                        computer.task_status_memory_percent = memory_percent
+                        db.session.commit()
+                        # computer.running_processes = new_item
+                        # db.session.commit()
                     if name == "CPU usage procentage":
                         computer.cpu_usage_procentage = item
                         db.session.commit()
@@ -91,11 +110,25 @@ def main():
                 #print(Todo.query.filter(Todo.id).all()[0].running_processes)
                 #print(computer.mac_address)
                 url = '/computers/' + str(id)
-                return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                return "" # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 #return render_template('get_json.html', json_request = js)
-                
             else:
-                return render_template('show_computer_data.html', computer=computer, timer=5000) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                pid = computer.task_status_pid
+                pid = pid.split('\n')
+                name = computer.task_status_name 
+                name = name.split('\n')
+                cpu_percent = computer.task_status_cpu_percent
+                cpu_percent = cpu_percent.split('\n')
+                memory_percent = computer.task_status_memory_percent
+                memory_percent = memory_percent.split('\n')
+                task_status = {
+                    "pid" : pid,
+                    "name" : name,
+                    "cpu percent" : cpu_percent,
+                    "memory percent": memory_percent 
+                }
+                cnt = 0
+                return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, cnt=cnt) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                 
     @app.route('/computers/add')
@@ -139,18 +172,29 @@ def main():
                 cpu_usage_procentage = request.form["CPU usage procentage"]
                 memory_usage_procentage = request.form["Memory usage procentage"]
                 running_processes = request.form["running processes"]
+                task_status_pid = request.form["task status pid"]
+                task_status_name = request.form["task status name"]
+                task_status_cpu_percent = request.form["task status cpu percent"]
+                task_status_memory_percent = request.form["task status memory percent"]
                 computer.running_processes = running_processes
                 db.session.commit()
                 computer.cpu_usage_procentage = cpu_usage_procentage
                 db.session.commit()
                 computer.memory_usage_procentage = memory_usage_procentage
                 db.session.commit()
-            json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
-            
-            return json_txt
+                computer.task_status_pid = task_status_pid
+                db.session.commit()
+                computer.task_status_name = task_status_name
+                db.session.commit()
+                computer.task_status_cpu_percent = task_status_cpu_percent
+                db.session.commit()
+                computer.task_status_memory_percent = task_status_memory_percent
+                db.session.commit()
+                print(task_status_pid)
+                json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage, "task status pid" : task_status_pid, "task status name" : computer.task_status_name, "task status cpu percent" : computer.task_status_cpu_percent, "task status memory percent" : computer.task_status_memory_percent}
+                return json_txt
         else:
-            
-            json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
+            json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage, "task status pid" : computer.task_status_pid, "task status name" : computer.task_status_name, "task status cpu percent" : computer.task_status_cpu_percent, "task status memory percent" : computer.task_status_memory_percent}
             
             return json_txt
             # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
