@@ -53,29 +53,28 @@
       <br>
       <br>
       <p class="btn btn-primary">running processes: </p>
-      <div class="scroll add-font" id="processes">{{computer.running_processes}}</div>
-      <table class="table table-striped table-dark">
-        <thead>
-          <tr>
-            <th scope="col">PID</th>
-            <th scope="col">Name</th>
-            <th scope="col">CPU</th>
-            <th scope="col">Memory</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% set count = namespace(value=0) %}
-          {% for (s_pid, s_name, s_cpu_percent, s_memory_percent) in zip(pid, name, cpu_percent, memory_percent)%}
-          <tr>
-            <td id="task-pid{{ count.value }}">{{s_pid}}</td>
-            <td id="task-name{{ count.value }}">{{s_name}}</td>
-            <td id="task-cpu-percent{{ count.value }}">{{s_cpu_percent}}</td>
-            <td id="task-memory-percent{{ count.value }}">{{s_memory_percent}}</td>
-          </tr>
-          {% set count.value = count.value + 1 %}
-        {% endfor %}
-        </tbody>
-      </table>
+      <div class="table-wrapper-scroll-y my-custom-scrollbar">
+        <table class="table table-dark table-hover">
+          <thead>
+            <tr class="table-dark text-dark">
+              <th scope="col">PID</th>
+              <th scope="col">Name</th>
+              <th scope="col">CPU</th>
+              <th scope="col">Memory</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for (s_pid, s_name, s_cpu_percent, s_memory_percent) in zip(pid, name, cpu_percent, memory_percent)%}
+            <tr>
+              <td class="task-pid">{{s_pid}}</td>
+              <td class="task-name">{{s_name}}</td>
+              <td class="task-cpu-percent">{{s_cpu_percent}}</td>
+              <td class="task-memory-percent">{{s_memory_percent}}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
       <br>
       <br>
       <br>
@@ -153,28 +152,26 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
     var before_change = $("#cpu").html();
     $("#cpu").text(data['CPU usage procentage']);
     $("#memory").html(data["Memory usage procentage"]);
-    var running_proc = $("#processes").text(data["running processes"]);
-    running_proc.html(running_proc.html().replace(/\n/g,'<br/>'));
     var cpu = data['CPU usage procentage'];
-    var task_status_pid = data["task status pid"];
-    task_status_pid = task_status_pid.split("\n");
-    var task_status_name = data["task status name"];
-    task_status_name = task_status_name.split("\n");
-    var task_status_cpu_percent = data["task status cpu percent"];
-    task_status_cpu_percent = task_status_cpu_percent.split("\n");
-    var task_status_memory_percent = data["task status memory percent"];
-    task_status_memory_percent = task_status_memory_percent.split("\n");
+    var task_status_pid = data['pid'];
+    var task_status_name = data['name'];
+    var task_status_cpu_percent = data['cpu_percent'];
+    var task_status_memory_percent = data['memory_percent'];
+
+    const $task_pid = $(".task-pid");
+    const $task_name = $(".task-name");
+    const $task_cpu_percent = $(".task-cpu-percent");
+    const $task_memory_percent = $(".task-memory-percent");
     for(var i = 0; i< task_status_pid.length; i++){
-      $("#task-pid"+i).text(task_status_pid[i]);
-      $("#task-memory-percent"+i).text(task_status_memory_percent[i]);
-      $("#task-name"+i).text(task_status_name[i]);
-      $("#task-cpu-percent"+i).text(task_status_cpu_percent[i]);
+      $task_pid.eq(i).text(task_status_pid[i]);
+      $task_name.eq(i).text(task_status_name[i]);
+      $task_cpu_percent.eq(i).text(task_status_cpu_percent[i]);
+      $task_memory_percent.eq(i).text(task_status_memory_percent[i]);
     }
     //var jso = JSON.parse(json);
     var cpu_after_change = $("#cpu").html();
     var memory_after_change = $("#memory").html();
     var running_programes = $("#processes").html();
-    console.log(running_programes)
     if(before_change != cpu_after_change){
         $(".live").fadeOut(200).fadeIn(200);
         cpu_after_change = parseInt(cpu_after_change);
@@ -186,13 +183,10 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
 }
 /* handle automatic update computer info without refresh */
 $(document).ready(function(){
+  change_progress_bar_color(cpu_usage,memory_usage);
   $("span").fadeOut(500).fadeIn(800); //animation
-  var running_proc = $("#processes").text($("#processes").text());
-    running_proc.html(running_proc.html().replace(/\n/g,'<br/>'));
-    console.log($("#processes").text());
     var cpu_usage = $("#cpu").text();
     var memory_usage = $("#memory").text();
-    change_progress_bar_color(cpu_usage,memory_usage);
       setTimeout(function(){
           get_new_data(); // creating an interval with settimeout because the timer won't change with a normal interval
       }, timer);
@@ -230,6 +224,14 @@ $(document).ready(function(){
 }
 #cpu-progress{
   width: "{{computer.cpu_usage_procentage}}" + "%";
+}
+.my-custom-scrollbar {
+position: relative;
+height: 300px;
+overflow: auto;
+}
+.table-wrapper-scroll-y {
+display: block;
 }
 </style>
 {% endblock %}
