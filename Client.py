@@ -3,7 +3,84 @@ import psutil
 import flask_restful
 import platform
 import getmac
+from ctypes import *
 import requests
+import ctypes
+from ctypes import byref
+from ctypes import Structure, Union
+from ctypes.wintypes import *
+
+LONGLONG = ctypes.c_longlong
+HQUERY = HCOUNTER = HANDLE
+pdh = ctypes.windll.pdh
+
+
+class PDH_Counter_Union(Union):
+    _fields_ = [('longValue', LONG),
+                ('doubleValue', ctypes.c_double),
+                ('largeValue', LONGLONG),
+                ('AnsiStringValue', LPCSTR),
+                ('WideStringValue', LPCWSTR)
+                ]
+
+
+class PDH_FMT_COUNTERVALUE(Structure):
+    _fields_ = [('CStatus', DWORD),
+                ('union', PDH_Counter_Union)]
+
+
+g_cpu_usage = 0
+
+class QueryCPUUsageThread:
+    def __init__(self):
+        super(QueryCPUUsageThread, self).__init__()
+        self.hQuery = HQUERY()
+        self.hCounter = HCOUNTER()
+        pdh.PdhOpenQueryW(None,
+                          0,
+                          byref(self.hQuery))
+        pdh.PdhAddCounterW(self.hQuery,
+                           u'''\\Processor(_Total)\\% Processor Time''',
+                           0,
+                           byref(self.hCounter))
+
+    def getCPUUsage(self):
+        long_dt = 0x00000100 #because long is 4bytes
+        pdh.PdhCollectQueryData(self.hQuery)
+        ctypes.windll.kernel32.Sleep(1000)
+        pdh.PdhCollectQueryData(self.hQuery)
+
+        counter_type = DWORD(0)
+        value = PDH_FMT_COUNTERVALUE()
+        pdh.PdhGetFormattedCounterValue(self.hCounter,
+                                        long_dt,
+                                        byref(counter_type),
+                                        byref(value))
+
+        return value.union.longValue
+
+    def run(self):
+        global g_cpu_usage
+        g_cpu_usage = self.getCPUUsage()
+        return g_cpu_usage
+
+class MEMORYSTATUSEX(Structure):
+    _fields_ = [
+        ("dwLength", c_ulong),
+        ("dwMemoryLoad", c_ulong),
+        ("ullTotalPhys", c_ulonglong),
+        ("ullAvailPhys", c_ulonglong),
+        ("ullTotalPageFile", c_ulonglong),
+        ("ullAvailPageFile", c_ulonglong),
+        ("ullTotalVirtual", c_ulonglong),
+        ("ullAvailVirtual", c_ulonglong),
+        ("sullAvailExtendedVirtual", c_ulonglong),
+    ]
+
+    def __init__(self):
+        self.dwLength = sizeof(self)  # איתחול dwLength אחרת זה לא עובד טוב
+        super().__init__()
+
 
 
 class CpuDetails:
@@ -11,7 +88,8 @@ class CpuDetails:
         pass
 
     def cpu_utilization_procentage(self):
-        return psutil.cpu_percent(interval=5)
+        f = QueryCPUUsageThread()
+        return f.run()
 
     def cpu_type(self):
         return platform.processor()
@@ -25,7 +103,10 @@ class MemoryDetails:
         return psutil.virtual_memory().used / 1000000000
 
     def memory_utilization_procentage(self):
-        return psutil.virtual_memory()[2]
+        stat = MEMORYSTATUSEX()
+        windll.kernel32.GlobalMemoryStatusEx(byref(stat))
+        return stat.dwMemoryLoad
+        # return psutil.virtual_memory()[2]
 
 
 class ProcessDetails:
