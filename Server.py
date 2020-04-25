@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user
 import requests
 import json
 import itertools 
@@ -14,9 +15,11 @@ js = ""
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users151.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users160.db'
+    app.config['SECRET_KEY'] = "thisistopsecret"
     db = SQLAlchemy(app)
-
+    login_manager = LoginManager()
+    login_manager.init_app(app)
     class Todo(db.Model):
         id = db.Column(db.Integer, primary_key=True)
         mac_address = db.Column(db.TEXT)
@@ -25,12 +28,39 @@ def main():
         running_processes = db.Column(db.TEXT)
         cpu_usage_procentage = db.Column(db.FLOAT)
         memory_usage_procentage = db.Column(db.FLOAT)
-        task_status_pid = db.Column(db.TEXT)
-        task_status_name = db.Column(db.TEXT)
-        task_status_memory_percent = db.Column(db.TEXT)
-        task_status_cpu_percent = db.Column(db.TEXT)
+    class users(db.Model, UserMixin):
+        id = db.Column(db.Integer, primary_key=True)
+        username = db.Column(db.TEXT, unique=True)
+        password = db.Column(db.TEXT)
+        email = db.Column(db.TEXT)
+        level = db.Column(db.INTEGER) #level 1 - regular employee, level 2 - Team leader, level 3 - Manager
     db.create_all()
-    print(Todo.query.all() is None)
+    
+
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return users.query.get(int(user_id))
+
+    @app.route('/login', methods=['POST', 'GET'])
+    def login():
+        if request.method == "POST":
+            username = request.form['username']
+            password = request.form['password']
+            user_exists = bool(users.query.filter_by(username=username,password=password).first())
+            print(user_exists)
+            if user_exists:
+                user = users.query.filter_by(username=username,password=password)
+                login_user(user)
+                return "valid"
+            else:
+                print("invalid")
+                return "Not valid"
+        if request.method == "GET":
+            return render_template('/login.html')
+
+
+
     #verify_login
     @app.route('/computers/verify_login', methods=['POST', 'GET'])
     def check_if_user_exists():
@@ -167,22 +197,7 @@ def main():
                         computer.memory_usage_procentage = item
                         db.session.commit()
             else:
-                cpu_usage_procentage = request.form["CPU usage procentage"]
-                memory_usage_procentage = request.form["Memory usage procentage"]
-                running_processes = request.form["running processes"]
-                task_status_pid = request.form["task status pid"]
-                task_status_name = request.form["task status name"]
-                task_status_cpu_percent = request.form["task status cpu percent"]
-                task_status_memory_percent = request.form["task status memory percent"]
-                computer.running_processes = running_processes
-                db.session.commit()
-                print(task_status_pid)
-                pid = running_processes["task status pid"]
-                name = running_processes["task status name"]
-                cpu_percent = running_processes["task status cpu percent"]
-                memory_percent = running_processes["task status memory percent"]
-                print(pid)
-                json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage, "task status pid" : task_status_pid, "task status name" : computer.task_status_name, "task status cpu percent" : computer.task_status_cpu_percent, "task status memory percent" : computer.task_status_memory_percent}
+                json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
                 return json_txt
         else:
             running_processes = computer.running_processes
