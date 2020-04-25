@@ -47,15 +47,16 @@ def main():
         if request.method == "POST":
             username = request.form['username']
             password = request.form['password']
-            user_exists = bool(users.query.filter_by(username=username,password=password).first())
-            print(user_exists)
-            if user_exists:
-                user = users.query.filter_by(username=username,password=password)
-                login_user(user)
-                return "valid"
+            print(username)
+            send = ""
+            user_check = bool(users.query.filter_by(username=username).first())
+            pass_check = bool(users.query.filter_by(password=password).first())
+            if user_check and not pass_check:
+                return "password"
+            elif not user_check:
+                return "username"
             else:
-                print("invalid")
-                return "Not valid"
+                return "Great"
         if request.method == "GET":
             return render_template('/login.html')
 
