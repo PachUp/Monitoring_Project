@@ -10,7 +10,7 @@
                 <div id="login-column" class="col-md-6">
                     <div id="login-box" class="col-md-12">
                         <form id="login-form" action="">
-                            <h3 class="text-center text-info">Login</h3>
+                            <h3 class="text-center text-info">Register</h3>
                             <div class="form-group">
                                 <label for="username" class="text-info glyphicon glyphicon-user">Username:</label><br>
                                 <input type="text" name="username" id="username" class="form-control">
@@ -22,9 +22,11 @@
                                 <p id="pass-wrong"></p>
                             </div>
                             <div class="form-group">
+                                <label for="email" class="text-info">Email:</label><br>
+                                <input type="text" name="email" id="email" class="form-control">
+                                <p id="email-wrong"></p>
                             </div>
-                            <div id="register-link" class="text-right">
-                                <a href="/register" class="text-info">Register here</a>
+                            <div class="form-group">
                             </div>
                         </form>
                         <input type="submit" name="submit" class="btn btn-info btn-md" id="button-id" value="submit">
@@ -46,12 +48,12 @@ body {
 #login .container #login-row #login-column #login-box {
   margin-top: 120px;
   max-width: 600px;
-  height: 320px;
+  height: 420px;
   border: 1px solid #9C9C9C;
   background-color: #EAEAEA;
 }
 #button-id{
-    margin-top: -43px;
+    margin-left: 220px;
 }
 </style>
 <script>
@@ -61,17 +63,17 @@ body {
             console.log(data);
             $.ajax({
                 type: "POST",
-                url: 'login',
+                url: 'register',
                 data: data,
                 success: function(res){
                     if(res=="username"){
                         $("#user-wrong").html("<div class = 'alert-danger'> Wrong username</div>");
                     } 
-                    else if(res=="password"){
-                        $("#pass-wrong").html("<div class = 'alert-danger'> Wrong password</div>");
+                    else if(res=="email"){
+                        $("#email-wrong").html("<div class = 'alert-danger'> the email is already used or not a valid email</div>");
                     }
                     else{
-                        $("#pass-wrong").html("great");
+                        $("#email-wrong").html("great");
                         $("#user-wrong").html("great");
                     }
                 }

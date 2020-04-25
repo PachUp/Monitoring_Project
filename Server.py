@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user
+from flask_login import LoginManager, UserMixin, login_user, login_required, current_user
 import requests
 import json
 import itertools 
@@ -48,6 +48,7 @@ def main():
             username = request.form['username']
             password = request.form['password']
             print(username)
+            print(users.query.all())
             send = ""
             user_check = bool(users.query.filter_by(username=username).first())
             pass_check = bool(users.query.filter_by(password=password).first())
@@ -56,11 +57,39 @@ def main():
             elif not user_check:
                 return "username"
             else:
+                user = users.query.filter_by(username=username,password=password).first()
+                login_user(user)
                 return "Great"
+                
         if request.method == "GET":
             return render_template('/login.html')
 
-
+    @app.route('/register', methods=['POST', 'GET'])
+    def register():
+        if request.method == "POST":
+            username = request.form['username']
+            password = request.form['password']
+            email = request.form['email']
+            print(username)
+            send = ""
+            user_check = bool(users.query.filter_by(username=username).first())
+            email_check = bool(users.query.filter_by(email=email).first())
+            if email_check or "@gmail.com" not in email:
+                return "email"
+            elif user_check:
+                return "username"
+            else:
+                if len(users.query.all()) == 0:
+                    new_user = users(username = username, password=password, email=email, level=3)
+                    db.session.add(new_user)
+                    db.session.commit()
+                else:
+                    new_user = users(username = username, password=password, email=email, level=1)
+                    db.session.add(new_user)
+                    db.session.commit()
+                return redirect('/')
+        if request.method == "GET":
+            return render_template('/register.html')
 
     #verify_login
     @app.route('/computers/verify_login', methods=['POST', 'GET'])
@@ -212,7 +241,9 @@ def main():
             return json_txt
             # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
     @app.route('/computers')
+    @login_required
     def show_all_computers():
+        print(current_user.is_authenticated)
         print(len(Todo.query.all()))
         all_computers_on_the_server = []
         for i in range(len(Todo.query.all())):
