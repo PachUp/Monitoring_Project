@@ -15,7 +15,7 @@ js = ""
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users160.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users180.db'
     app.config['SECRET_KEY'] = "thisistopsecret"
     db = SQLAlchemy(app)
     login_manager = LoginManager()
@@ -28,6 +28,7 @@ def main():
         running_processes = db.Column(db.TEXT)
         cpu_usage_procentage = db.Column(db.FLOAT)
         memory_usage_procentage = db.Column(db.FLOAT)
+        user_id = db.Column(db.Integer, primary_key=True)
     class users(db.Model, UserMixin):
         id = db.Column(db.Integer, primary_key=True)
         username = db.Column(db.TEXT, unique=True)
@@ -246,6 +247,16 @@ def main():
             
             return json_txt
             # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
+
+    @app.route("/admin", methods=['POST', 'GET'])
+    def admin_panel():
+        if request.method == 'GET':
+            if current_user.level == 3:
+                return render_template("admin_panel.html")
+            else:
+                return redirect('/')
+
+
     @app.route('/computers')
     @login_required
     def show_all_computers():
@@ -265,7 +276,7 @@ def main():
     @app.route('/')
     @login_required
     def index():
-        return render_template('index.html', user=current_user.username)
+        return render_template('index.html', user=current_user.username, level = current_user.level)
     app.run(debug=True,host='192.168.1.181')
     
 if __name__ == "__main__":
