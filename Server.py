@@ -248,42 +248,57 @@ def main():
             return json_txt
             # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
 
-    @app.route("/admin", methods=['POST', 'GET'])
+    @app.route("/admin", methods=['GET', 'POST'])
     def admin_panel():
-        print(users.query.all()[0].computer_id)
+        if request.method == "POST":
+            return redirect("/admin")
+        if request.method == 'GET':
+            if current_user.level == 3:
+                users_username = []
+                computer_client_id = []
+                computers_mac = []
+                assigned_values = []
+                for i in range(0,len(users.query.all())):
+                    users_username.append(users.query.all()[i].username)
+                    if users.query.all()[i].computer_id == -1:
+                        assigned_values.append("None")
+                    else:
+                        assigned_values.append(users.query.all()[i].computer_id)
+                for i in range(0, len(Todo.query.all())):
+                    computer_client_id.append(Todo.query.all()[i].id)
+                    computers_mac.append(Todo.query.all()[i].mac_address)
+                return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, computers_mac=computers_mac, assigned_values=assigned_values ,zip=itertools.zip_longest)
+            else:
+                return redirect('/')
+
+
+    @app.route("/admin/data", methods=['POST'])
+    @login_required
+    def admin_data():
         if request.method == "POST":
             try:
                 assign_value = -1
                 user = ""
+                print("Hi!")
+                all_assign_values = []
                 for i in range(0,len(users.query.all())):
                     try:
                         assign_value = request.form[users.query.all()[i].username]
                         user = users.query.all()[i].username
                     except:
                         pass
+                for i in range(0,len(users.query.all())):
+                    all_assign_values.append(users.query.all()[i].computer_id)
                 try:
                     assign_value = int(assign_value)
                 except:
                     return "failed"
                 users.query.filter_by(username = user).update(dict(computer_id = assign_value))
                 db.session.commit()
-                print(users.query.all()[0].computer_id)
-                return "success"
+                print(all_assign_values)
+                return {"Values" : all_assign_values}
             except:
                 return "failed"
-        if request.method == 'GET':
-            if current_user.level == 3:
-                users_username = []
-                computer_client_id = []
-                computers_mac = []
-                for i in range(0,len(users.query.all())):
-                    users_username.append(users.query.all()[i].username)
-                for i in range(0, len(Todo.query.all())):
-                    computer_client_id.append(Todo.query.all()[i].id)
-                    computers_mac.append(Todo.query.all()[i].mac_address)
-                return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, computers_mac=computers_mac, zip=itertools.zip_longest)
-            else:
-                return redirect('/')
 
 
     @app.route('/computers')

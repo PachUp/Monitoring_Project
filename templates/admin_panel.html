@@ -13,22 +13,25 @@
       <tr>
         <th scope="col">computer id</th>
         <th scope="col">username</th>
+        <th scope="col">Assigned computer id</th>
         <th scope="col">Assign</th>
         <th scope="col">status</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        {% for(username, client_id, computer_mac) in zip(users_username, computer_client_id, computers_mac) %}
-            <form action="">
+        {% for(username, client_id, computer_mac, assign_value) in zip(users_username, computer_client_id, computers_mac, assigned_values) %}
+            <form action="" method="POST">
                 <td>
                 computer number: 
                 <select class="custom-select" name={{username}}>
-                <option value={{client_id}} name={{client_id}}>{{client_id}}</option>
+                <option value={{client_id}} name={{client_id}} >{{client_id}}</option>
                 <option value="-1" name="-1">None</option>
+                <option hidden selected>{{assign_value}}</option>
                 </select>
                 </td>
                 <td>{{username}} ({{computer_mac}})</td>
+                <td class="assigned_values">{{assign_value}}</td>
                 <td>
                     <input type="submit" class="btn btn-danger btn-md a" id="button-id" value="submit">
                 </td>   
@@ -53,16 +56,29 @@ $(document).ready(function(){
             console.log(data);
             $.ajax({
                 type: "POST",
-                url: 'admin',
+                url: 'admin/data',
                 data: data,
+                beforeSend: function(){
+                    $("#status").html("<div class = 'alert-info'>Loading...</div>");
+                    $(".assigned_values").text("Loading..");
+                },
                 success: function(res){
-                    if(res == "success"){
-                        $("#status").html("<div class = 'alert-success'>Success</div>")
+                    console.log(res)
+                    res = res["Values"]
+                    if(res != "failed"){
+                        const $assigned_values = $(".assigned_values");
+                        $("#status").html("<div class = 'alert-success'>Success</div>");
+                        for(var i = 0; i< res.length; i++){
+                            $assigned_values.eq(i).text(res[i]);
+                        }
+
+                        console.log("Awsome!")
                     }
                     else{
-                        $("#status").html("<div class = 'alert-success'>Failed</div>")
+                        console.log(res)
+                        $("#status").html("<div class = 'alert-success'>Failed</div>");
+                        console.log("Failed!")
                     }
-                    location.reload();
                 }
             });
         });
