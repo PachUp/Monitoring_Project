@@ -67,7 +67,7 @@ body {
                 data: data,
                 success: function(res){
                     if(res=="username"){
-                        $("#user-wrong").html("<div class = 'alert-danger'> Wrong username</div>");
+                        $("#user-wrong").html("<div class = 'alert-danger'>the username is already used</div>");
                     } 
                     else if(res=="email"){
                         $("#email-wrong").html("<div class = 'alert-danger'> the email is already used or not a valid email</div>");
@@ -75,6 +75,7 @@ body {
                     else{
                         $("#email-wrong").html("great");
                         $("#user-wrong").html("great");
+                        $(location).attr("href", "http://192.168.1.181:5000/login")
                     }
                 }
             });

@@ -3,14 +3,22 @@
 {% block head%}
 <title> Main Page </title>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}"/>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 {% endblock %}
 
 
 {% block body%}
-<h1 class = "title"> Hello manager!</h1>
+<h1 class = "title"> Hello! you are logged in as {{user}}</h1>
 <p>Welcome!</p>
 <p>This is the main page</p>
 <p>Click the link!</p>
 <div class = "computers_link"> <a href="http://192.168.1.181:5000/computers">Click me to view all the signed computers</a></div>
-
+<form action="/logout">
+<div class = "computers_link">
+    <input type="submit" name="submit" class="btn btn-info btn-md " id="" value="logout">
+</div>
+<br>
+</form>
+</style>
 {% endblock %}

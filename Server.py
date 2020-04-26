@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify
 from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, current_user
+from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 import requests
 import json
 import itertools 
@@ -62,7 +62,10 @@ def main():
                 return "Great"
                 
         if request.method == "GET":
-            return render_template('/login.html')
+            if current_user.is_authenticated:
+                return redirect('/')
+            else:
+                return render_template('/login.html')
 
     @app.route('/register', methods=['POST', 'GET'])
     def register():
@@ -89,7 +92,10 @@ def main():
                     db.session.commit()
                 return redirect('/')
         if request.method == "GET":
-            return render_template('/register.html')
+            if current_user.is_authenticated:
+                return redirect('/')
+            else:
+                return render_template('/register.html')
 
     #verify_login
     @app.route('/computers/verify_login', methods=['POST', 'GET'])
@@ -243,16 +249,23 @@ def main():
     @app.route('/computers')
     @login_required
     def show_all_computers():
-        print(current_user.is_authenticated)
         print(len(Todo.query.all()))
         all_computers_on_the_server = []
         for i in range(len(Todo.query.all())):
             all_computers_on_the_server.append(Todo.query.all()[i].id)
         print(all_computers_on_the_server)
         return render_template('show_all_computers.html', computer_list =all_computers_on_the_server)
+    @app.route('/logout')
+    def logout():
+        logout_user()
+        return redirect('/login')
+    @app.errorhandler(401) 
+    def invalid_route(e): 
+        return redirect('/login')
     @app.route('/')
+    @login_required
     def index():
-        return render_template('index.html')
+        return render_template('index.html', user=current_user.username)
     app.run(debug=True,host='192.168.1.181')
     
 if __name__ == "__main__":
