@@ -15,7 +15,7 @@ js = ""
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users180.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users1989.db'
     app.config['SECRET_KEY'] = "thisistopsecret"
     db = SQLAlchemy(app)
     login_manager = LoginManager()
@@ -28,13 +28,13 @@ def main():
         running_processes = db.Column(db.TEXT)
         cpu_usage_procentage = db.Column(db.FLOAT)
         memory_usage_procentage = db.Column(db.FLOAT)
-        user_id = db.Column(db.Integer, primary_key=True)
     class users(db.Model, UserMixin):
         id = db.Column(db.Integer, primary_key=True)
         username = db.Column(db.TEXT, unique=True)
         password = db.Column(db.TEXT)
         email = db.Column(db.TEXT)
         level = db.Column(db.INTEGER) #level 1 - regular employee, level 2 - Team leader, level 3 - Manager
+        computer_id = db.Column(db.Integer, default=-1)
     db.create_all()
     
 
@@ -250,9 +250,38 @@ def main():
 
     @app.route("/admin", methods=['POST', 'GET'])
     def admin_panel():
+        print(users.query.all()[0].computer_id)
+        if request.method == "POST":
+            try:
+                assign_value = -1
+                user = ""
+                for i in range(0,len(users.query.all())):
+                    try:
+                        assign_value = request.form[users.query.all()[i].username]
+                        user = users.query.all()[i].username
+                    except:
+                        pass
+                try:
+                    assign_value = int(assign_value)
+                except:
+                    return "failed"
+                users.query.filter_by(username = user).update(dict(computer_id = assign_value))
+                db.session.commit()
+                print(users.query.all()[0].computer_id)
+                return "success"
+            except:
+                return "failed"
         if request.method == 'GET':
             if current_user.level == 3:
-                return render_template("admin_panel.html")
+                users_username = []
+                computer_client_id = []
+                computers_mac = []
+                for i in range(0,len(users.query.all())):
+                    users_username.append(users.query.all()[i].username)
+                for i in range(0, len(Todo.query.all())):
+                    computer_client_id.append(Todo.query.all()[i].id)
+                    computers_mac.append(Todo.query.all()[i].mac_address)
+                return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, computers_mac=computers_mac, zip=itertools.zip_longest)
             else:
                 return redirect('/')
 

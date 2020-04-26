@@ -4,11 +4,70 @@
 {% block head%}
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 {% endblock %}
 
 {% block body%}
+<table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">computer id</th>
+        <th scope="col">username</th>
+        <th scope="col">Assign</th>
+        <th scope="col">status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        {% for(username, client_id, computer_mac) in zip(users_username, computer_client_id, computers_mac) %}
+            <form action="">
+                <td>
+                computer number: 
+                <select class="custom-select" name={{username}}>
+                <option value={{client_id}} name={{client_id}}>{{client_id}}</option>
+                <option value="-1" name="-1">None</option>
+                </select>
+                </td>
+                <td>{{username}} ({{computer_mac}})</td>
+                <td>
+                    <input type="submit" class="btn btn-danger btn-md a" id="button-id" value="submit">
+                </td>   
+                <td>
+                    <div id="status"></div>
+                </td>
+            </form>
+       </tr>
+        {% endfor %}
+    </tbody>
+  </table>
 
-
+<style>
+    .custom-select{
+        width: 80px;
+    }
+</style>
+<script>
+$(document).ready(function(){
+        $("#button-id").click(function(){
+            var data = $("form").serialize();
+            console.log(data);
+            $.ajax({
+                type: "POST",
+                url: 'admin',
+                data: data,
+                success: function(res){
+                    if(res == "success"){
+                        $("#status").html("<div class = 'alert-success'>Success</div>")
+                    }
+                    else{
+                        $("#status").html("<div class = 'alert-success'>Failed</div>")
+                    }
+                    location.reload();
+                }
+            });
+        });
+    });
+</script>
 
 
 {% endblock %}
