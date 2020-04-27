@@ -21,6 +21,7 @@
     <tbody>
         {% for(username, assign_value) in zip(users_username, assigned_values) %}
         <tr>
+        <form method="POST">
                 <td>
                 computer number: 
                 <select class="custom-select" name={{username}}>
@@ -31,7 +32,7 @@
                 <option hidden selected class="va">{{assign_value}}</option>
                 </select>
                 </td>
-                <td class = "username">{{username}}</td>
+                <td>{{username}}</td>
                 <td class="assigned_values">{{assign_value}}</td>
                 <td>
                     <input type="submit" class="btn btn-danger btn-md button-class" value="submit" formaction="">
@@ -39,6 +40,7 @@
                 <td>
                     <div class="status"></div>
                 </td>     
+            </form>
        </tr>
        {% endfor %}
     </tbody>
@@ -51,21 +53,28 @@
 </style>
 <script>
 $(document).ready(function(){
-        $(".button-class").click(function(){
             var currentIndex = $('.button-class').index(this);
-            var computer_number = $('.custom-select').eq(currentIndex).val()
-            var username = $('.custom-select').eq(currentIndex).attr("name")
-            var data = username + "=" + computer_number;
-            console.log(data)
+            var data = $("form").serialize();
+            try{
+                data = data.split('&');
+                data = data[currentIndex]
+            }
+            catch(err){
+                data = ""
+            }
             $.ajax({
                 type: "POST",
                 url: 'admin-panel/data',
                 data: data,
+                beforeSend: function(){
+                    $(".status").eq(currentIndex).html("<div class = 'alert-info'>Loading...</div>");
+                    $(".assigned_values").text("Loading..");
+                },
                 success: function(res){
                     console.log(res);
                     res = res["Values"]
                     console.log(typeof(res));
-                    if(res != "failed"){
+                    if(Array.isArray(res)){
                         const $assigned_values = $(".assigned_values");
                         $(".status").eq(currentIndex).html("<div class = 'alert-success'>Success</div>");
                         for(var i = 0; i< res.length; i++){
@@ -83,7 +92,6 @@ $(document).ready(function(){
                 }
             });
         });
-    });
 </script>
 
 

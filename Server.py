@@ -5,6 +5,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, cur
 import requests
 import json
 import itertools 
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
 
 new_id = -1
 new_mac_address = ""
@@ -18,6 +20,7 @@ def main():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users1989.db'
     app.config['SECRET_KEY'] = "thisistopsecret"
     db = SQLAlchemy(app)
+    admin = Admin(app,url="/admindb")
     login_manager = LoginManager()
     login_manager.init_app(app)
     class Todo(db.Model):
@@ -28,13 +31,15 @@ def main():
         running_processes = db.Column(db.TEXT)
         cpu_usage_procentage = db.Column(db.FLOAT)
         memory_usage_procentage = db.Column(db.FLOAT)
+    admin.add_view(ModelView(Todo, db.session))
     class users(db.Model, UserMixin):
         id = db.Column(db.Integer, primary_key=True)
         username = db.Column(db.TEXT, unique=True)
         password = db.Column(db.TEXT)
         email = db.Column(db.TEXT)
         level = db.Column(db.INTEGER) #level 1 - regular employee, level 2 - Team leader, level 3 - Manager
-        computer_id = db.Column(db.Integer, default=-1)
+        computer_id = db.Column(db.Integer, default=-1) 
+    admin.add_view(ModelView(users, db.session))
     db.create_all()
     
 
@@ -248,61 +253,82 @@ def main():
             return json_txt
             # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
 
-    @app.route("/admin", methods=['GET', 'POST'])
+
+    def get_admin_panel_data():
+        users_username = []
+        computer_client_id = []
+        computers_mac = []
+        assigned_values = []
+        for i in range(0,len(users.query.all())):
+            users_username.append(users.query.all()[i].username)
+            if users.query.all()[i].computer_id == -1:
+                assigned_values.append("None")
+            else:
+                assigned_values.append(users.query.all()[i].computer_id)
+        for i in range(0, len(Todo.query.all())):
+            computer_client_id.append(Todo.query.all()[i].id)
+            computers_mac.append(Todo.query.all()[i].mac_address)
+        return users_username, computer_client_id, assigned_values
+    
+    @app.route("/admin-panel", methods=['GET', 'POST'])
+    @login_required
     def admin_panel():
         if request.method == "POST":
-            return redirect("/admin")
+            return redirect("/admin-panel/data", code=307)
         if request.method == 'GET':
             if current_user.level == 3:
-                users_username = []
-                computer_client_id = []
-                computers_mac = []
-                assigned_values = []
-                for i in range(0,len(users.query.all())):
-                    users_username.append(users.query.all()[i].username)
-                    if users.query.all()[i].computer_id == -1:
-                        assigned_values.append("None")
-                    else:
-                        assigned_values.append(users.query.all()[i].computer_id)
-                for i in range(0, len(Todo.query.all())):
-                    computer_client_id.append(Todo.query.all()[i].id)
-                    computers_mac.append(Todo.query.all()[i].mac_address)
-                return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, computers_mac=computers_mac, assigned_values=assigned_values ,zip=itertools.zip_longest)
+                users_username, computer_client_id, assigned_values = get_admin_panel_data()
+                return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values ,zip=itertools.zip_longest)
             else:
                 return redirect('/')
 
 
-    @app.route("/admin/data", methods=['POST'])
+    @app.route("/admin-panel/data", methods=['POST'])
     @login_required
     def admin_data():
         if request.method == "POST":
             try:
                 assign_value = -1
                 user = ""
-                print("Hi!")
                 all_assign_values = []
-                for i in range(0,len(users.query.all())):
-                    try:
-                        assign_value = request.form[users.query.all()[i].username]
-                        user = users.query.all()[i].username
-                    except:
-                        pass
-                for i in range(0,len(users.query.all())):
-                    all_assign_values.append(users.query.all()[i].computer_id)
+                print(request.get_data())
+                data = request.get_data().decode()
+                try:
+                    user = data.split("=")[0]
+                    assign_value = data.split("=")[1]
+                except:
+                    return {"Values" : "failed"}
+                print(user)
+                print(assign_value)
                 try:
                     assign_value = int(assign_value)
+                    user = str(user)
                 except:
-                    return "failed"
+                    return {"Values" : "failed"}
+                user_found = False
+                if assign_value != -1:
+                    for j in range(0,len(users.query.all())):
+                        print(users.query.all()[j].username)
+                        if user == users.query.all()[j].username:
+                            user_found = True
+                        if assign_value == users.query.all()[j].computer_id:
+                            return {"Values" : "failed"}
+                if user_found == False and assign_value != -1:
+                    return {"Values" : "failed"}
                 users.query.filter_by(username = user).update(dict(computer_id = assign_value))
                 db.session.commit()
+                for i in range(0,len(users.query.all())):
+                    if users.query.all()[i].computer_id == -1:
+                        all_assign_values.append("None")
+                    else:
+                        all_assign_values.append(users.query.all()[i].computer_id)
                 print(all_assign_values)
                 return {"Values" : all_assign_values}
             except:
-                return "failed"
+                return {"Values" : "failed"}
 
 
     @app.route('/computers')
-    @login_required
     def show_all_computers():
         print(len(Todo.query.all()))
         all_computers_on_the_server = []
@@ -314,13 +340,18 @@ def main():
     def logout():
         logout_user()
         return redirect('/login')
-    @app.errorhandler(401) 
-    def invalid_route(e): 
-        return redirect('/login')
     @app.route('/')
     @login_required
     def index():
-        return render_template('index.html', user=current_user.username, level = current_user.level)
+        return render_template('index.html', user=current_user.username, level = int(current_user.level))
+
+    # err handles
+    @app.errorhandler(401) 
+    def invalid_route(somearg): 
+        return redirect('/login')
+    @app.errorhandler(404)
+    def not_found_route(somearg):
+        return redirect('/login')
     app.run(debug=True,host='192.168.1.181')
     
 if __name__ == "__main__":
