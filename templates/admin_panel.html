@@ -2,9 +2,14 @@
 
 
 {% block head%}
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
+
 {% endblock %}
 
 {% block body%}
@@ -13,6 +18,7 @@
       <tr>
         <th scope="col">computer id</th>
         <th scope="col">level</th>
+        <th scope="col">Allow to view</th>
         <th scope="col">username</th>
         <th scope="col">Assigned computer id</th>
         <th scope="col">Assigned level</th>
@@ -41,9 +47,20 @@
                         <option value={{level}} name={{level}} hidden selected>{{level}}</option>
                     </select>
                 </td>
+                {% if level == 2 %}
+                <td>
+                    <select class="selectpicker multiple-choice" multiple data-live-search="true">
+                        {% for client_id in  computer_client_id%}
+                            <option>{{client_id}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                {% else %}
+                <td class="level-2-none">None</td>
+                {% endif%}
                 <td class = "username">{{username}}</td>
                 <td class="assigned_values">{{assign_value}}</td>
-                <td class="assigned_level">{{level}}</td>
+                <td class="assigned_levels">{{level}}</td>
                 <td>
                     <input type="submit" class="btn btn-danger btn-md button-class" value="submit" formaction="">
                 </td>   
@@ -69,28 +86,57 @@ $(document).ready(function(){
             var currentIndex = $('.button-class').index(this);
             var computer_number = $('.computer-number').eq(currentIndex).val()
             var level_number = $('.level-number').eq(currentIndex).val()
-            console.log(level_number)
+            allow_to_view_minus = 0;
+            for(var i = 0; i<$('.level-number').length; i++){
+                if (parseInt($('.level-number').eq(i).val()) != 2){
+                    allow_to_view_minus = allow_to_view_minus + 1;
+                }
+            } // finding how many people are level 2
+            console.log(allow_to_view_minus)
+            var allow_to_view = $("select.multiple-choice").eq(parseInt(currentIndex)- allow_to_view_minus).val()
+            console.log(allow_to_view)
             var username = $('.computer-number').eq(currentIndex).attr("name")
-            var data = username + "=" + computer_number + "&" + level_number;
+            if(allow_to_view != null || allow_to_view==""){
+                var data = username + "=" + computer_number + "&" + level_number + "&";
+                for(var i =0; i<allow_to_view.length; i++){
+                    if(i==allow_to_view.length - 1){
+                        data = data + allow_to_view[i];
+                    }
+                    else{
+                        data = data + allow_to_view[i] + ',';
+                    }
+                }
+            } 
+            else{
+                var data = username + "=" + computer_number + "&" + level_number;
+            }
             console.log(data)
             $.ajax({
                 type: "POST",
                 url: 'admin-panel/data',
                 data: data,
+                beforeSend: function(){
+                    $(".status").eq(currentIndex).html("<div class = 'alert-info'>Loading...</div>");
+                },
                 success: function(res){
-                    console.log(res);
                     user_computer_id = res["computer id"]
                     user_computer_level = res["computer level"]
-                    console.log(user_computer_level)
                     failed = res["Values"]
-                    console.log(typeof(res));
                     if(failed != "failed"){
                         const $assigned_values = $(".assigned_values");
+                        const $assigned_levels = $(".assigned_levels");
                         $(".status").eq(currentIndex).html("<div class = 'alert-success'>Success</div>");
+                        setTimeout(function(){
+                            $(".status").eq(currentIndex).html("");
+                        }, 1500);
                         for(var i = 0; i< user_computer_id.length; i++){
                             $assigned_values.eq(i).text(user_computer_id[i]);
+                            $assigned_levels.eq(i).text(user_computer_level[i]);
                         }
-                        console.log("Awsome!")
+                        if($('.level-number').eq(currentIndex).val() == 2){
+                            $(".level-2-none").eq(currentIndex).html("<select class='selectpicker multiple-choice' multiple data-live-search='true'>{% for client_id in  computer_client_id%}<option>{{client_id}}</option>{% endfor %}</select>")
+                            console.log("level2")
+                        }
                     }
                     else{
                         console.log(res)

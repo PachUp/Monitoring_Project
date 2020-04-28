@@ -293,6 +293,7 @@ def main():
                 assign_value = -1
                 user = ""
                 all_assign_values = []
+                all_assign_levels = []
                 print(request.get_data())
                 data = request.get_data().decode()
                 try:
@@ -305,6 +306,8 @@ def main():
                 print(user)
                 print(assign_value)
                 print(level)
+                if assign_value == "None":
+                    assign_value = -1
                 try:
                     assign_value = int(assign_value)
                     user = str(user)
@@ -331,12 +334,14 @@ def main():
                 users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
                 db.session.commit()
                 for i in range(0,len(users.query.all())):
+                    all_assign_levels.append(users.query.all()[i].level)
                     if users.query.all()[i].computer_id == -1:
                         all_assign_values.append("None")
                     else:
                         all_assign_values.append(users.query.all()[i].computer_id)
                 print(all_assign_values)
-                return {"computer id" : all_assign_values, "computer level": level}
+                print
+                return {"computer id" : all_assign_values, "computer level": all_assign_levels}
             except:
                 return {"Values" : "failed"}
 
