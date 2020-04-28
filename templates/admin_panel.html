@@ -12,18 +12,20 @@
     <thead>
       <tr>
         <th scope="col">computer id</th>
+        <th scope="col">level</th>
         <th scope="col">username</th>
         <th scope="col">Assigned computer id</th>
+        <th scope="col">Assigned level</th>
         <th scope="col">Assign</th>
         <th scope="col">status</th>
       </tr>
     </thead>
     <tbody>
-        {% for(username, assign_value) in zip(users_username, assigned_values) %}
+        {% for(username, assign_value, level) in zip(users_username, assigned_values, levels) %}
         <tr>
                 <td>
                 computer number: 
-                <select class="custom-select" name={{username}}>
+                <select class="computer-number custom-select" name={{username}}>
                 {% for client_id in  computer_client_id%}
                 <option value={{client_id}} name={{client_id}} >{{client_id}}</option>
                 {% endfor %}
@@ -31,8 +33,17 @@
                 <option hidden selected class="va">{{assign_value}}</option>
                 </select>
                 </td>
+                <td>
+                    <select class="level-number custom-select" name={{username}}>
+                        <option value=1 name=1>1</option>
+                        <option value=2 name=2>2</option>
+                        <option value=3 name=3>3</option>
+                        <option value={{level}} name={{level}} hidden selected>{{level}}</option>
+                    </select>
+                </td>
                 <td class = "username">{{username}}</td>
                 <td class="assigned_values">{{assign_value}}</td>
+                <td class="assigned_level">{{level}}</td>
                 <td>
                     <input type="submit" class="btn btn-danger btn-md button-class" value="submit" formaction="">
                 </td>   
@@ -45,17 +56,22 @@
   </table>
 
 <style>
-    .custom-select{
+    .computer-number{
         width: 80px;
+    }
+    .level-number{
+        width: 50px;
     }
 </style>
 <script>
 $(document).ready(function(){
         $(".button-class").click(function(){
             var currentIndex = $('.button-class').index(this);
-            var computer_number = $('.custom-select').eq(currentIndex).val()
-            var username = $('.custom-select').eq(currentIndex).attr("name")
-            var data = username + "=" + computer_number;
+            var computer_number = $('.computer-number').eq(currentIndex).val()
+            var level_number = $('.level-number').eq(currentIndex).val()
+            console.log(level_number)
+            var username = $('.computer-number').eq(currentIndex).attr("name")
+            var data = username + "=" + computer_number + "&" + level_number;
             console.log(data)
             $.ajax({
                 type: "POST",
@@ -63,13 +79,16 @@ $(document).ready(function(){
                 data: data,
                 success: function(res){
                     console.log(res);
-                    res = res["Values"]
+                    user_computer_id = res["computer id"]
+                    user_computer_level = res["computer level"]
+                    console.log(user_computer_level)
+                    failed = res["Values"]
                     console.log(typeof(res));
-                    if(res != "failed"){
+                    if(failed != "failed"){
                         const $assigned_values = $(".assigned_values");
                         $(".status").eq(currentIndex).html("<div class = 'alert-success'>Success</div>");
-                        for(var i = 0; i< res.length; i++){
-                            $assigned_values.eq(i).text(res[i]);
+                        for(var i = 0; i< user_computer_id.length; i++){
+                            $assigned_values.eq(i).text(user_computer_id[i]);
                         }
                         console.log("Awsome!")
                     }

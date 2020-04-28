@@ -259,8 +259,10 @@ def main():
         computer_client_id = []
         computers_mac = []
         assigned_values = []
+        levels = []
         for i in range(0,len(users.query.all())):
             users_username.append(users.query.all()[i].username)
+            levels.append(users.query.all()[i].level)
             if users.query.all()[i].computer_id == -1:
                 assigned_values.append("None")
             else:
@@ -268,7 +270,7 @@ def main():
         for i in range(0, len(Todo.query.all())):
             computer_client_id.append(Todo.query.all()[i].id)
             computers_mac.append(Todo.query.all()[i].mac_address)
-        return users_username, computer_client_id, assigned_values
+        return users_username, computer_client_id, assigned_values, levels
     
     @app.route("/admin-panel", methods=['GET', 'POST'])
     @login_required
@@ -277,8 +279,8 @@ def main():
             return redirect("/admin-panel/data", code=307)
         if request.method == 'GET':
             if current_user.level == 3:
-                users_username, computer_client_id, assigned_values = get_admin_panel_data()
-                return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values ,zip=itertools.zip_longest)
+                users_username, computer_client_id, assigned_values, levels = get_admin_panel_data()
+                return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,zip=itertools.zip_longest)
             else:
                 return redirect('/')
 
@@ -296,26 +298,37 @@ def main():
                 try:
                     user = data.split("=")[0]
                     assign_value = data.split("=")[1]
+                    assign_value = assign_value.split("&")[0]
+                    level = data.split('&')[1]
                 except:
                     return {"Values" : "failed"}
                 print(user)
                 print(assign_value)
+                print(level)
                 try:
                     assign_value = int(assign_value)
                     user = str(user)
+                    level = int(level)
                 except:
                     return {"Values" : "failed"}
                 user_found = False
+                username_pos = -1
+                for i in range(0,len(users.query.all())):
+                    if user ==  users.query.all()[i].username:
+                        username_pos = i
+                print(username_pos)
                 if assign_value != -1:
                     for j in range(0,len(users.query.all())):
                         print(users.query.all()[j].username)
                         if user == users.query.all()[j].username:
                             user_found = True
-                        if assign_value == users.query.all()[j].computer_id:
+                        if assign_value == users.query.all()[j].computer_id and j != username_pos:
+                            print("Failed")
                             return {"Values" : "failed"}
-                if user_found == False and assign_value != -1:
+                if user_found == False and assign_value != -1 or level > 3:
                     return {"Values" : "failed"}
-                users.query.filter_by(username = user).update(dict(computer_id = assign_value))
+                print("level passed")
+                users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
                 db.session.commit()
                 for i in range(0,len(users.query.all())):
                     if users.query.all()[i].computer_id == -1:
@@ -323,7 +336,7 @@ def main():
                     else:
                         all_assign_values.append(users.query.all()[i].computer_id)
                 print(all_assign_values)
-                return {"Values" : all_assign_values}
+                return {"computer id" : all_assign_values, "computer level": level}
             except:
                 return {"Values" : "failed"}
 
@@ -352,7 +365,7 @@ def main():
     @app.errorhandler(404)
     def not_found_route(somearg):
         return redirect('/login')
-    app.run(debug=True,host='192.168.1.181')
+    app.run(debug=True,host='192.168.1.107')
     
 if __name__ == "__main__":
     main()
