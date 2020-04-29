@@ -450,7 +450,7 @@ def main():
     @app.errorhandler(404)
     def not_found_route(somearg):
         return redirect('/login')
-    app.run(debug=True,host='192.168.1.181')
+    app.run(debug=True)
     
 if __name__ == "__main__":
     main()
