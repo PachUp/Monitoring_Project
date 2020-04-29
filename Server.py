@@ -7,7 +7,6 @@ import json
 import itertools 
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-
 new_id = -1
 new_mac_address = ""
 change = 5000
@@ -17,7 +16,7 @@ js = ""
 def main():
     app = Flask(__name__)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users19999.db'
+    app.config['DATABASE_URL'] = 'postgres://mdukubstsajbyg:7bf92e4fa16bfced886874ab78908019889e4178b7c634765a88417b9f0ba7ab@ec2-79-125-26-232.eu-west-1.compute.amazonaws.com:5432/d5hvq232pml9mk'
     app.config['SECRET_KEY'] = "thisistopsecret"
     db = SQLAlchemy(app)
     admin = Admin(app,url="/admindb")
@@ -43,7 +42,6 @@ def main():
     admin.add_view(ModelView(users, db.session))
     db.create_all()
     
-
 
     @login_manager.user_loader
     def load_user(user_id):
