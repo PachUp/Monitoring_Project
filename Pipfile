@@ -9,6 +9,11 @@ pylint = "*"
 [packages]
 gunicorn = "*"
 requests = "*"
+flask-restful = "*"
+flask = "*"
+flask-sqlalchemy = "*"
+flask-login = "*"
+flask-admin = "*"
 
 [requires]
 python_version = "3.8.2"
