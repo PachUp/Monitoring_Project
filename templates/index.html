@@ -12,13 +12,13 @@
 <h1 class = "title"> Hello! you are logged in as {{user}} level: {{level}}</h1>
 {% if level == 3 %}
 <div class = "computers_link">
-    <a href="http://192.168.1.181:5000/admin-panel">Click here to go the the admin panel</a>
+    <a href="http://admin-monitor.herokuapp.com/admin-panel">Click here to go the the admin panel</a>
 </div>
 {%endif%}
 <p>Welcome!</p>
 <p>This is the main page</p>
 <p>Click the link!</p>
-<div class = "computers_link"> <a href="http://192.168.1.181:5000/computers">Click me to view all the signed computers</a></div>
+<div class = "computers_link"> <a href="http://admin-monitor.herokuapp.com/computers">Click me to view all the signed computers</a></div>
 <form action="/logout">
 <div class = "computers_link">
     <input type="submit" name="submit" class="btn btn-info btn-md " id="" value="logout">
