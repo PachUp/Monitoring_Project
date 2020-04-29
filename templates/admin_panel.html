@@ -47,17 +47,15 @@
                         <option value={{level}} name={{level}} hidden selected>{{level}}</option>
                     </select>
                 </td>
-                {% if level == 2 %}
                 <td>
+                    <div class="check-level">
                     <select class="selectpicker multiple-choice" multiple data-live-search="true">
                         {% for client_id in  computer_client_id%}
                             <option>{{client_id}}</option>
                         {% endfor %}
                     </select>
+                    </div>
                 </td>
-                {% else %}
-                <td class="level-2-none">None</td>
-                {% endif%}
                 <td class = "username">{{username}}</td>
                 <td class="assigned_values">{{assign_value}}</td>
                 <td class="assigned_levels">{{level}}</td>
@@ -81,22 +79,37 @@
     }
 </style>
 <script>
+// TODO: No one select in allow to view
 $(document).ready(function(){
+    for(var i = 0; i<$('.level-number').length; i++){
+                if (parseInt($('.level-number').eq(i).val()) != 2){
+                    $(".check-level").eq(i).hide()// if attacker unhides it - check if it's still level 2 and just in case in backend, check if the level is 2
+                }
+                else{
+                    var assigned_level_2_allowed_to_view = '{{assigned_level_2_allowed_to_view}}';
+                    chosen_values = ""
+                    assigned_level_2_allowed_to_view = $('<textarea/>').html(assigned_level_2_allowed_to_view).text();
+                    for(var i = 0; i<assigned_level_2_allowed_to_view.length; i++){
+                        if(i%2 == 0 && (assigned_level_2_allowed_to_view[i] != '[' || assigned_level_2_allowed_to_view[i] != ']') && i!=0 && i!=assigned_level_2_allowed_to_view.length -1){ 
+                            chosen_values = chosen_values + assigned_level_2_allowed_to_view[i] + ' '
+                        }
+                    }
+                    $(".filter-option-inner-inner").eq(i).text(chosen_values);
+                }
+            } // hiding users that are under the level 2
         $(".button-class").click(function(){
             var currentIndex = $('.button-class').index(this);
             var computer_number = $('.computer-number').eq(currentIndex).val()
             var level_number = $('.level-number').eq(currentIndex).val()
-            allow_to_view_minus = 0;
+            var allow_to_view = $("select.multiple-choice").eq(currentIndex).val()
+            var username = $('.computer-number').eq(currentIndex).attr("name")
             for(var i = 0; i<$('.level-number').length; i++){
                 if (parseInt($('.level-number').eq(i).val()) != 2){
-                    allow_to_view_minus = allow_to_view_minus + 1;
+                    //$(".filter-option-inner-inner").eq(currentIndex).text("Nothing selected");
+                    $(".check-level").eq(i).hide()// if attacker unhides it - check if it's still level 2 and just in case in backend, check if the level is 2
                 }
-            } // finding how many people are level 2
-            console.log(allow_to_view_minus)
-            var allow_to_view = $("select.multiple-choice").eq(parseInt(currentIndex)- allow_to_view_minus).val()
-            console.log(allow_to_view)
-            var username = $('.computer-number').eq(currentIndex).attr("name")
-            if(allow_to_view != null || allow_to_view==""){
+            } // hiding users that are under the level 2
+            if(allow_to_view != null && allow_to_view!="" && allow_to_view != "undefined" && level_number == 2){
                 var data = username + "=" + computer_number + "&" + level_number + "&";
                 for(var i =0; i<allow_to_view.length; i++){
                     if(i==allow_to_view.length - 1){
@@ -108,7 +121,7 @@ $(document).ready(function(){
                 }
             } 
             else{
-                var data = username + "=" + computer_number + "&" + level_number;
+                var data = username + "=" + computer_number + "&" + level_number + "&None";
             }
             console.log(data)
             $.ajax({
@@ -122,6 +135,12 @@ $(document).ready(function(){
                     user_computer_id = res["computer id"]
                     user_computer_level = res["computer level"]
                     failed = res["Values"]
+                    for(var i = 0; i<$('.level-number').length; i++){
+                        if (parseInt($('.level-number').eq(i).val()) == 2){
+                            console.log("HHGHIDFGIDFGIDFG")
+                            $(".check-level").eq(i).show()// if attacker unhides it - check if it's still level 2 and just in case in backend, check if the level is 2
+                        }
+                    } // hiding users that are under the level 2
                     if(failed != "failed"){
                         const $assigned_values = $(".assigned_values");
                         const $assigned_levels = $(".assigned_levels");
@@ -134,7 +153,7 @@ $(document).ready(function(){
                             $assigned_levels.eq(i).text(user_computer_level[i]);
                         }
                         if($('.level-number').eq(currentIndex).val() == 2){
-                            $(".level-2-none").eq(currentIndex).html("<select class='selectpicker multiple-choice' multiple data-live-search='true'>{% for client_id in  computer_client_id%}<option>{{client_id}}</option>{% endfor %}</select>")
+                            //$(".level-2-none").eq(currentIndex).html("<select class='selectpicker multiple-choice' multiple data-live-search='true'>{% for client_id in  computer_client_id%}<option>{{client_id}}</option>{% endfor %}</select>")
                             console.log("level2")
                         }
                     }
