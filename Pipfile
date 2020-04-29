@@ -8,6 +8,7 @@ pylint = "*"
 
 [packages]
 gunicorn = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8.2"
