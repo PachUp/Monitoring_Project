@@ -1,4 +1,5 @@
 .vscode/launch.json
+.vscode/settings.json
 Server-Test.py
 users1.db
 users12.db
