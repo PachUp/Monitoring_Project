@@ -1,4 +1,3 @@
-
 import requests
 from flask_restful import Resource, Api
 from flask import Flask, render_template, url_for, request, redirect, jsonify, abort
