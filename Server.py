@@ -362,6 +362,7 @@ def main():
                 all_assign_values = []
                 all_assign_levels = []
                 remove_vals = []
+                level_2_allowed_vals = []
                 print(request.get_data())
                 data = request.get_data().decode()
                 try:
@@ -416,7 +417,10 @@ def main():
                     else:
                         all_assign_values.append(users.query.all()[i].computer_id)
                 level_2_handle(remove_vals,user,level)
-                return {"computer id" : all_assign_values, "computer level": all_assign_levels}
+                for i in range(0,len(users.query.all())):
+                    level_2_allowed_vals.append(users.query.all()[i].allow_to_view_level_2)
+                print(level_2_allowed_vals)
+                return {"computer id" : all_assign_values, "computer level": all_assign_levels, "level 2" : level_2_allowed_vals}
             except:
                 print("the err")
                 return {"Values" : "failed"}
