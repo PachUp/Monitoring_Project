@@ -1,5 +1,5 @@
-from flask import Flask, render_template, url_for, request, redirect, jsonify, abort
 from flask_restful import Resource, Api
+from flask import Flask, render_template, url_for, request, redirect, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 import requests
