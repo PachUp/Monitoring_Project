@@ -7,6 +7,7 @@ import json
 import itertools 
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+import psycopg2
 new_id = -1
 new_mac_address = ""
 change = 5000
