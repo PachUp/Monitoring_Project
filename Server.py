@@ -23,6 +23,7 @@ admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
 class Todo(db.Model):
+    __tablename__ = "Todo"
     id = db.Column(db.Integer, primary_key=True)
     mac_address = db.Column(db.TEXT)
     cpu_type = db.Column(db.TEXT)
