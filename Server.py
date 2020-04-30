@@ -39,7 +39,6 @@ class users(db.Model, UserMixin):
     computer_id = db.Column(db.Integer, default=-1) 
     allow_to_view_level_2 = db.Column(db.TEXT, default="None")
 admin.add_view(ModelView(users, db.session))
-db.create_all()
 
 
 @login_manager.user_loader
