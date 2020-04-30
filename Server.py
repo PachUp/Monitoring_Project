@@ -66,11 +66,11 @@ def login():
                 login_user(user)
                 return "Great"
     else:
-        return redirect("/")
+        return redirect("/login", code=700)
             
     if request.method == "GET":
         if current_user.is_authenticated:
-            return redirect('/')
+            return redirect("/", code=700)
         else:
             return render_template('/login.html')
 
@@ -97,10 +97,10 @@ def register():
                 new_user = users(username = username, password=password, email=email, level=1)
                 db.session.add(new_user)
                 db.session.commit()
-            return redirect('/')
+            return redirect("/", code=700)
     if request.method == "GET":
         if current_user.is_authenticated:
-            return redirect('/')
+            return redirect("/", code=700)
         else:
             return render_template('/register.html')
 
@@ -234,7 +234,7 @@ if len(Todo.query.all()) >= 0:
             elif current_user.level == 3:
                 return no_one_in_db_code(id)
         else:
-            return redirect("/login")
+            return redirect("/login", code=700)
 
 
 @app.route('/computers/add')
@@ -324,9 +324,9 @@ def admin_panel():
                 users_username, computer_client_id, assigned_values, levels, assigned_level_2_allowed_to_view = get_admin_panel_data()
                 return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view,zip=itertools.zip_longest)
             else:
-                return redirect('/')
+                return redirect("/", code=700)
     else:
-        return redirect("/login")
+        return redirect("/login", code=700)
 
 
 def level_2_handle(remove_vals, user,level):
@@ -439,7 +439,7 @@ def show_all_computers():
         print(all_computers_on_the_server)
         return render_template('show_all_computers.html', computer_list =all_computers_on_the_server)
     else:
-        redirect("/login")
+        redirect("/login", code=700)
 @app.route('/logout')
 def logout():
     logout_user()
@@ -449,7 +449,7 @@ def index():
     if current_user.is_authenticated:
         return render_template('index.html', user=current_user.username, level = int(current_user.level))
     else:
-        return redirect("/login")
+        return redirect("/login", code=700)
 
 # err handles
 
