@@ -187,22 +187,21 @@ def main():
     index = 0
     status_code = 200
     response_content = ""
-    address_link = 'http://192.168.1.181:5000/computers/verify_login'
+    address_link = 'http://admin-monitor.herokuapp.com/computers/verify_login'
     response = requests.get(address_link)
     response_content = response.content.decode()
     status_code = response.status_code
-    print(status_code == 200)
     print(status_code)
-    print(response_content)
+    print("res: " + response_content)
     computer_id = ""
     send_request_to = ""
     if status_code == 200:
         while computer_id == "":
-            send_request_to = "http://192.168.1.181:5000/computers/"
-            req_id = requests.post('http://192.168.1.181:5000/computers/verify_login',
-                                   json={"MAC address: ": computer_mac_address()})
+            send_request_to = "http://admin-monitor.herokuapp.com/computers"
+            req_id = requests.post('http://admin-monitor.herokuapp.com/computers/verify_login',
+                               json={"mac_address": computer_mac_address()})
             computer_id = req_id.content.decode()
-            print(computer_id)
+            print("computer id: " + computer_id)
             print(type(computer_id))
             if computer_id != "":
                 send_request_to = send_request_to + str(computer_id)

@@ -110,14 +110,14 @@ def check_if_user_exists():
         js = request.get_json()
         print(js)
         if js is not None:
-            for mac_address in js.values():
-                for i in range(len(Todo.query.all())):
-                    if mac_address == Todo.query.filter(Todo.id).all()[i].mac_address:
-                        print("True!")
-                        return str(Todo.query.filter(Todo.id).all()[i].id)
-                new_mac_address = mac_address
-                print("Not found!")
-                return redirect('/computers/add')
+            mac_address = js['mac_address']
+            for i in range(len(Todo.query.all())):
+                if mac_address == Todo.query.filter(Todo.id).all()[i].mac_address:
+                    print("True!")
+                    return str(Todo.query.filter(Todo.id).all()[i].id)
+            new_mac_address = mac_address
+            print("Not found!")
+            return redirect('/computers/add')
         else:
             print("Empty? wtf")
     else:   
