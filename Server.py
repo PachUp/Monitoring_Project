@@ -117,7 +117,7 @@ def check_if_user_exists():
                     return str(Todo.query.filter(Todo.id).all()[i].id)
             new_mac_address = mac_address
             print("Not found!")
-            return redirect('/computers/add')
+            return url_for("new_computer")
         else:
             print("Empty? wtf")
     else:   
