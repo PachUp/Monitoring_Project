@@ -309,7 +309,6 @@ def get_admin_panel_data():
     return users_username, computer_client_id, assigned_values, levels, assigned_level_2_allowed_to_view
 
 @app.route("/admin-panel", methods=['GET', 'POST'])
-@login_required
 def admin_panel():
     if request.method == "POST":
         return redirect("/admin-panel/data", code=307)
@@ -350,7 +349,6 @@ def level_2_handle(remove_vals, user,level):
 
 
 @app.route("/admin-panel/data", methods=['POST'])
-@login_required
 def admin_data():
     if request.method == "POST":
         try:
@@ -436,17 +434,10 @@ def logout():
     logout_user()
     return redirect('/login')
 @app.route('/')
-@login_required
 def index():
     return render_template('index.html', user=current_user.username, level = int(current_user.level))
 
 # err handles
-@app.errorhandler(401) 
-def invalid_route(somearg): 
-    return redirect('/login')
-@app.errorhandler(404)
-def not_found_route(somearg):
-    return redirect('/login')
 
 if __name__ == "__main__":
     app.run(debug=True)
