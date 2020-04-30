@@ -15,7 +15,7 @@ js = ""
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URL'] = 'postgres://mdukubstsajbyg:7bf92e4fa16bfced886874ab78908019889e4178b7c634765a88417b9f0ba7ab@ec2-79-125-26-232.eu-west-1.compute.amazonaws.com:5432/d5hvq232pml9mk'
+app.config['DATABASE_URL'] = 'postgres://mdukubstsajbyg:7bf92e4fa16bfced886874ab78908019889e4178b7c634765a88417b9f0ba7ab@ec2-79-125-26-232.eu-west-1.compute.amazonaws.com:5432/d5hvq232pml9mk'
 app.config['SECRET_KEY'] = "thisistopsecret"
 db = SQLAlchemy(app)
 admin = Admin(app,url="/admindb")
