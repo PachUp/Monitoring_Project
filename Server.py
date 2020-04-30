@@ -208,9 +208,10 @@ def no_one_in_db_code(id):
         print(pid)
         return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
         
-if len(Todo.query.all()) >= 0:
-    @app.route('/computers/<int:id>', methods=['POST', 'GET'])
-    def no_one_in_db(id):
+
+@app.route('/computers/<int:id>', methods=['POST', 'GET'])
+def no_one_in_db(id):
+    if len(Todo.query.all()) >= 0:
         computer = Todo.query.get_or_404(id)
         print(current_user.allow_to_view_level_2) 
         if current_user.level == 1:
