@@ -48,22 +48,25 @@ def load_user(user_id):
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if request.method == "POST":
-        username = request.form['username']
-        password = request.form['password']
-        print(username)
-        print(users.query.all())
-        send = ""
-        user_check = bool(users.query.filter_by(username=username).first())
-        pass_check = bool(users.query.filter_by(password=password).first())
-        if user_check and not pass_check:
-            return "password"
-        elif not user_check:
-            return "username"
-        else:
-            user = users.query.filter_by(username=username,password=password).first()
-            login_user(user)
-            return "Great"
+    if not current_user.is_authenticated:
+        if request.method == "POST":
+            username = request.form['username']
+            password = request.form['password']
+            print(username)
+            print(users.query.all())
+            send = ""
+            user_check = bool(users.query.filter_by(username=username).first())
+            pass_check = bool(users.query.filter_by(password=password).first())
+            if user_check and not pass_check:
+                return "password"
+            elif not user_check:
+                return "username"
+            else:
+                user = users.query.filter_by(username=username,password=password).first()
+                login_user(user)
+                return "Great"
+    else:
+        return redirect("/")
             
     if request.method == "GET":
         if current_user.is_authenticated:
@@ -202,33 +205,36 @@ def no_one_in_db_code(id):
 if len(Todo.query.all()) >= 0:
     @app.route('/computers/<int:id>', methods=['POST', 'GET'])
     def no_one_in_db(id):
-        computer = Todo.query.get_or_404(id)
-        print(current_user.allow_to_view_level_2) 
-        if current_user.level == 1:
-            if current_user.computer_id == id:
-                return no_one_in_db_code(id)
-            else:
-                return abort(404)
-        elif current_user.level == 2:
-            if current_user.computer_id == id:
-                return no_one_in_db_code(id)
-            try:
-                allow_to_acces = current_user.allow_to_view_level_2.split(',')
-            except:
-                allow_to_acces = current_user.allow_to_view_level_2
-            if len(allow_to_acces) == 1:
-                print("Abort!")
-                if allow_to_acces[0] == "None":
-                    return abort(404)
-                elif int(allow_to_acces[0]) == id:
+        if current_user.is_authenticated:
+            computer = Todo.query.get_or_404(id)
+            print(current_user.allow_to_view_level_2) 
+            if current_user.level == 1:
+                if current_user.computer_id == id:
                     return no_one_in_db_code(id)
-            else:
-                for i in allow_to_acces:
-                    i = int(i)
-                    if i == id:
+                else:
+                    return abort(404)
+            elif current_user.level == 2:
+                if current_user.computer_id == id:
+                    return no_one_in_db_code(id)
+                try:
+                    allow_to_acces = current_user.allow_to_view_level_2.split(',')
+                except:
+                    allow_to_acces = current_user.allow_to_view_level_2
+                if len(allow_to_acces) == 1:
+                    print("Abort!")
+                    if allow_to_acces[0] == "None":
+                        return abort(404)
+                    elif int(allow_to_acces[0]) == id:
                         return no_one_in_db_code(id)
-        elif current_user.level == 3:
-            return no_one_in_db_code(id)
+                else:
+                    for i in allow_to_acces:
+                        i = int(i)
+                        if i == id:
+                            return no_one_in_db_code(id)
+            elif current_user.level == 3:
+                return no_one_in_db_code(id)
+        else:
+            return redirect("/login")
 
 
 @app.route('/computers/add')
@@ -310,15 +316,17 @@ def get_admin_panel_data():
 
 @app.route("/admin-panel", methods=['GET', 'POST'])
 def admin_panel():
-    if request.method == "POST":
-        return redirect("/admin-panel/data", code=307)
-    if request.method == 'GET':
-        if current_user.level == 3:
-            users_username, computer_client_id, assigned_values, levels, assigned_level_2_allowed_to_view = get_admin_panel_data()
-            return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view,zip=itertools.zip_longest)
-        else:
-            return redirect('/')
-
+    if current_user.is_authenticated:
+        if request.method == "POST":
+            return redirect("/admin-panel/data", code=307)
+        if request.method == 'GET':
+            if current_user.level == 3:
+                users_username, computer_client_id, assigned_values, levels, assigned_level_2_allowed_to_view = get_admin_panel_data()
+                return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view,zip=itertools.zip_longest)
+            else:
+                return redirect('/')
+    else:
+        return redirect("/login")
 
 
 def level_2_handle(remove_vals, user,level):
@@ -423,19 +431,25 @@ def admin_data():
 
 @app.route('/computers')
 def show_all_computers():
-    print(len(Todo.query.all()))
-    all_computers_on_the_server = []
-    for i in range(len(Todo.query.all())):
-        all_computers_on_the_server.append(Todo.query.all()[i].id)
-    print(all_computers_on_the_server)
-    return render_template('show_all_computers.html', computer_list =all_computers_on_the_server)
+    if current_user.is_authenticated:
+        print(len(Todo.query.all()))
+        all_computers_on_the_server = []
+        for i in range(len(Todo.query.all())):
+            all_computers_on_the_server.append(Todo.query.all()[i].id)
+        print(all_computers_on_the_server)
+        return render_template('show_all_computers.html', computer_list =all_computers_on_the_server)
+    else:
+        redirect("/login")
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect('/login')
 @app.route('/')
 def index():
-    return render_template('index.html', user=current_user.username, level = int(current_user.level))
+    if current_user.is_authenticated:
+        return render_template('index.html', user=current_user.username, level = int(current_user.level))
+    else:
+        return redirect("/login")
 
 # err handles
 
