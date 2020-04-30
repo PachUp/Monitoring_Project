@@ -16,13 +16,14 @@ js = ""
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://mdukubstsajbyg:7bf92e4fa16bfced886874ab78908019889e4178b7c634765a88417b9f0ba7ab@ec2-79-125-26-232.eu-west-1.compute.amazonaws.com:5432/d5hvq232pml9mk'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://dfrawwwpzamher:2290ce982f10bf8d567ed1fbee42765e550a6e84b9049c717feb8945477b38b7@ec2-54-228-251-117.eu-west-1.compute.amazonaws.com:5432/d3updufagirasd'
 app.config['SECRET_KEY'] = "thisistopsecret"
 db = SQLAlchemy(app)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
 class Todo(db.Model):
+    __tablename__ = "Todo"
     id = db.Column(db.Integer, primary_key=True)
     mac_address = db.Column(db.TEXT)
     cpu_type = db.Column(db.TEXT)
@@ -30,6 +31,16 @@ class Todo(db.Model):
     running_processes = db.Column(db.TEXT)
     cpu_usage_procentage = db.Column(db.FLOAT)
     memory_usage_procentage = db.Column(db.FLOAT)
+    """
+    def __init__(self,id,mac_address,cpu_type,ram_usage,running_processes,cpu_usage_procentage,memory_usage_procentage):
+        self.mac_address = mac_address
+        self.id = id
+        self.cpu_type = cpu_type
+        self.ram_usage = ram_usage
+        self.running_processes = running_processes
+        self.cpu_usage_procentage = cpu_usage_procentage
+        self.memory_usage_procentage = memory_usage_procentage
+    """
 admin.add_view(ModelView(Todo, db.session))
 class users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -111,13 +122,15 @@ def check_if_user_exists():
         print(js)
         if js is not None:
             mac_address = js['mac_address']
-            for i in range(len(Todo.query.all())):
-                if mac_address == Todo.query.filter(Todo.id).all()[i].mac_address:
+            for i in range(0,len(Todo.query.all())):
+                print(Todo.query.all()[i].id)
+                print(Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].mac_address)
+                if mac_address == Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].mac_address:
                     print("True!")
-                    return str(Todo.query.filter(Todo.id).all()[i].id)
+                    return str(Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].id)
             new_mac_address = mac_address
             print("Not found!")
-            return url_for("new_computer")
+            return redirect('/computers/add')
         else:
             print("Empty? wtf")
     else:   
@@ -129,108 +142,115 @@ def check_if_user_exists():
 def no_one_in_db_code(id):
     global js
     computer = Todo.query.get_or_404(id)
-    if request.method == 'POST':
-        js = request.get_json()
-        for name, item in js.items():
-            if name == "CPU type:":
-                computer.cpu_type = item
-                db.session.commit()
-            if name == "Ram usage: ":
-                computer.ram_usage = item
-                db.session.commit()
-            if name == "running processes":
-                new_item = []
-                count = 0
-                pid = []
-                name = []
-                memory_percent = []
-                cpu_percent = []
-                f = item
-                for i in item:
-                    if count == 0:
-                        pass
-                    else:
-                        pid.append(str(i["pid"]))  
-                        name.append(str(i["name"]))
-                        memory_percent.append(str(i["memory_percent"]))
-                        cpu_percent.append(str(i["cpu_percent"])) 
-                    count = count + 1
-                dict_task = {
-                    "task status pid":pid,
-                    "task status name":name,
-                    "task status cpu percent":cpu_percent,
-                    "task status memory percent":memory_percent
-                }
-                dict_task_status_name = {
-                    "name":name
-                }
-                dict_task_status_cpu_percent = {
-                    "cpu percent":cpu_percent
-                }
-                dict_task_status_memory_percent = {
-                    "memory percent":memory_percent
-                }
-                dict_task = json.dumps(dict_task)
-                computer.running_processes = dict_task
-                db.session.commit()
-            if name == "CPU usage procentage":
-                computer.cpu_usage_procentage = item
-                db.session.commit()
-            if name == "Memory usage procentage":
-                computer.memory_usage_procentage = item
-                db.session.commit()
-        #db.session.add(new_computer)
-        #db.session.commit()
-        #print(Todo.query.filter(Todo.id).all())
-        #print(Todo.query.filter(Todo.id).all()[0].mac_address)
-        #print(Todo.query.filter(Todo.id).all()[0].cpu_usage_procentage)
-        #print(Todo.query.filter(Todo.id).all()[0].memory_usage_procentage)
-        #print(Todo.query.filter(Todo.id).all()[0].running_processes)
-        #print(computer.mac_address)
-        url = '/computers/' + str(id)
-        return "" # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
-        #return render_template('get_json.html', json_request = js)
-    else:
-        running_processes = computer.running_processes
-        running_processes = json.loads(running_processes)
-        pid = running_processes["task status pid"]
-        name = running_processes["task status name"]
-        cpu_percent = running_processes["task status cpu percent"]
-        memory_percent = running_processes["task status memory percent"]
-        print(pid)
-        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
-        
+    js = request.get_json()
+    for name, item in js.items():
+        if name == "CPU type: ":
+            computer.cpu_type = item
+            db.session.commit()
+        if name == "Ram usage: ":
+            computer.ram_usage = item
+            db.session.commit()
+        if name == "running processes":
+            new_item = []
+            count = 0
+            pid = []
+            name = []
+            memory_percent = []
+            cpu_percent = []
+            f = item
+            for i in item:
+                if count == 0:
+                    pass
+                else:
+                    pid.append(str(i["pid"]))  
+                    name.append(str(i["name"]))
+                    memory_percent.append(str(i["memory_percent"]))
+                    cpu_percent.append(str(i["cpu_percent"])) 
+                count = count + 1
+            dict_task = {
+                "task status pid":pid,
+                "task status name":name,
+                "task status cpu percent":cpu_percent,
+                "task status memory percent":memory_percent
+            }
+            dict_task_status_name = {
+                "name":name
+            }
+            dict_task_status_cpu_percent = {
+                "cpu percent":cpu_percent
+            }
+            dict_task_status_memory_percent = {
+                "memory percent":memory_percent
+            }
+            dict_task = json.dumps(dict_task)
+            computer.running_processes = dict_task
+            db.session.commit()
+        if name == "CPU usage procentage":
+            computer.cpu_usage_procentage = item
+            db.session.commit()
+        if name == "Memory usage procentage":
+            computer.memory_usage_procentage = item
+            db.session.commit()
+    #db.session.add(new_computer)
+    #db.session.commit()
+    #print(Todo.query.filter(Todo.id).all())
+    #print(Todo.query.filter(Todo.id).all()[0].mac_address)
+    #print(Todo.query.filter(Todo.id).all()[0].cpu_usage_procentage)
+    #print(Todo.query.filter(Todo.id).all()[0].memory_usage_procentage)
+    #print(Todo.query.filter(Todo.id).all()[0].running_processes)
+    #print(computer.mac_address)
+    url = '/computers/' + str(id)
+    print("returnin'")
+    return "Something" # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+    #return render_template('get_json.html', json_request = js)
 
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
 def no_one_in_db(id):
     if len(Todo.query.all()) >= 0:
-        computer = Todo.query.get_or_404(id)
-        print(current_user.allow_to_view_level_2) 
-        if current_user.level == 1:
-            if current_user.computer_id == id:
-                return no_one_in_db_code(id)
-            else:
-                return abort(404)
-        elif current_user.level == 2:
-            if current_user.computer_id == id:
-                return no_one_in_db_code(id)
-            try:
-                allow_to_acces = current_user.allow_to_view_level_2.split(',')
-            except:
-                allow_to_acces = current_user.allow_to_view_level_2
-            if len(allow_to_acces) == 1:
-                print("Abort!")
-                if allow_to_acces[0] == "None":
-                    return abort(404)
-                elif int(allow_to_acces[0]) == id:
-                    return no_one_in_db_code(id)
-            else:
-                for i in allow_to_acces:
-                    i = int(i)
-                    if i == id:
-                        return no_one_in_db_code(id)
-        elif current_user.level == 3:
+        if request.method == "POST":
             return no_one_in_db_code(id)
+        else:
+            if current_user.is_authenticated:
+                computer = Todo.query.get_or_404(id)
+                running_processes = computer.running_processes
+                running_processes = json.loads(running_processes)
+                pid = running_processes["task status pid"]
+                name = running_processes["task status name"]
+                cpu_percent = running_processes["task status cpu percent"]
+                memory_percent = running_processes["task status memory percent"]
+                computer = Todo.query.get_or_404(id)
+                if current_user.level == 1:
+                    if current_user.computer_id == id:
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                
+                    else:
+                        return abort(404)
+                elif current_user.level == 2:
+                    if current_user.computer_id == id:
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                
+                    try:
+                        allow_to_acces = current_user.allow_to_view_level_2.split(',')
+                    except:
+                        allow_to_acces = current_user.allow_to_view_level_2
+                    if len(allow_to_acces) == 1:
+                        print("Abort!")
+                        if allow_to_acces[0] == "None":
+                            return abort(404)
+                        elif int(allow_to_acces[0]) == id:
+                            return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                
+                    else:
+                        for i in allow_to_acces:
+                            i = int(i)
+                            if i == id:
+                                return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                
+                elif current_user.level == 3:
+                    return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+            else:
+                return redirect("/login")
+            
 
 
 @app.route('/computers/add')
