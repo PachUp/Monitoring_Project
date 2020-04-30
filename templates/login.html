@@ -73,6 +73,7 @@ function myFunction() {
                 url: 'login',
                 data: data,
                 success: function(res){
+                    console.log(res)
                     if(res=="username"){
                         $("#user-wrong").html("<div class = 'alert-danger'> Wrong username</div>");
                     } 
