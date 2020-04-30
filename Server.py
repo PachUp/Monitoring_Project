@@ -30,14 +30,6 @@ class Todo(db.Model):
     running_processes = db.Column(db.TEXT)
     cpu_usage_procentage = db.Column(db.FLOAT)
     memory_usage_procentage = db.Column(db.FLOAT)
-    
-    def __init__(self,mac_address,cpu_type,ram_usage,running_processes,cpu_usage_procentage,memory_usage_procentage):
-        self.mac_address = mac_address
-        self.cpu_type = cpu_type
-        self.ram_usage = ram_usage
-        self.running_processes = running_processes
-        self.cpu_usage_procentage = cpu_usage_procentage
-        self.memory_usage_procentage = memory_usage_procentage
 admin.add_view(ModelView(Todo, db.session))
 class users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
