@@ -1,19 +1,19 @@
-#all_comp h1{
+h1{
     font-family: fantasy;
     text-align: center;
 }
-#all_comp p{
+p{
     font-family: unset;
     text-align: center;
 }
 .computers_link{
     text-align: center;
 }
-#all_comp body {
+body {
     background-color: lightblue;
   }
   
-#all_comp a {
+a {
     background:
        linear-gradient(
          to bottom, var(--mainColor) 0%,
@@ -27,12 +27,17 @@
     transition: background-size .2s;
   }
   
-  #all_comp:hover {
+  a:hover {
     background-size: 4px 50px;
   }
 :root {
   --mainColor: #ff9800;
 }
-body{
-  text-align: center;
+
+body {
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
+  height: 100vh;
+  justify-content: center;
 }
