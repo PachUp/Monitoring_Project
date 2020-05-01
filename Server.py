@@ -386,11 +386,6 @@ def admin_data():
             data = request.get_data().decode()
             try:
                 remove_vals = data.split('&')[2]
-                try:
-                    remove_vals = remove_vals.split(',')
-                except:
-                    remove_vals = "None"
-                print(remove_vals)
             except:
                 remove_vals = "None"
             try:
@@ -403,6 +398,7 @@ def admin_data():
             print(user)
             print(assign_value)
             print(level)
+            print(remove_vals)
             if assign_value == "None":
                 assign_value = -1
             try:
@@ -429,16 +425,8 @@ def admin_data():
                 return {"Values" : "failed"}
             users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
             db.session.commit()
-            for i in range(0,len(users.query.all())):
-                all_assign_levels.append(users.query.all()[i].level)
-                if users.query.all()[i].computer_id == -1:
-                    all_assign_values.append("None")
-                else:
-                    all_assign_values.append(users.query.all()[i].computer_id)
-            level_2_handle(remove_vals,user,level)
-            for i in range(0,len(users.query.all())):
-                level_2_allowed_vals.append(users.query.all()[i].allow_to_view_level_2)
-            print(level_2_allowed_vals)
+            if level == -1:
+                level = "None"
             return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
         except:
             print("the err")
