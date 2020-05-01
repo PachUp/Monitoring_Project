@@ -341,7 +341,7 @@ def admin_panel():
     if request.method == 'GET':
         if current_user.level == 3:
             users_username, computer_client_id, assigned_values, levels, assigned_level_2_allowed_to_view = get_admin_panel_data()
-            return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view, , computer_list =computer_client_id, level = int(current_user.level),zip=itertools.zip_longest)
+            return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view, computer_list =computer_client_id, level = int(current_user.level),zip=itertools.zip_longest)
         else:
             return redirect('/')
 
