@@ -13,15 +13,14 @@
     <a href="http://admin-monitor.herokuapp.com/admin-panel">Click here to go the the admin panel</a>
 </div>
 {%endif%}
-<p>Welcome!</p>
-<p>This is the main page</p>
-<p>Click the link!</p>
-<div class = "computers_link"> <a href="http://admin-monitor.herokuapp.com/computers">Click me to view all the signed computers</a></div>
+<p id="all_comp">Welcome!</p>
+<p id="all_comp">This is the main page</p>
+<p id="all_comp">Click the link!</p>
+<div class = "computers_link"> <a href="http://admin-monitor.herokuapp.com/computers" id="all_comp">Click me to view all the signed computers</a></div>
 <form action="/logout">
 <div class = "computers_link">
     <input type="submit" name="submit" class="btn btn-info btn-md " id="" value="logout">
 </div>
 <br>
 </form>
-</style>
 {% endblock %}

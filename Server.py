@@ -448,7 +448,7 @@ def index():
     all_computers = []
     for i in range(0, len(Todo.query.all())):
         all_computers.append(Todo.query.all()[i].id)
-    return render_template('index.html', user=current_user.username, level = int(current_user.level), computers=all_computers)
+    return render_template('index.html', user=current_user.username, level = int(current_user.level), computers=all_computers, level=current_user.level)
 
 # err handles
 @app.errorhandler(401) 
