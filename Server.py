@@ -389,10 +389,10 @@ def admin_data():
                 try:
                     remove_vals = remove_vals.split(',')
                 except:
-                    pass # or None or a single number
+                    remove_vals = "None"
                 print(remove_vals)
             except:
-                pass
+                remove_vals = "None"
             try:
                 user = data.split("=")[0]
                 assign_value = data.split("=")[1]
@@ -439,7 +439,7 @@ def admin_data():
             for i in range(0,len(users.query.all())):
                 level_2_allowed_vals.append(users.query.all()[i].allow_to_view_level_2)
             print(level_2_allowed_vals)
-            return {"computer id" : all_assign_values, "computer level": all_assign_levels, "level 2" : level_2_allowed_vals}
+            return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
         except:
             print("the err")
             return {"Values" : "failed"}
