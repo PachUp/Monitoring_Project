@@ -378,10 +378,7 @@ def admin_data():
         try:
             assign_value = -1
             user = ""
-            all_assign_values = []
-            all_assign_levels = []
             remove_vals = []
-            level_2_allowed_vals = []
             print(request.get_data())
             data = request.get_data().decode()
             try:
@@ -423,8 +420,8 @@ def admin_data():
             if (user_found == False and assign_value != -1) or level > 3:
                 print("the err")
                 return {"Values" : "failed"}
-            if level == -1:
-                level = "None"
+            if assign_value == -1:
+                assign_value = "None"
             users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
             db.session.commit()
             return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
