@@ -423,10 +423,10 @@ def admin_data():
             if (user_found == False and assign_value != -1) or level > 3:
                 print("the err")
                 return {"Values" : "failed"}
-            users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
-            db.session.commit()
             if level == -1:
                 level = "None"
+            users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
+            db.session.commit()
             return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
         except:
             print("the err")
