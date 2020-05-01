@@ -445,7 +445,10 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html', user=current_user.username, level = int(current_user.level))
+    all_computers = []
+    for i in range(0, len(Todo.query.all())):
+        all_computers.append(Todo.query.all()[i].id)
+    return render_template('index.html', user=current_user.username, level = int(current_user.level), computers=all_computers)
 
 # err handles
 @app.errorhandler(401) 

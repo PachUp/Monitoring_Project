@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Document</title>
+    {% block head%}{% endblock %}
+</head>
+<body>
+    <div class="bs-example">
+        <nav class="navbar navbar-expand-md navbar-light bg-light">
+            <a href="#" class="navbar-brand">admin-monitor</a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                <div class="navbar-nav">
+                    <a href="http://admin-monitor.herokuapp.com/" class="nav-item nav-link active">Home</a>
+                    <a href="http://admin-monitor.herokuapp.com/computers" class="nav-item nav-link">Computers list</a>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Signed computers</a>
+                        <div class="dropdown-menu">
+                            {% for i in computers %}
+                            <a href= "http://admin-monitor.herokuapp.com/computers/{{i}}" class="dropdown-item">{{i}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="navbar-nav">
+                    <a href="http://admin-monitor.herokuapp.com/logout" class="nav-item nav-link">Logout</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+    {% block body%}{% endblock %}
+</body>
+</html>
