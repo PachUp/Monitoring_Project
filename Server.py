@@ -224,13 +224,13 @@ def no_one_in_db(id):
                     all_computers.append(Todo.query.all()[i].id)
                 if current_user.level == 1:
                     if current_user.computer_id == id:
-                        return render_template('show_computer_data.html',levels=levels ,computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     else:
                         return abort(404)
                 elif current_user.level == 2:
                     if current_user.computer_id == id:
-                        return render_template('show_computer_data.html',levels=levels, computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     try:
                         allow_to_acces = current_user.allow_to_view_level_2.split(',')
@@ -241,16 +241,16 @@ def no_one_in_db(id):
                         if allow_to_acces[0] == "None":
                             return abort(404)
                         elif int(allow_to_acces[0]) == id:
-                            return render_template('show_computer_data.html',levels=levels, computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                            return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     else:
                         for i in allow_to_acces:
                             i = int(i)
                             if i == id:
-                                return render_template('show_computer_data.html',levels=levels, computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                                return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                 elif current_user.level == 3:
-                    return render_template('show_computer_data.html',levels=levels, computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                    return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
             else:
                 return redirect("/login")
             
