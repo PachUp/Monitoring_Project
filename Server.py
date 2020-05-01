@@ -219,15 +219,18 @@ def no_one_in_db(id):
                 cpu_percent = running_processes["task status cpu percent"]
                 memory_percent = running_processes["task status memory percent"]
                 computer = Todo.query.get_or_404(id)
+                all_computers = []
+                for i in range(0, len(Todo.query.all())):
+                    all_computers.append(Todo.query.all()[i].id)
                 if current_user.level == 1:
                     if current_user.computer_id == id:
-                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level = int(current_user.level), computer_list=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     else:
                         return abort(404)
                 elif current_user.level == 2:
                     if current_user.computer_id == id:
-                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level = int(current_user.level), computer_list=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     try:
                         allow_to_acces = current_user.allow_to_view_level_2.split(',')
@@ -238,16 +241,16 @@ def no_one_in_db(id):
                         if allow_to_acces[0] == "None":
                             return abort(404)
                         elif int(allow_to_acces[0]) == id:
-                            return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                            return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level = int(current_user.level), computer_list=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     else:
                         for i in allow_to_acces:
                             i = int(i)
                             if i == id:
-                                return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                                return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level = int(current_user.level), computer_list=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                 elif current_user.level == 3:
-                    return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                    return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level = int(current_user.level), computer_list=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
             else:
                 return redirect("/login")
             
@@ -338,7 +341,7 @@ def admin_panel():
     if request.method == 'GET':
         if current_user.level == 3:
             users_username, computer_client_id, assigned_values, levels, assigned_level_2_allowed_to_view = get_admin_panel_data()
-            return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view,zip=itertools.zip_longest)
+            return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view, , computer_list =computer_client_id, level = int(current_user.level),zip=itertools.zip_longest)
         else:
             return redirect('/')
 
@@ -437,7 +440,7 @@ def show_all_computers():
     for i in range(len(Todo.query.all())):
         all_computers_on_the_server.append(Todo.query.all()[i].id)
     print(all_computers_on_the_server)
-    return render_template('show_all_computers.html', computer_list =all_computers_on_the_server)
+    return render_template('show_all_computers.html', computer_list =all_computers_on_the_server, level = int(current_user.level))
 @app.route('/logout')
 def logout():
     logout_user()
@@ -448,7 +451,7 @@ def index():
     all_computers = []
     for i in range(0, len(Todo.query.all())):
         all_computers.append(Todo.query.all()[i].id)
-    return render_template('index.html', user=current_user.username, level = int(current_user.level), computers=all_computers, level=current_user.level)
+    return render_template('index.html', user=current_user.username, level = int(current_user.level), computer_list=all_computers)
 
 # err handles
 @app.errorhandler(401) 

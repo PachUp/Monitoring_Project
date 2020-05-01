@@ -32,7 +32,7 @@
                         <a href="http://admin-monitor.herokuapp.com/admin-panel" class="nav-link dropdown-toggle this-is-navbar" data-toggle="dropdown">Admin panel</a>
                         {%endif%}
                         <div class="dropdown-menu this-is-navbar">
-                            {% for i in computers %}
+                            {% for i in computer_list %}
                             <a href= "http://admin-monitor.herokuapp.com/computers/{{i}}" class="dropdown-item this-is-navbar">{{i}}</a>
                             {% endfor %}
                         </div>

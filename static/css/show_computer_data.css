@@ -1,3 +1,4 @@
+/*
 div.scroll{
     background-color: lightblue;
     width: 1000px;
@@ -10,7 +11,7 @@ body {
     height: 100vh;
     justify-content: center;
   }
-  /* css dropdown and botton and text filed start */
+  
 .dropbtn {
   background-color: #4CAF50;
   color: white;
@@ -51,7 +52,7 @@ body {
   background-color: #3e8e41;
 }
 .button {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50; 
     border: none;
     color: white;
     padding: 15px 32px;
