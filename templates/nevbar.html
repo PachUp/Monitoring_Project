@@ -25,11 +25,11 @@
             <div class="collapse navbar-collapse justify-content-between this-is-navbar" id="navbarCollapse">
                 <div class="navbar-nav this-is-navbar">
                     <a href="http://admin-monitor.herokuapp.com/" class="nav-item nav-link active this-is-navbar">Home</a>
-                    <div class="nav-item dropdown this-is-navbar">
+                    <div class="nav-item dropdown this-is-navbar dropdown-navbar">
                         <a href="#" class="nav-link dropdown-toggle this-is-navbar" data-toggle="dropdown">Computers list</a>
                         <div class="dropdown-menu this-is-navbar">
                             {% for i in computer_list_nev %}
-                            <a href= "http://admin-monitor.herokuapp.com/computers/{{i}}" class="dropdown-item this-is-navbar">{{i}}</a>
+                            <a href= "http://admin-monitor.herokuapp.com/computers/{{i}}" class="dropdown-item dropdown-item-nevbar this-is-navbar">{{i}}</a>
                             {% endfor %}
                         </div>
                     </div>
@@ -51,3 +51,13 @@
         margin: 20px;
     }
 </style>
+<script>
+  $('.dropdown-navbar').on('show.bs.dropdown', function() {
+    $(this).find('.dropdown-item-nevbar').first().stop(true, true).slideDown();
+  });
+
+  // Add slideUp animation to Bootstrap dropdown when collapsing.
+  $('.dropdown-navbar').on('hide.bs.dropdown', function() {
+    $(this).find('.dropdown-item-nevbar').first().stop(true, true).slideUp();
+  });
+</script>
