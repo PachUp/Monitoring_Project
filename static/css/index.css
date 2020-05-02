@@ -35,10 +35,9 @@ a {
   --mainColor: #ff9800;
 }
 */
-body {
+#center-me {
   align-items: center;
+  text-align: center;
   font-family: 'Montserrat', sans-serif;
-  font-size: 2em;
-  height: 100vh;
   justify-content: center;
 }

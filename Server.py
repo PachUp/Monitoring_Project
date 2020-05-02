@@ -1,34 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@PachUp 
-Learn Git and GitHub without any code!
-Using the Hello World guide, you’ll start a branch, write comments, and open a pull request.
-
-
-PachUp
-/
-Monitoring_Project
-Private
-3
-00
- Code
- Issues 0
- Pull requests 0 Actions
- Projects 0
- Security 0
- Insights
- Settings
-Monitoring_Project/Server.py /
-@R4z7 R4z7 nevbar added bug fixed6
-7e4dcfa 13 hours ago
-465 lines (430 sloc)  19.8 KB
-  
 import requests
 from flask_restful import Resource, Api
 from flask import Flask, render_template, url_for, request, redirect, jsonify, abort
@@ -454,24 +423,15 @@ def admin_data():
             if (user_found == False and assign_value != -1) or level > 3:
                 print("the err")
                 return {"Values" : "failed"}
-            if assign_value == -1:
-                assign_value = "None"
             users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
             db.session.commit()
+            if assign_value == -1:
+                assign_value = "None"
             return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
         except:
             print("the err")
             return {"Values" : "failed"}
 
-
-@app.route('/computers')
-def show_all_computers():
-    print(len(Todo.query.all()))
-    all_computers_on_the_server = []
-    for i in range(len(Todo.query.all())):
-        all_computers_on_the_server.append(Todo.query.all()[i].id)
-    print(all_computers_on_the_server)
-    return render_template('show_all_computers.html', computer_list_nev =all_computers_on_the_server, level_nev = int(current_user.level))
 @app.route('/logout')
 def logout():
     logout_user()
@@ -482,7 +442,7 @@ def index():
     all_computers = []
     for i in range(0, len(Todo.query.all())):
         all_computers.append(Todo.query.all()[i].id)
-    return render_template('index.html', user=current_user.username,level = level ,level_nev = int(current_user.level), computer_list_nev=all_computers)
+    return render_template('index.html', user=current_user.username,level =int(current_user.level) ,level_nev = int(current_user.level), computer_list_nev=all_computers)
 
 # err handles
 @app.errorhandler(401) 
