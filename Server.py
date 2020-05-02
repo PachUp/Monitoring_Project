@@ -1,3 +1,34 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@PachUp 
+Learn Git and GitHub without any code!
+Using the Hello World guide, you’ll start a branch, write comments, and open a pull request.
+
+
+PachUp
+/
+Monitoring_Project
+Private
+3
+00
+ Code
+ Issues 0
+ Pull requests 0 Actions
+ Projects 0
+ Security 0
+ Insights
+ Settings
+Monitoring_Project/Server.py /
+@R4z7 R4z7 nevbar added bug fixed6
+7e4dcfa 13 hours ago
+465 lines (430 sloc)  19.8 KB
+  
 import requests
 from flask_restful import Resource, Api
 from flask import Flask, render_template, url_for, request, redirect, jsonify, abort
@@ -219,15 +250,18 @@ def no_one_in_db(id):
                 cpu_percent = running_processes["task status cpu percent"]
                 memory_percent = running_processes["task status memory percent"]
                 computer = Todo.query.get_or_404(id)
+                all_computers = []
+                for i in range(0, len(Todo.query.all())):
+                    all_computers.append(Todo.query.all()[i].id)
                 if current_user.level == 1:
                     if current_user.computer_id == id:
-                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     else:
                         return abort(404)
                 elif current_user.level == 2:
                     if current_user.computer_id == id:
-                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     try:
                         allow_to_acces = current_user.allow_to_view_level_2.split(',')
@@ -238,16 +272,16 @@ def no_one_in_db(id):
                         if allow_to_acces[0] == "None":
                             return abort(404)
                         elif int(allow_to_acces[0]) == id:
-                            return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                            return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     else:
                         for i in allow_to_acces:
                             i = int(i)
                             if i == id:
-                                return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                                return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                 elif current_user.level == 3:
-                    return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                    return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
             else:
                 return redirect("/login")
             
@@ -338,7 +372,7 @@ def admin_panel():
     if request.method == 'GET':
         if current_user.level == 3:
             users_username, computer_client_id, assigned_values, levels, assigned_level_2_allowed_to_view = get_admin_panel_data()
-            return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view,zip=itertools.zip_longest)
+            return render_template("admin_panel.html", users_username = users_username, computer_client_id=computer_client_id, assigned_values=assigned_values, levels=levels,assigned_level_2_allowed_to_view=assigned_level_2_allowed_to_view, computer_list_nev =computer_client_id, level_nev = int(current_user.level),zip=itertools.zip_longest)
         else:
             return redirect('/')
 
@@ -406,30 +440,24 @@ def admin_data():
                 return {"Values" : "failed"}
             user_found = False
             username_pos = -1
-            print("in check")
             for i in range(0,len(users.query.all())):
-                print(users.query.all()[i].username, end=" ")
                 if user ==  users.query.all()[i].username:
                     username_pos = i
-            print(username_pos)
             if assign_value != -1:
                 for j in range(0,len(users.query.all())):
-                    print(str(user) == str(users.query.all()[j].username))
-                    if str(user) == str(users.query.all()[j].username):
+                    if user == users.query.all()[j].username:
                         user_found = True
                         print("found")
                     if assign_value == users.query.all()[j].computer_id and j != username_pos:
                         print("Failed")
                         return {"Values" : "failed"}
-            print(user_found)
-            print(assign_value != -1)
             if (user_found == False and assign_value != -1) or level > 3:
-                print("the err1")
+                print("the err")
                 return {"Values" : "failed"}
-            users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
-            db.session.commit()
             if assign_value == -1:
                 assign_value = "None"
+            users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
+            db.session.commit()
             return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
         except:
             print("the err")
@@ -443,15 +471,18 @@ def show_all_computers():
     for i in range(len(Todo.query.all())):
         all_computers_on_the_server.append(Todo.query.all()[i].id)
     print(all_computers_on_the_server)
-    return render_template('show_all_computers.html', computer_list =all_computers_on_the_server)
+    return render_template('show_all_computers.html', computer_list_nev =all_computers_on_the_server, level_nev = int(current_user.level))
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect('/login')
 @app.route('/')
 @login_required
-def index():    
-    return render_template('index.html', user=current_user.username, level = int(current_user.level))
+def index():
+    all_computers = []
+    for i in range(0, len(Todo.query.all())):
+        all_computers.append(Todo.query.all()[i].id)
+    return render_template('index.html', user=current_user.username,level = level ,level_nev = int(current_user.level), computer_list_nev=all_computers)
 
 # err handles
 @app.errorhandler(401) 
