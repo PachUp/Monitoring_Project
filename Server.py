@@ -406,24 +406,30 @@ def admin_data():
                 return {"Values" : "failed"}
             user_found = False
             username_pos = -1
+            print("in check")
             for i in range(0,len(users.query.all())):
+                print(users.query.all()[i].username, end=" ")
                 if user ==  users.query.all()[i].username:
                     username_pos = i
+            print(username_pos)
             if assign_value != -1:
                 for j in range(0,len(users.query.all())):
-                    if user == users.query.all()[j].username:
+                    print(str(user) == str(users.query.all()[j].username))
+                    if str(user) == str(users.query.all()[j].username):
                         user_found = True
                         print("found")
                     if assign_value == users.query.all()[j].computer_id and j != username_pos:
                         print("Failed")
                         return {"Values" : "failed"}
+            print(user_found)
+            print(assign_value != -1)
             if (user_found == False and assign_value != -1) or level > 3:
-                print("the err")
+                print("the err1")
                 return {"Values" : "failed"}
-            if assign_value == -1:
-                assign_value = "None"
             users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
             db.session.commit()
+            if assign_value == -1:
+                assign_value = "None"
             return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
         except:
             print("the err")
