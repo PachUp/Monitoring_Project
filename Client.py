@@ -1,4 +1,6 @@
 # coding=utf-8
+import glob
+import threading
 import os
 import psutil
 import flask_restful
@@ -172,8 +174,32 @@ class ProcessDetails:
             name.append(infoDict["name"])
             cpu_percent.append(infoDict["cpu_percent"])
             memory_percent.append(infoDict["memory_percent"])
-        print(running_programs)
         return running_programs, pid, name, cpu_percent, memory_percent
+
+
+class SendToServer:
+    def __init__(self, send_request_to):
+        self.send_request_to = send_request_to
+
+    def send_computer_details(self, ProcessDetail, CpuDetail, MemoryDetail):
+        while True:
+            requests.post(self.send_request_to, json={"running processes": ProcessDetail.get_running_processes()[0],
+                                                    "CPU usage procentage": CpuDetail.cpu_utilization_procentage(),
+                                                    "Memory usage procentage": MemoryDetail.memory_utilization_procentage()
+                                                    })
+    def send_dir_files(self):
+        while True:
+            last_content = ""
+            dir_url = self.send_request_to + "/get-dir"
+            dir_content = requests.post(dir_url)
+            print(dir_content.content.decode())
+            if dir_content.content.decode() != "None":
+                try:
+                    dir_items = os.listdir(dir_content.content.decode())
+                except:
+                    dir_items = "Not found"
+                requests.get(dir_url, json={"dir list": dir_items})
+            sleep(1)
 
 
 def computer_mac_address():
@@ -187,7 +213,7 @@ def main():
     index = 0
     status_code = 200
     response_content = ""
-    address_link = 'http://admin-monitor.herokuapp.com/computers/verify_login'
+    address_link = 'http://127.0.0.1:5000/computers/verify_login'
     response = requests.get(address_link)
     response_content = response.content.decode()
     status_code = response.status_code
@@ -198,9 +224,9 @@ def main():
     print(computer_mac_address())
     if status_code == 200:
         while computer_id == "":
-            send_request_to = "http://admin-monitor.herokuapp.com/computers"
-            req_id = requests.post('http://admin-monitor.herokuapp.com/computers/verify_login',
-                               json={"mac_address": computer_mac_address()})
+            send_request_to = "http://127.0.0.1:5000/computers"
+            req_id = requests.post('http://127.0.0.1:5000/computers/verify_login',
+                               json={"mac_address": "84:a6:c8:62:dd:e2"})
             computer_id = req_id.content.decode()
             print("computer id: " + computer_id)
             print(type(computer_id))
@@ -208,12 +234,13 @@ def main():
                 send_request_to = send_request_to + "/" + computer_id
         requests.post(send_request_to,
                       json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ": MemoryDetail.ram_usage()})
-        while True:
-            requests.post(send_request_to, json={"running processes": ProcessDetail.get_running_processes()[0],
-                                                 "CPU usage procentage": CpuDetail.cpu_utilization_procentage(),
-                                                 "Memory usage procentage": MemoryDetail.memory_utilization_procentage()
-                                                 })
-
+        
+        send_to_server = SendToServer(send_request_to)
+        send_computer_details = threading.Thread(target=send_to_server.send_computer_details, args=[ProcessDetail, CpuDetail, MemoryDetail])
+        send_dir_files = threading.Thread(target=send_to_server.send_dir_files)
+        send_computer_details.setDaemon(True)
+        send_computer_details.start()
+        send_dir_files.start()
 
 if __name__ == "__main__":
     main()

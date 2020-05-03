@@ -91,6 +91,19 @@
       <div class="progress">
         <div id="memory-progress" class="progress-bar bg-info" role="progressbar" style="width: {{computer.memory_usage_procentage}}%" aria-valuenow="{{computer.memory_usage_procentage}}" aria-valuemin="0" aria-valuemax="100">{{computer.memory_usage_procentage}}</div>
       </div>
+      <br>
+      <br>
+      <br>
+      <br>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" placeholder="Enter directory" aria-label="Enter directory" aria-describedby="basic-addon2" value="C:/" id="dir-val">
+          <div class="input-group-append" id="inlineFormInputGroup">
+            <button class="btn btn-outline-secondary" id="dir-button" type="button">Go!</button>
+          </div>
+        </div>
+      <ul id="list-dir">
+
+      </ul>
   </div>
 </div>
 <script>
@@ -98,6 +111,32 @@
 var timer = 5000;
 $(".computer-data-dropdown").click(function(){
   $(".computer-data-dropdown-item").fadeOut(1).fadeIn(2000); //animation
+});
+$("#dir-button").click(function(){
+  var input_val = $("#dir-val").val();
+  var currentLocation = window.location;
+  var send_loc = currentLocation + "/get-dir"
+  data = "DirVals=" + input_val
+  $.ajax({
+    type: "POST",
+    url: send_loc,
+    data: data
+  });
+  
+  setTimeout(function(){
+    $.get("/computers/{{computer.id}}/get-dir", function(data){
+    if(data !="Not found" && data["response" + "{{computer.id}}"] != "Not found"){
+      console.log(data["response" + "{{computer.id}}"])
+      $listSelector = $("#list-dir")
+      $.each(data["response" + "{{computer.id}}"], function(i){
+        $listSelector.append("<il>" + data["response" + "{{computer.id}}"][i] + "</il> <br>")
+      });
+    }
+    else{
+      console.log("Not found")
+    }
+  });
+  }, 1001);
 });
 $(".computer-data-dropdown-item").click(function(){ //make sure if I add another dropdown I need to change the class so they'll have diffrent ones if needed.
   var id = $(this).attr('id');

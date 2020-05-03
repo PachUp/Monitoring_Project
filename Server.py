@@ -12,11 +12,12 @@ new_id = -1
 new_mac_address = ""
 change = 5000
 js = ""
-
+dir_requests = {}
+dir_response = {}
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://dfrawwwpzamher:2290ce982f10bf8d567ed1fbee42765e550a6e84b9049c717feb8945477b38b7@ec2-54-228-251-117.eu-west-1.compute.amazonaws.com:5432/d3updufagirasd'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://jkeqyakitkhvpa:99ee29e318f1672f4b92eea65fb91e9c7e28eef8763e2230fd6530019e031b76@ec2-54-246-87-132.eu-west-1.compute.amazonaws.com:5432/daen64rflb81qo'
 app.config['SECRET_KEY'] = "thisistopsecret"
 db = SQLAlchemy(app)
 admin = Admin(app,url="/admindb")
@@ -122,14 +123,15 @@ def check_if_user_exists():
         print(js)
         if js is not None:
             mac_address = js['mac_address']
+            print("MAC: " + mac_address)
             for i in range(0,len(Todo.query.all())):
                 print(Todo.query.all()[i].id)
-                print(Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].mac_address)
+                print("mac found: " + Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].mac_address)
                 if mac_address == Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].mac_address:
                     print("True!")
                     return str(Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].id)
             new_mac_address = mac_address
-            print("Not found!")
+            print("Not found!?")
             return redirect('/computers/add')
         else:
             print("Empty? wtf")
@@ -203,7 +205,35 @@ def no_one_in_db_code(id):
     print("returnin'")
     return "Something" # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
     #return render_template('get_json.html', json_request = js)
-
+@app.route("/computers/<int:id>/get-dir", methods=['POST', 'GET'])
+def get_dir_files(id):
+    dir_location = ""
+    if request.method == "POST":
+        params = request.form
+        try:
+            dir_requests[id] = params["DirVals"]
+        except:
+            pass
+        if id not in dir_requests:
+            print("None")
+            return "None"
+        else:
+            return dir_requests[id]
+    else:
+        try:
+            jq = request.get_json()
+            dir_response["response" + str(id)] = jq["dir list"]
+            if jq!= None:
+                return jq
+            else:
+                return "Not found"
+        except:
+            print("expected!")
+            try:
+                print(dir_response)
+                return dir_response
+            except:
+                return "Not found"
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
 def no_one_in_db(id):
     if len(Todo.query.all()) >= 0:
