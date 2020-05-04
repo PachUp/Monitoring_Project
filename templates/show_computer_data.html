@@ -116,6 +116,7 @@ $("#dir-button").click(function(){
   var currentLocation = window.location;
   var send_loc = currentLocation + "/ajax-dir"
   data = "DirVals=" + input_val
+  console.log(currentLocation)
   console.log("before data"  +data)
   $.ajax({
     type: "POST",
