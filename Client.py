@@ -192,15 +192,15 @@ class SendToServer:
             last_content = ""
             dir_url = self.send_request_to + "/get-dir"
             dir_content = requests.post(dir_url)
-            print(dir_content.content.decode())
-            if dir_content.content.decode() != "None":
+            print("Boe" + dir_content.content.decode())
+            if dir_content.content.decode() != "Not found":
+                print("content: " + dir_content.content.decode())
                 try:
                     dir_items = os.listdir(dir_content.content.decode())
                 except:
-                    dir_items = "Not found"
+                    dir_items = ["Not found"]
                 requests.get(dir_url, json={"dir list": dir_items})
             sleep(1)
-
 
 def computer_mac_address():
     return getmac.get_mac_address()

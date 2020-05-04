@@ -102,7 +102,6 @@
           </div>
         </div>
       <ul id="list-dir">
-
       </ul>
   </div>
 </div>
@@ -115,16 +114,25 @@ $(".computer-data-dropdown").click(function(){
 $("#dir-button").click(function(){
   var input_val = $("#dir-val").val();
   var currentLocation = window.location;
-  var send_loc = currentLocation + "/get-dir"
+  var send_loc = currentLocation + "/ajax-dir"
   data = "DirVals=" + input_val
+  console.log("before data"  +data)
   $.ajax({
     type: "POST",
     url: send_loc,
-    data: data
+    data: data,
+    success: function(dir_items){
+      dir_items = dir_items["dir items"]
+      console.log(dir_items)
+      for(var i = 0; i<dir_items.length; i++){
+        $("#list-dir").append("<il>" + dir_items[i] + "</il> <br>")
+      }
+    }
   });
   
+  /*
   setTimeout(function(){
-    $.get("/computers/{{computer.id}}/get-dir", function(data){
+    $.get("/computers/{{computer.id}}/ajax-dir", function(data){
     if(data !="Not found" && data["response" + "{{computer.id}}"] != "Not found"){
       console.log(data["response" + "{{computer.id}}"])
       $listSelector = $("#list-dir")
@@ -136,7 +144,8 @@ $("#dir-button").click(function(){
       console.log("Not found")
     }
   });
-  }, 1001);
+  }, 2500);
+  */
 });
 $(".computer-data-dropdown-item").click(function(){ //make sure if I add another dropdown I need to change the class so they'll have diffrent ones if needed.
   var id = $(this).attr('id');
@@ -219,6 +228,11 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
 }
 /* handle automatic update computer info without refresh */
 $(document).ready(function(){
+  setInterval(function(){
+    $('#list-dir').on('change', function() {
+  alert( this.value );
+});
+  },1000);
   change_progress_bar_color(cpu_usage,memory_usage);
   $("span").fadeOut(500).fadeIn(800); //animation
     var cpu_usage = $("#cpu").text();

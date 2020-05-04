@@ -205,35 +205,45 @@ def no_one_in_db_code(id):
     print("returnin'")
     return "Something" # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
     #return render_template('get_json.html', json_request = js)
-@app.route("/computers/<int:id>/get-dir", methods=['POST', 'GET'])
-def get_dir_files(id):
-    dir_location = ""
+@app.route("/computers/<int:id>/ajax-dir", methods=["POST", "GET"])
+def get_ajax_data(id):
     if request.method == "POST":
         params = request.form
+        print(params)
         try:
             dir_requests[id] = params["DirVals"]
         except:
             pass
         if id not in dir_requests:
             print("None")
-            return "None"
+            return "None!"
         else:
+            while("response" + str(id) not in dir_response):
+                pass
+            temp_dict_val = dir_response["response" + str(id)]
+            del dir_response["response" + str(id)]
+            del dir_requests[id]
+            return {"dir items": temp_dict_val}
+
+
+@app.route("/computers/<int:id>/get-dir", methods=['POST', 'GET'])
+def get_dir_files(id):
+    dir_location = ""
+    computer = Todo.query.get_or_404(id)
+    if request.method == "POST":
+        if id in dir_requests:
             return dir_requests[id]
+        else:
+            return "Not found"
     else:
         try:
             jq = request.get_json()
             dir_response["response" + str(id)] = jq["dir list"]
-            if jq!= None:
-                return jq
-            else:
-                return "Not found"
+            print(dir_response["response" + str(id)])
+            return ""
         except:
-            print("expected!")
-            try:
-                print(dir_response)
-                return dir_response
-            except:
-                return "Not found"
+            print("Inncrort request")
+            return "Not found"
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
 def no_one_in_db(id):
     if len(Todo.query.all()) >= 0:
@@ -254,7 +264,7 @@ def no_one_in_db(id):
                     all_computers.append(Todo.query.all()[i].id)
                 if current_user.level == 1:
                     if current_user.computer_id == id:
-                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest ,level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
                 
                     else:
                         return abort(404)
