@@ -124,7 +124,7 @@ def check_if_user_exists():
         if js is not None:
             mac_address = js['mac_address']
             print("MAC: " + mac_address)
-            print(len(Todo.query.all())
+            print(len(Todo.query.all()))
             for i in range(0,len(Todo.query.all())):
                 print(Todo.query.all()[i].id)
                 print("mac found: " + Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].mac_address)
