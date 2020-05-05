@@ -209,6 +209,8 @@ def no_one_in_db_code(id):
 @app.route("/computers/<int:id>/ajax-dir", methods=["POST", "GET"])
 def get_ajax_data(id):
     if request.method == "POST":
+        global dir_requests
+        global dir_response
         params = request.form
         print("Pa: ", end="")
         print(params)
@@ -232,6 +234,8 @@ def get_ajax_data(id):
 
 @app.route("/computers/<int:id>/get-dir", methods=['POST', 'GET'])
 def get_dir_files(id):
+    global dir_requests
+    global dir_response
     dir_location = ""
     computer = Todo.query.get_or_404(id)
     if request.method == "POST":
