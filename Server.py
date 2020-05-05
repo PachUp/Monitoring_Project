@@ -213,9 +213,6 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
-        computer.directory_response = ""
-        db.session.commit()
-        computer.directory_request = ""
         db.session.commit()
         params = request.form
         print("Pa: ", end="")
@@ -288,6 +285,10 @@ def no_one_in_db(id):
             return no_one_in_db_code(id)
         else:
             if current_user.is_authenticated:
+                computer.directory_response = ""
+                db.session.commit()
+                computer.directory_request = ""
+                db.session.commit()
                 computer = Todo.query.get_or_404(id)
                 running_processes = computer.running_processes
                 running_processes = json.loads(running_processes)
