@@ -17,7 +17,7 @@ dir_response = {}
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://jkeqyakitkhvpa:99ee29e318f1672f4b92eea65fb91e9c7e28eef8763e2230fd6530019e031b76@ec2-54-246-87-132.eu-west-1.compute.amazonaws.com:5432/daen64rflb81qo'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://jhtkkajhhteskh:eaf51b9ee644a8201136cceeda061cfab7b8f32f1d69a98155f5f22802c3e1ad@ec2-54-217-204-34.eu-west-1.compute.amazonaws.com:5432/d35k8ndm0u88bh'
 app.config['SECRET_KEY'] = "thisistopsecret"
 db = SQLAlchemy(app)
 admin = Admin(app,url="/admindb")
@@ -32,6 +32,7 @@ class Todo(db.Model):
     running_processes = db.Column(db.TEXT,default="initializing")
     cpu_usage_procentage = db.Column(db.FLOAT, default=1.0)
     memory_usage_procentage = db.Column(db.FLOAT, default=1.0)
+    directory_request = db.Column(db.TEXT, default="")
     """
     def __init__(self,id,mac_address,cpu_type,ram_usage,running_processes,cpu_usage_procentage,memory_usage_procentage):
         self.mac_address = mac_address
@@ -210,27 +211,34 @@ def no_one_in_db_code(id):
 @app.route("/computers/<int:id>/ajax-dir", methods=["POST", "GET"])
 def get_ajax_data(id):
     if request.method == "POST":
+        computer = Todo.query.get_or_404(id)
         global dir_requests
         global dir_response
         params = request.form
         print("Pa: ", end="")
         print(params)
         try:
-            dir_requests[id] = params["DirVals"]
             print("Req recived!")
-            print(dir_requests[id])
+            computer.directory_request = params["DirVals"]
+            db.session.commit()
+            print(computer.directory_request)
         except:
             pass
-        if id not in dir_requests:
+        if computer.directory_request == "":
             print("None")
             return "None!"
         else:
+            print("befo: ", end="")
+            print(dir_response)
             while("response" + str(id) not in dir_response):
                 pass
             print("finished! 1")
+            print("af: ", end="")
+            print(dir_response)
             temp_dict_val = dir_response["response" + str(id)]
             del dir_response["response" + str(id)]
-            del dir_requests[id]
+            computer.directory_request = ""
+            db.session.commit()
             return {"dir items": temp_dict_val}
 
 
@@ -242,10 +250,10 @@ def get_dir_files(id):
     computer = Todo.query.get_or_404(id)
     if request.method == "POST":
         print("get-dir req recived!", end="")
-        print(dir_requests)
-        if id in dir_requests:
-            print("I found:" + dir_requests[id])
-            return dir_requests[id]
+        print(computer.directory_request)
+        if computer.id == id and computer.directory_request != "":
+            print("I found:" + computer.directory_request)
+            return computer.directory_request
         else:
             return "Not found"
     else:
