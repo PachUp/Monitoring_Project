@@ -209,8 +209,11 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         params = request.form
+        print("Pa: ", end="")
+        print(params)
         try:
             dir_requests[id] = params["DirVals"]
+            print("Req recived!")
             print(dir_requests[id])
         except:
             pass
