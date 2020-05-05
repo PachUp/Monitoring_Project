@@ -27,11 +27,11 @@ class Todo(db.Model):
     __tablename__ = "Todo"
     id = db.Column(db.Integer, primary_key=True)
     mac_address = db.Column(db.TEXT)
-    cpu_type = db.Column(db.TEXT)
-    ram_usage = db.Column(db.FLOAT)
-    running_processes = db.Column(db.TEXT)
-    cpu_usage_procentage = db.Column(db.FLOAT)
-    memory_usage_procentage = db.Column(db.FLOAT)
+    cpu_type = db.Column(db.TEXT, default="1.0")
+    ram_usage = db.Column(db.FLOAT, default=1.0)
+    running_processes = db.Column(db.TEXT,default="initializing")
+    cpu_usage_procentage = db.Column(db.FLOAT, default=1.0)
+    memory_usage_procentage = db.Column(db.FLOAT, default=1.0)
     """
     def __init__(self,id,mac_address,cpu_type,ram_usage,running_processes,cpu_usage_procentage,memory_usage_procentage):
         self.mac_address = mac_address
@@ -44,6 +44,7 @@ class Todo(db.Model):
     """
 admin.add_view(ModelView(Todo, db.session))
 class users(db.Model, UserMixin):
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.TEXT, unique=True)
     password = db.Column(db.TEXT)
@@ -125,12 +126,12 @@ def check_if_user_exists():
             mac_address = js['mac_address']
             print("MAC: " + mac_address)
             print(len(Todo.query.all()))
-            for i in range(0,len(Todo.query.all())-1):
-                print(Todo.query.all()[i].id)
-                print("mac found: " + Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].mac_address)
-                if mac_address == Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].mac_address:
+            for i in range(0,len(Todo.query.all())):
+                current_id = Todo.query.all()[i].id
+                current_mac = Todo.query.all()[i].mac_address
+                if mac_address == current_mac:
                     print("True!")
-                    return str(Todo.query.filter_by(id = Todo.query.all()[i].id).all()[i].id)
+                    return str(current_id)
             new_mac_address = mac_address
             print("Not found!?")
             return redirect('/computers/add')
