@@ -192,7 +192,7 @@ class SendToServer:
             last_content = ""
             dir_url = self.send_request_to + "/get-dir"
             dir_content = requests.post(dir_url)
-            print("Boe" + dir_content.content.decode())
+            print("going to be sent " + dir_content.content.decode())
             if dir_content.content.decode() != "Not found":
                 print("content: " + dir_content.content.decode())
                 try:
