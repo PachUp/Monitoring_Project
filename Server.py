@@ -17,7 +17,7 @@ dir_response = {}
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://jhtkkajhhteskh:eaf51b9ee644a8201136cceeda061cfab7b8f32f1d69a98155f5f22802c3e1ad@ec2-54-217-204-34.eu-west-1.compute.amazonaws.com:5432/d35k8ndm0u88bh'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://fhnegpigdbdikc:37ed07f8c112ec9e466c416eeee5c45ae06b893081dc78419634bc03710c6a50@ec2-54-247-89-181.eu-west-1.compute.amazonaws.com:5432/d1t5r8cklned1b'
 app.config['SECRET_KEY'] = "thisistopsecret"
 db = SQLAlchemy(app)
 admin = Admin(app,url="/admindb")
@@ -33,6 +33,7 @@ class Todo(db.Model):
     cpu_usage_procentage = db.Column(db.FLOAT, default=1.0)
     memory_usage_procentage = db.Column(db.FLOAT, default=1.0)
     directory_request = db.Column(db.TEXT, default="")
+    directory_response = db.Column(db.TEXT, default="")
     """
     def __init__(self,id,mac_address,cpu_type,ram_usage,running_processes,cpu_usage_procentage,memory_usage_procentage):
         self.mac_address = mac_address
@@ -229,16 +230,18 @@ def get_ajax_data(id):
             return "None!"
         else:
             print("befo: ", end="")
-            print(dir_response)
-            while("response" + str(id) not in dir_response):
+            while(computer.directory_response == ""):
                 pass
             print("finished! 1")
             print("af: ", end="")
-            print(dir_response)
-            temp_dict_val = dir_response["response" + str(id)]
-            del dir_response["response" + str(id)]
+            temp_dict_val = computer.directory_response
+            computer.directory_response = ""
+            db.session.commit()
             computer.directory_request = ""
             db.session.commit()
+            print("end: ", end="")
+            print(temp_dict_val)
+            temp_dict_val = temp_dict_val.split(",") # needs to be replaced! use json dumps and loads
             return {"dir items": temp_dict_val}
 
 
@@ -259,8 +262,11 @@ def get_dir_files(id):
     else:
         try:
             jq = request.get_json()
-            dir_response["response" + str(id)] = jq["dir list"]
-            print(dir_response["response" + str(id)])
+            print("before jq!", end="")
+            print(jq)
+            computer.directory_response = jq["dir list"]
+            db.session.commit()
+            print(computer.directory_response)
             return ""
         except:
             print("Inncrort request")
