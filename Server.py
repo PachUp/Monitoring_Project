@@ -227,6 +227,7 @@ def get_ajax_data(id):
         else:
             while("response" + str(id) not in dir_response):
                 pass
+            print("finished! 1")
             temp_dict_val = dir_response["response" + str(id)]
             del dir_response["response" + str(id)]
             del dir_requests[id]
