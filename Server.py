@@ -213,8 +213,10 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
-        global dir_requests
-        global dir_response
+        computer.directory_response = ""
+        db.session.commit()
+        computer.directory_request = ""
+        db.session.commit()
         params = request.form
         print("Pa: ", end="")
         print(params)
@@ -258,6 +260,10 @@ def get_dir_files(id):
             print("I found:" + computer.directory_request)
             return computer.directory_request
         else:
+            computer.directory_response = ""
+            db.session.commit()
+            computer.directory_request = ""
+            db.session.commit()
             return "Not found"
     else:
         try:
@@ -269,6 +275,10 @@ def get_dir_files(id):
             print(computer.directory_response)
             return ""
         except:
+            computer.directory_response = ""
+            db.session.commit()
+            computer.directory_request = ""
+            db.session.commit()
             print("Inncrort request")
             return "Not found"
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
