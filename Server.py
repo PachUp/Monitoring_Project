@@ -209,9 +209,9 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         params = request.form
-        print(params)
         try:
             dir_requests[id] = params["DirVals"]
+            print(dir_requests[id])
         except:
             pass
         if id not in dir_requests:
@@ -221,6 +221,8 @@ def get_ajax_data(id):
             while("response" + str(id) not in dir_response):
                 pass
             temp_dict_val = dir_response["response" + str(id)]
+            del dir_response["response" + str(id)]
+            del dir_requests[id]
             return {"dir items": temp_dict_val}
 
 
