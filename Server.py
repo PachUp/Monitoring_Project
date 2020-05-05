@@ -234,8 +234,10 @@ def get_dir_files(id):
     dir_location = ""
     computer = Todo.query.get_or_404(id)
     if request.method == "POST":
+        print("get-dir req recived!")
         if id in dir_requests:
             return dir_requests[id]
+            print("I found:" + dir_requests[id])
         else:
             return "Not found"
     else:
