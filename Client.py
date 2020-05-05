@@ -226,7 +226,7 @@ def main():
         while computer_id == "":
             send_request_to = "http://admin-monitor.herokuapp.com/computers"
             req_id = requests.post('http://admin-monitor.herokuapp.com/computers/verify_login',
-                               json={"mac_address": computer_mac_address()})
+                               json={"mac_address": "84:a6:c8:62:dd:e2"})
             computer_id = req_id.content.decode()
             print("computer id: " + computer_id)
             print(type(computer_id))
