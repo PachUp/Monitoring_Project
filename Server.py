@@ -15,9 +15,10 @@ js = ""
 dir_requests = {}
 dir_response = {}
 
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://fhnegpigdbdikc:37ed07f8c112ec9e466c416eeee5c45ae06b893081dc78419634bc03710c6a50@ec2-54-247-89-181.eu-west-1.compute.amazonaws.com:5432/d1t5r8cklned1b'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://elxqgsztvkhjaw:539ef0f68492adcefad2a471203ba421cb4699ae50b806f4698ea84a32a1f88f@ec2-54-195-247-108.eu-west-1.compute.amazonaws.com:5432/d7v0a7vgovnqos'
 app.config['SECRET_KEY'] = "thisistopsecret"
 db = SQLAlchemy(app)
 admin = Admin(app,url="/admindb")
@@ -152,9 +153,11 @@ def no_one_in_db_code(id):
     for name, item in js.items():
         if name == "CPU type: ":
             computer.cpu_type = item
+            db.session.add(computer)
             db.session.commit()
         if name == "Ram usage: ":
             computer.ram_usage = item
+            db.session.add(computer)
             db.session.commit()
         if name == "running processes":
             new_item = []
@@ -190,12 +193,15 @@ def no_one_in_db_code(id):
             }
             dict_task = json.dumps(dict_task)
             computer.running_processes = dict_task
+            db.session.add(computer)
             db.session.commit()
         if name == "CPU usage procentage":
             computer.cpu_usage_procentage = item
+            db.session.add(computer)
             db.session.commit()
         if name == "Memory usage procentage":
             computer.memory_usage_procentage = item
+            db.session.add(computer)
             db.session.commit()
     #db.session.add(new_computer)
     #db.session.commit()
@@ -213,71 +219,45 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
-        db.session.commit()
         params = request.form
-        print("Pa: ", end="")
-        print(params)
         try:
-            print("Req recived!")
-            computer.directory_request = params["DirVals"]
-            db.session.commit()
-            print(computer.directory_request)
+            dir_requests[id] = params["DirVals"]
         except:
             pass
-        if computer.directory_request == "":
+        if id not in dir_requests:
             print("None")
             return "None!"
         else:
-            print("befo: ", end="")
-            while(computer.directory_response == ""):
+            while("response" + str(id) not in dir_response):
                 pass
-            print("finished! 1")
-            print("af: ", end="")
-            temp_dict_val = computer.directory_response
-            computer.directory_response = ""
-            db.session.commit()
-            computer.directory_request = ""
-            db.session.commit()
-            print("end: ", end="")
-            print(temp_dict_val)
-            temp_dict_val = temp_dict_val.split(",") # needs to be replaced! use json dumps and loads
+            temp_dict_val = dir_response["response" + str(id)]
+            del dir_response["response" + str(id)]
+            del dir_requests[id]
             return {"dir items": temp_dict_val}
+
 
 
 @app.route("/computers/<int:id>/get-dir", methods=['POST', 'GET'])
 def get_dir_files(id):
-    global dir_requests
-    global dir_response
     dir_location = ""
     computer = Todo.query.get_or_404(id)
     if request.method == "POST":
-        print("get-dir req recived!", end="")
-        print(computer.directory_request)
-        if computer.id == id and computer.directory_request != "":
-            print("I found:" + computer.directory_request)
-            return computer.directory_request
+        if id in dir_requests:
+            return dir_requests[id]
         else:
-            computer.directory_response = ""
-            db.session.commit()
-            computer.directory_request = ""
-            db.session.commit()
             return "Not found"
     else:
         try:
             jq = request.get_json()
-            print("before jq!", end="")
-            print(jq)
-            computer.directory_response = jq["dir list"]
-            db.session.commit()
-            print(computer.directory_response)
+            dir_response["response" + str(id)] = jq["dir list"]
+            print(dir_response["response" + str(id)]) 
             return ""
         except:
-            computer.directory_response = ""
-            db.session.commit()
-            computer.directory_request = ""
-            db.session.commit()
             print("Inncrort request")
             return "Not found"
+
+
+
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
 def no_one_in_db(id):
     if len(Todo.query.all()) >= 0:
@@ -287,8 +267,10 @@ def no_one_in_db(id):
             if current_user.is_authenticated:
                 computer = Todo.query.get_or_404(id)
                 computer.directory_response = ""
-                db.session.commit()
+                db.session.add(computer)
+                db.session.commit() 
                 computer.directory_request = ""
+                db.session.add(computer)
                 db.session.commit()
                 running_processes = computer.running_processes
                 running_processes = json.loads(running_processes)
@@ -364,12 +346,15 @@ def live_info(id):
                         new_item = new_item + " name: " + str(i["name"]) + " memory_percent: " + str(i["memory_percent"]) + " cpu_percent: " + str(i["cpu_percent"]) 
                         count = count + 1
                     computer.running_processes = new_item
+                    db.session.add(computer)
                     db.session.commit()
                 if name == "CPU usage procentage":
                     computer.cpu_usage_procentage = item
+                    db.session.add(computer)
                     db.session.commit()
                 if name == "Memory usage procentage":
                     computer.memory_usage_procentage = item
+                    db.session.add(computer)
                     db.session.commit()
         else:
             json_txt = {"CPU usage procentage" : computer.cpu_usage_procentage, "running processes" : computer.running_processes, "Memory usage procentage": computer.memory_usage_procentage}
@@ -431,6 +416,7 @@ def level_2_handle(remove_vals, user,level):
         if remove_vals[0] == "None":
             print("Allowed to view: " + "None")
             users.query.filter_by(username = user).update(dict(allow_to_view_level_2 = "None"))
+            db.session.add(users)
             db.session.commit()
         try:
             allow_to_view = ""
@@ -444,6 +430,7 @@ def level_2_handle(remove_vals, user,level):
                     allow_to_view = allow_to_view + i
             print("Allowed to view: " + allow_to_view)
             users.query.filter_by(username = user).update(dict(allow_to_view_level_2 = allow_to_view))
+            db.session.add(users)
             db.session.commit()
         except:
             return "None"
@@ -502,6 +489,7 @@ def admin_data():
                 print("the err")
                 return {"Values" : "failed"}
             users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
+            db.session.add(users)
             db.session.commit()
             if assign_value == -1:
                 assign_value = "None"

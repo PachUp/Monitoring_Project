@@ -239,8 +239,8 @@ def main():
         send_computer_details = threading.Thread(target=send_to_server.send_computer_details, args=[ProcessDetail, CpuDetail, MemoryDetail])
         send_dir_files = threading.Thread(target=send_to_server.send_dir_files)
         send_computer_details.setDaemon(True)
-        send_computer_details.start()
         send_dir_files.start()
+        send_computer_details.start()
 
 if __name__ == "__main__":
     main()
