@@ -222,6 +222,7 @@ def get_ajax_data(id):
         params = request.form
         try:
             dir_requests[id] = params["DirVals"]
+            print("Registered!")
         except:
             pass
         if id not in dir_requests:
@@ -242,6 +243,8 @@ def get_dir_files(id):
     dir_location = ""
     computer = Todo.query.get_or_404(id)
     if request.method == "POST":
+        print("dir req: ", end="")
+        print(dir_requests)
         if id in dir_requests:
             return dir_requests[id]
         else:
