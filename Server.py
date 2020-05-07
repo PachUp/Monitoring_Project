@@ -220,6 +220,8 @@ def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
         params = request.form
+        print("I am the paramsn", end = "")
+        print(params)
         try:
             dir_requests[id] = params["DirVals"]
             print("Registered!")
@@ -232,6 +234,7 @@ def get_ajax_data(id):
             while("response" + str(id) not in dir_response):
                 pass
             temp_dict_val = dir_response["response" + str(id)]
+            print("del!")
             del dir_response["response" + str(id)]
             del dir_requests[id]
             return {"dir items": temp_dict_val}
