@@ -8,13 +8,12 @@ import itertools
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import psycopg2
+import redis
+import os
 new_id = -1
 new_mac_address = ""
 change = 5000
 js = ""
-dir_requests = {}
-dir_response = {}
-
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -219,49 +218,113 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
+        redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+
+        redis_response_name = "directory response" + str(id)
+        redis_request_name = "directory request" + str(id)
+
+        redis_server.delete(redis_response_name)
+        redis_server.delete(redis_request_name)
+        """
+        computer.directory_response = ""
+        db.session.add(computer)
+        db.session.commit() 
+        computer.directory_request = ""
+        db.session.add(computer)
+        db.session.commit()
+        """
         params = request.form
-        print("I am the paramsn", end = "")
+        print("Pa: ", end="")
         print(params)
         try:
-            dir_requests[id] = params["DirVals"]
-            print("Registered!")
+            print("Req recived!")
+            print(type(params["DirVals"]))
+            redis_server.set(redis_request_name, params["DirVals"])
+            #computer.directory_request = params["DirVals"]
+            #db.session.add(computer)
+            #db.session.commit()
+            print(redis_server.get(redis_request_name))
         except:
             pass
-        if id not in dir_requests:
+        if redis_server.get(redis_request_name) == "":
             print("None")
             return "None!"
         else:
-            while("response" + str(id) not in dir_response):
-                pass
-            temp_dict_val = dir_response["response" + str(id)]
-            print("del!")
-            del dir_response["response" + str(id)]
-            del dir_requests[id]
+            print("befo: ", end="")
+            print(redis_server.get(redis_response_name))
+            # check in the while loop if when you click on the button there is an existing value
+            get_redis_response = redis_server.lrange(redis_response_name,0, -1)
+            """
+            while(computer.directory_response == ""):
+                computer2 = Todo.query.get(id)
+                if computer2.directory_response != "": 
+                    break
+                else:
+                    pass
+            """
+            try:
+                while(redis_server.get(redis_response_name) is None):
+                    pass
+            except:
+                while(len(get_redis_response) == 0):
+                    get_redis_response = redis_server.lrange(redis_response_name,0, -1)
+                    pass
+            print("finished!")
+            print("af: ", end="")
+            get_redis_response = redis_server.lrange(redis_response_name,0, -1)
+            temp_dict_val = get_redis_response
+            print(temp_dict_val)
+            redis_server.delete(redis_response_name)
+            redis_server.delete(redis_request_name)
+            """
+            computer.directory_response = ""
+            db.session.add(computer)
+            db.session.commit() 
+            computer.directory_request = ""
+            db.session.add(computer)
+            db.session.commit()
+            """
+            print("end: ", end="")
+            print(temp_dict_val)
             return {"dir items": temp_dict_val}
-
-
 
 @app.route("/computers/<int:id>/get-dir", methods=['POST', 'GET'])
 def get_dir_files(id):
     dir_location = ""
     computer = Todo.query.get_or_404(id)
+    print(id)
+    #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
     if request.method == "POST":
-        print("dir req: ", end="")
-        print(dir_requests)
-        if id in dir_requests:
-            return dir_requests[id]
+        print("get-dir req recived!", end="")
+        request_redis = redis_server.get("directory request" + str(id))
+        print(request_redis)
+        if request_redis is not None:
+            if computer.id == id and request_redis != "":
+                print("I found:" + request_redis)
+                return request_redis
+            else:
+                print("err12")
+                return "Not found"
         else:
             return "Not found"
     else:
         try:
             jq = request.get_json()
-            dir_response["response" + str(id)] = jq["dir list"]
-            print(dir_response["response" + str(id)]) 
+            print("before jq!", end="")
+            print(jq)
+            dir_items = jq["dir list"]
+            response_redis_name = "directory response" + str(id)
+            redis_server.rpush(response_redis_name, *dir_items)
+            #computer.directory_response = jq["dir list"]
+            #db.session.add(computer)
+            #db.session.commit()
+            get_redis_response = redis_server.lrange(response_redis_name,0, -1)
+            print(get_redis_response)
             return ""
         except:
             print("Inncrort request")
             return "Not found"
-
 
 
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
@@ -272,12 +335,6 @@ def no_one_in_db(id):
         else:
             if current_user.is_authenticated:
                 computer = Todo.query.get_or_404(id)
-                computer.directory_response = ""
-                db.session.add(computer)
-                db.session.commit() 
-                computer.directory_request = ""
-                db.session.add(computer)
-                db.session.commit()
                 running_processes = computer.running_processes
                 running_processes = json.loads(running_processes)
                 pid = running_processes["task status pid"]

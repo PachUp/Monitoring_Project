@@ -15,6 +15,7 @@ flask-sqlalchemy = "*"
 flask-login = "*"
 flask-admin = "*"
 psycopg2 = "*"
+redis = "*"
 
 [requires]
 python_version = "3.8.2"
