@@ -566,6 +566,8 @@ def admin_data():
                     username_pos = i
             if assign_value != -1:
                 for j in range(0,len(users.query.all())):
+                    print("user: ", end="")
+                    print(users.query.all()[j].username)
                     if user == users.query.all()[j].username:
                         user_found = True
                         print("found")
@@ -573,7 +575,7 @@ def admin_data():
                         print("Failed")
                         return {"Values" : "failed"}
             if (user_found == False and assign_value != -1) or level > 3:
-                print("the err")
+                print("the err2 ")
                 return {"Values" : "failed"}
             print("passed!")
             users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level, remove_vals= remove_vals))
