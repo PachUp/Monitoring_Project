@@ -320,7 +320,7 @@ def get_dir_files(id):
             print("Inncrort request")
             return "Not found"
  
-
+"""
 @app.route("/computers/<int:id>/upload-file/<name>", methods=['POST', 'GET'])
 def upload_file(name, id):
     if request.method == "GET":
@@ -339,15 +339,15 @@ def upload_file(name, id):
         return redirect(redirct_to)
     else:
         
-
-
+"""
+"""
 @app.route("/computers/<int:id>/get-name")
 def send_name(id):
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
     redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
     name = redis_server.get("download" + str(id))
     return name
-
+"""
 
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
 def no_one_in_db(id):
