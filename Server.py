@@ -579,6 +579,7 @@ def admin_data():
             print("almost there")
             if assign_value == -1:
                 assign_value = "None"
+            level_2_handle(remove_vals,user,level)
             return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
         except:
             print("the err")
