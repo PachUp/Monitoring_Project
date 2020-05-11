@@ -578,7 +578,7 @@ def admin_data():
                 print("the err2 ")
                 return {"Values" : "failed"}
             print("passed!")
-            users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level, remove_vals= remove_vals))
+            users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level, allow_to_view_level_2= remove_vals))
             db.session.commit()
             print("almost there")
             if assign_value == -1:
