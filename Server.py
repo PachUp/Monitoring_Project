@@ -218,8 +218,8 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
+        #redis_server = redis.Redis("localhost", charset="utf-8", decode_responses=True)
         redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
-
         redis_response_name = "directory response" + str(id)
         redis_request_name = "directory request" + str(id)
 
@@ -250,14 +250,13 @@ def get_ajax_data(id):
             print("None")
             return "None!"
         else:
-            print("befo: ", end="")
             print(redis_server.get(redis_response_name))
             # check in the while loop if when you click on the button there is an existing value
             get_redis_response = redis_server.lrange(redis_response_name,0, -1)
             """
             while(computer.directory_response == ""):
                 computer2 = Todo.query.get(id)
-                if computer2.directory_response != "": 
+                if computer2.directory_response != "":  
                     break
                 else:
                     pass
@@ -273,9 +272,8 @@ def get_ajax_data(id):
             print("af: ", end="")
             get_redis_response = redis_server.lrange(redis_response_name,0, -1)
             temp_dict_val = get_redis_response
-            print(temp_dict_val)
-            redis_server.delete(redis_response_name)
-            redis_server.delete(redis_request_name)
+            #redis_server.delete(redis_response_name)
+            #redis_server.delete(redis_request_name)
             """
             computer.directory_response = ""
             db.session.add(computer)
@@ -285,7 +283,6 @@ def get_ajax_data(id):
             db.session.commit()
             """
             print("end: ", end="")
-            print(temp_dict_val)
             return {"dir items": temp_dict_val}
 
 @app.route("/computers/<int:id>/get-dir", methods=['POST', 'GET'])
@@ -295,10 +292,10 @@ def get_dir_files(id):
     print(id)
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
     redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    
     if request.method == "POST":
         print("get-dir req recived!", end="")
         request_redis = redis_server.get("directory request" + str(id))
-        print(request_redis)
         if request_redis is not None:
             if computer.id == id and request_redis != "":
                 print("I found:" + request_redis)
@@ -311,8 +308,6 @@ def get_dir_files(id):
     else:
         try:
             jq = request.get_json()
-            print("before jq!", end="")
-            print(jq)
             dir_items = jq["dir list"]
             response_redis_name = "directory response" + str(id)
             redis_server.rpush(response_redis_name, *dir_items)
@@ -320,12 +315,39 @@ def get_dir_files(id):
             #db.session.add(computer)
             #db.session.commit()
             get_redis_response = redis_server.lrange(response_redis_name,0, -1)
-            print(get_redis_response)
             return ""
         except:
             print("Inncrort request")
             return "Not found"
-
+ 
+"""
+@app.route("/computers/<int:id>/upload-file/<name>", methods=['POST', 'GET'])
+def upload_file(name, id):
+    if request.method == "GET":
+        print("in!")
+        #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+        redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+        redis_server.delete("download" + str(id))
+        requested_dir = redis_server.get("directory request" + str(id))
+        full_url = requested_dir + "\\" + name
+        redis_server.set("download" + str(id), full_url)
+        print(full_url)
+        download = redis_server.get("download" + str(id))
+        download = str(download)
+        print(download)
+        redirct_to = "/computer/" + str(id) + "/get-name"
+        return redirect(redirct_to)
+    else:
+        
+"""
+"""
+@app.route("/computers/<int:id>/get-name")
+def send_name(id):
+    #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    name = redis_server.get("download" + str(id))
+    return name
+"""
 
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
 def no_one_in_db(id):
@@ -549,7 +571,7 @@ def admin_data():
                         print("Failed")
                         return {"Values" : "failed"}
             if (user_found == False and assign_value != -1) or level > 3:
-                print("the err")
+                print("the err2")
                 return {"Values" : "failed"}
             users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
             db.session.add(users)
