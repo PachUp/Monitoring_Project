@@ -504,6 +504,7 @@ def level_2_handle(remove_vals, user,level):
             db.session.add(users)
             db.session.commit()
         try:
+            print("trying level 2")
             allow_to_view = ""
             for i in remove_vals:
                 count = count + 1
@@ -518,6 +519,7 @@ def level_2_handle(remove_vals, user,level):
             db.session.add(users)
             db.session.commit()
         except:
+            print("err level 2")
             return "None"
     else:
         print("err2")
@@ -574,12 +576,12 @@ def admin_data():
                 print("the err")
                 return {"Values" : "failed"}
             print("passed!")
-            users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level))
+            users.query.filter_by(username = user).update(dict(computer_id = assign_value, level=level, remove_vals= remove_vals))
             db.session.commit()
             print("almost there")
             if assign_value == -1:
                 assign_value = "None"
-            level_2_handle(remove_vals,user,level)
+            #level_2_handle(remove_vals,user,level)
             return {"computer id" : assign_value, "computer level": level, "level 2" : remove_vals}
         except:
             print("the err")
