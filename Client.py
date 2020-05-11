@@ -201,7 +201,17 @@ class SendToServer:
                 except:
                     dir_items = ["Not found"]
                 requests.get(dir_url, json={"dir list": dir_items})
+                #upload = requests.get(self.send_request_to + "/get-name")
+                #requests.post(self.send_request_to + "/upload-file/") read_data(upload.content.decode())
             sleep(1)
+
+
+def read_data(name):
+    some_file = b""
+    with open(name, 'rb') as some_file:
+        for row in some_file:
+            yield row
+
 
 def computer_mac_address():
     return getmac.get_mac_address()
@@ -214,19 +224,18 @@ def main():
     index = 0
     status_code = 200
     response_content = ""
-    address_link = 'http://127.0.0.1:5000/computers/verify_login'
+    address_link = 'http://admin-monitor.herokuapp.com/computers/verify_login'
     response = requests.get(address_link)
     response_content = response.content.decode()
     status_code = response.status_code
     print(status_code)
-    print("res: " + response_content)
     computer_id = ""
     send_request_to = ""
     print(computer_mac_address())
     if status_code == 200:
         while computer_id == "":
-            send_request_to = "http://127.0.0.1:5000/computers"
-            req_id = requests.post('http://127.0.0.1:5000/computers/verify_login',
+            send_request_to = "http://admin-monitor.herokuapp.com/computers"
+            req_id = requests.post('http://admin-monitor.herokuapp.com/computers/verify_login',
                                json={"mac_address": computer_mac_address()})
             computer_id = req_id.content.decode()
             print("computer id: " + computer_id)

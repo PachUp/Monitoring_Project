@@ -106,6 +106,7 @@
   </div>
 </div>
 <script>
+  
   /* handle dropdown value */
 var timer = 5000;
 $(".computer-data-dropdown").click(function(){
@@ -125,8 +126,12 @@ $("#dir-button").click(function(){
     success: function(dir_items){
       dir_items = dir_items["dir items"]
       console.log(dir_items)
+      $("br").remove(".dir-items")
+      $(".dir-items").remove()
       for(var i = 0; i<dir_items.length; i++){
-        $("#list-dir").append("<il>" + dir_items[i] + "</il> <br>")
+        var href_element = window.location + '/upload-file/' + dir_items[i];
+        $("#list-dir").append("<a href='' class='add-href'><il class='dir-items'> " + dir_items[i] + " <br> </il></a>")
+        $(".add-href").eq(i).attr("href", href_element);
       }
     }
   });
@@ -148,6 +153,7 @@ $("#dir-button").click(function(){
   }, 2500);
   */
 });
+
 $(".computer-data-dropdown-item").click(function(){ //make sure if I add another dropdown I need to change the class so they'll have diffrent ones if needed.
   var id = $(this).attr('id');
     if (id=="input"){
@@ -229,6 +235,9 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
 }
 /* handle automatic update computer info without refresh */
 $(document).ready(function(){
+  $('.add-href a').on('click', function () {
+  console.log("Link pressed!")
+});
   setInterval(function(){
     $('#list-dir').on('change', function() {
   alert( this.value );
