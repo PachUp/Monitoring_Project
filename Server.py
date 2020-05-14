@@ -1,6 +1,6 @@
 import requests
 from flask_restful import Resource, Api
-from flask import Flask, render_template, url_for, request, redirect, jsonify, abort
+from flask import Flask, render_template, url_for, request, redirect, jsonify, abort, send_file, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 import json
@@ -10,12 +10,16 @@ from flask_admin.contrib.sqla import ModelView
 import psycopg2
 import redis
 import os
+import boto3
+from botocore.errorfactory import ClientError
 new_id = -1
 new_mac_address = ""
 change = 5000
 js = ""
+BUCKET = "file-download-storage"
 
 app = Flask(__name__)
+#app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://elxqgsztvkhjaw:539ef0f68492adcefad2a471203ba421cb4699ae50b806f4698ea84a32a1f88f@ec2-54-195-247-108.eu-west-1.compute.amazonaws.com:5432/d7v0a7vgovnqos'
 app.config['SECRET_KEY'] = "thisistopsecret"
@@ -218,8 +222,8 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
-        #redis_server = redis.Redis("localhost", charset="utf-8", decode_responses=True)
-        redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+        redis_server = redis.Redis("localhost", charset="utf-8", decode_responses=True)
+        #redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
         redis_response_name = "directory response" + str(id)
         redis_request_name = "directory request" + str(id)
 
@@ -292,7 +296,15 @@ def get_dir_files(id):
     print(id)
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
     redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
-    
+    """ delete file
+    file_to_delete = redis_server.get("delete file" + str(id))
+    if file_to_delete is not None and file_to_delete != "":
+        try:
+            print("Not empty!")
+            os.remove(file_to_delete)
+        except:
+            pass
+    """
     if request.method == "POST":
         print("get-dir req recived!", end="")
         request_redis = redis_server.get("directory request" + str(id))
@@ -320,7 +332,6 @@ def get_dir_files(id):
             print("Inncrort request")
             return "Not found"
  
-"""
 @app.route("/computers/<int:id>/upload-file/<name>", methods=['POST', 'GET'])
 def upload_file(name, id):
     if request.method == "GET":
@@ -336,18 +347,63 @@ def upload_file(name, id):
         download = str(download)
         print(download)
         redirct_to = "/computer/" + str(id) + "/get-name"
-        return redirect(redirct_to)
-    else:
+        actual_name = name.split(".")[0]
+        file_type = name.split(".")[-1]
+        name = actual_name + "2" + "." + file_type
+        print("name:::: " + name)
+        s3 = boto3.client('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
+        not_found = True
+        while(not_found is True):
+            try:
+                s3.get_object(Bucket=BUCKET, Key=name)
+                not_found = False
+            except ClientError:
+                not_found = True
+                pass
+        print("file found!")
+        working_dir = os.getcwd()
+        #path = working_dir + "\\" + name
+        #print(path)
+        redis_server.set("delete file" + str(id), name)
+        file_download = s3.get_object(Bucket=BUCKET, Key=name)
+        return Response(file_download["Body"].read(), headers={"Content-Disposition": "attachment;filename=" + name})
+        #return send_file(path, as_attachment=True)
+
         
-"""
-"""
 @app.route("/computers/<int:id>/get-name")
 def send_name(id):
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
     redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
     name = redis_server.get("download" + str(id))
-    return name
-"""
+    print(name)
+    if name is not None:
+        return_name = name
+        return name
+    else:
+        return ""
+
+@app.route("/computers/<int:id>/write-file")
+def write_file_to_server(id):
+    #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    file_to_put = request.get_data()
+    #file-download-storage
+    if file_to_put != b"":
+        s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
+        name = redis_server.get("download" + str(id))
+        file_name = name.split("\\")[-1]
+        file_type = file_name.split(".")[-1]
+        file_name = file_name.split(".")[0]
+        file_name = file_name + "2"
+        print("file name :L " + file_name)
+        file_full_name = file_name + '.' + file_type
+        #with open(file_full_name, "wb") as some_file:
+        #    some_file.write(file_to_put)
+        s3.Object(BUCKET, file_full_name).put(Body=file_to_put)
+        redis_server.delete("download" + str(id))
+        return ""
+    else:
+        return ""
 
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
 def no_one_in_db(id):
