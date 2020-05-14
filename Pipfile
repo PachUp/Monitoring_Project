@@ -17,7 +17,7 @@ flask-admin = "*"
 psycopg2 = "*"
 redis = "*"
 boto3 = "*"
-magic = "*"
+botocore = "*"
 
 [requires]
 python_version = "3.8.2"
