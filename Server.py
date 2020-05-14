@@ -121,6 +121,20 @@ def register():
         else:
             return render_template('/register.html')
 
+
+@app.route("/computers/<int:id>/inital-call", methods=['POST'])
+def inital_data(id):
+    print("inital call!")
+    computer = Todo.query.get_or_404(id)
+    #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    redis_response_name = "directory response" + str(id)
+    redis_request_name = "directory request" + str(id)
+    redis_server.delete(redis_response_name)
+    redis_server.delete(redis_request_name)
+    redis_server.delete("download" + str(id))
+    return ""
+
 #verify_login
 @app.route('/computers/verify_login', methods=['POST', 'GET'])
 def check_if_user_exists():
@@ -137,6 +151,9 @@ def check_if_user_exists():
                 current_mac = Todo.query.all()[i].mac_address
                 if mac_address == current_mac:
                     print("True!")
+                    #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+                    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+                    
                     return str(current_id)
             new_mac_address = mac_address
             print("Not found!?")
@@ -215,20 +232,21 @@ def no_one_in_db_code(id):
     #print(Todo.query.filter(Todo.id).all()[0].running_processes)
     #print(computer.mac_address)
     url = '/computers/' + str(id)
-    print("returnin'")
     return "Something" # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
     #return render_template('get_json.html', json_request = js)
 @app.route("/computers/<int:id>/ajax-dir", methods=["POST", "GET"])
 def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
-        #redis_server = redis.Redis("localhost", charset="utf-8", decode_responses=True)
+        #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
         redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
         redis_response_name = "directory response" + str(id)
         redis_request_name = "directory request" + str(id)
-
+        redis_request_save_name = "directory name" + str(id)
         redis_server.delete(redis_response_name)
         redis_server.delete(redis_request_name)
+        redis_server.delete(redis_request_save_name)
+        redis_server.delete("download" + str(id))
         """
         computer.directory_response = ""
         db.session.add(computer)
@@ -244,10 +262,12 @@ def get_ajax_data(id):
             print("Req recived!")
             print(type(params["DirVals"]))
             redis_server.set(redis_request_name, params["DirVals"])
+            redis_server.set(redis_request_save_name, params["DirVals"])
             #computer.directory_request = params["DirVals"]
             #db.session.add(computer)
             #db.session.commit()
             print(redis_server.get(redis_request_name))
+            print(redis_server.get(redis_request_save_name))
         except:
             pass
         if redis_server.get(redis_request_name) == "":
@@ -265,6 +285,8 @@ def get_ajax_data(id):
                 else:
                     pass
             """
+            print("redis_server: ", end=" ")
+            print(redis_server.get(redis_response_name))
             try:
                 while(redis_server.get(redis_response_name) is None):
                     pass
@@ -276,8 +298,8 @@ def get_ajax_data(id):
             print("af: ", end="")
             get_redis_response = redis_server.lrange(redis_response_name,0, -1)
             temp_dict_val = get_redis_response
-            #redis_server.delete(redis_response_name)
-            #redis_server.delete(redis_request_name)
+            print(redis_server.get(redis_request_name))
+            print(get_redis_response)
             """
             computer.directory_response = ""
             db.session.add(computer)
@@ -286,6 +308,8 @@ def get_ajax_data(id):
             db.session.add(computer)
             db.session.commit()
             """
+            redis_server.delete(redis_response_name)
+            redis_server.delete(redis_request_name)
             print("end: ", end="")
             return {"dir items": temp_dict_val}
 
@@ -323,6 +347,7 @@ def get_dir_files(id):
             dir_items = jq["dir list"]
             response_redis_name = "directory response" + str(id)
             redis_server.rpush(response_redis_name, *dir_items)
+            print(jq["dir list"])
             #computer.directory_response = jq["dir list"]
             #db.session.add(computer)
             #db.session.commit()
@@ -339,7 +364,8 @@ def upload_file(name, id):
         #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
         redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
         redis_server.delete("download" + str(id))
-        requested_dir = redis_server.get("directory request" + str(id))
+        print(redis_server.get("directory name" + str(id)))
+        requested_dir = redis_server.get("directory name" + str(id))
         full_url = requested_dir + "\\" + name
         redis_server.set("download" + str(id), full_url)
         print(full_url)
@@ -353,6 +379,13 @@ def upload_file(name, id):
         print("name:::: " + name)
         s3 = boto3.client('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
         not_found = True
+        while(not_found == True):
+            try:
+                s3.head_object(Bucket=BUCKET, Key=name)
+                not_found = False
+            except ClientError:
+                not_found = True
+        """
         while(not_found is True):
             try:
                 s3.get_object(Bucket=BUCKET, Key=name)
@@ -360,6 +393,7 @@ def upload_file(name, id):
             except ClientError:
                 not_found = True
                 pass
+        """
         print("file found!")
         working_dir = os.getcwd()
         #path = working_dir + "\\" + name
@@ -376,6 +410,7 @@ def send_name(id):
     redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
     name = redis_server.get("download" + str(id))
     print(name)
+    print("in get-name")
     if name is not None:
         return_name = name
         return name
@@ -412,6 +447,14 @@ def no_one_in_db(id):
             return no_one_in_db_code(id)
         else:
             if current_user.is_authenticated:
+                #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+                redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+                redis_response_name = "directory response" + str(id)
+                redis_request_name = "directory request" + str(id)
+
+                redis_server.delete(redis_response_name)
+                redis_server.delete(redis_request_name)
+                redis_server.delete("download" + str(id))
                 computer = Todo.query.get_or_404(id)
                 running_processes = computer.running_processes
                 running_processes = json.loads(running_processes)

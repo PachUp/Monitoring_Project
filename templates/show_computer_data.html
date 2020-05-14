@@ -128,6 +128,7 @@ $("#dir-button").click(function(){
       console.log(dir_items)
       $("br").remove(".dir-items")
       $(".dir-items").remove()
+      $(".add-href").remove()
       for(var i = 0; i<dir_items.length; i++){
         var href_element = window.location + '/upload-file/' + dir_items[i];
         $("#list-dir").append("<a href='' class='add-href'><il class='dir-items'> " + dir_items[i] + " <br> </il></a>")
