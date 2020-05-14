@@ -222,8 +222,8 @@ def no_one_in_db_code(id):
 def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
-        redis_server = redis.Redis("localhost", charset="utf-8", decode_responses=True)
-        #redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+        #redis_server = redis.Redis("localhost", charset="utf-8", decode_responses=True)
+        redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
         redis_response_name = "directory response" + str(id)
         redis_request_name = "directory request" + str(id)
 
