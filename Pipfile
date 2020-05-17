@@ -18,6 +18,7 @@ psycopg2 = "*"
 redis = "*"
 boto3 = "*"
 botocore = "*"
+celery = "*"
 
 [requires]
 python_version = "3.8.2"

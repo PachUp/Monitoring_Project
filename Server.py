@@ -11,7 +11,10 @@ import psycopg2
 import redis
 import os
 import boto3
+import binascii
 from botocore.errorfactory import ClientError
+#from celery import Celery
+from flask_celery import make_celery
 new_id = -1
 new_mac_address = ""
 change = 5000
@@ -23,6 +26,9 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://elxqgsztvkhjaw:539ef0f68492adcefad2a471203ba421cb4699ae50b806f4698ea84a32a1f88f@ec2-54-195-247-108.eu-west-1.compute.amazonaws.com:5432/d7v0a7vgovnqos'
 app.config['SECRET_KEY'] = "thisistopsecret"
+app.config["CELERY_BROKER_URL"] =  'redis://localhost:6379/0'
+app.config["CELERY_RESULT_BACKEND"] = 'redis://localhost:6379/0'
+celery = make_celery(app)
 db = SQLAlchemy(app)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
@@ -329,6 +335,14 @@ def get_dir_files(id):
         except:
             pass
     """
+    file_to_delete = redis_server.get("delete file" + str(id))
+    if file_to_delete is not None and file_to_delete != "":
+        print(file_to_delete)
+        s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
+        try:
+            s3.Object(BUCKET, file_to_delete).delete()
+        except:
+            pass
     if request.method == "POST":
         print("get-dir req recived!", end="")
         request_redis = redis_server.get("directory request" + str(id))
@@ -434,11 +448,31 @@ def write_file_to_server(id):
         file_full_name = file_name + '.' + file_type
         #with open(file_full_name, "wb") as some_file:
         #    some_file.write(file_to_put)
+        #s3.Object(BUCKET, file_full_name).put(Body=file_to_put)
+        print(type(file_to_put))
+        #file_to_put = binascii.b2a_base64(file_to_put)
+        s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
         s3.Object(BUCKET, file_full_name).put(Body=file_to_put)
         redis_server.delete("download" + str(id))
+        print("sent")
         return ""
     else:
         return ""
+
+
+#celery background write file
+@celery.task(name="write_file_to_aws")
+def write_file_aws(file_full_name, file_to_put):
+    #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    #file_to_put = file_to_put.encode()
+    s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
+    s3.Object(BUCKET, file_full_name).put(Body=file_to_put)
+    
+    redis_server.delete("download" + str(id))
+    return "Request sent!"
+
+
 
 @app.route('/computers/<int:id>', methods=['POST', 'GET'])
 def no_one_in_db(id):
