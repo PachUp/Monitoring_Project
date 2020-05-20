@@ -26,9 +26,12 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://elxqgsztvkhjaw:539ef0f68492adcefad2a471203ba421cb4699ae50b806f4698ea84a32a1f88f@ec2-54-195-247-108.eu-west-1.compute.amazonaws.com:5432/d7v0a7vgovnqos'
 app.config['SECRET_KEY'] = "thisistopsecret"
-app.config["CELERY_BROKER_URL"] =  'redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-50-237-81.eu-west-1.compute.amazonaws.com:28359'
-app.config["CELERY_RESULT_BACKEND"] = 'redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-50-237-81.eu-west-1.compute.amazonaws.com:28359'
+app.config["CELERY_BROKER_URL"] =  "redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-50-237-81.eu-west-1.compute.amazonaws.com:28359"
+app.config["CELERY_RESULT_BACKEND"] = "redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-50-237-81.eu-west-1.compute.amazonaws.com:28359"
 celery = make_celery(app)
+
+celery.conf.update(BROKER_URL = "redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-50-237-81.eu-west-1.compute.amazonaws.com:28359",
+                CELERY_RESULT_BACKEND="redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-50-237-81.eu-west-1.compute.amazonaws.com:28359")
 db = SQLAlchemy(app)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
