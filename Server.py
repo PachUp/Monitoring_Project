@@ -33,6 +33,7 @@ celery = make_celery(app)
 celery.conf.update(BROKER_URL = "redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-50-237-81.eu-west-1.compute.amazonaws.com:28359",
                 CELERY_RESULT_BACKEND="redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-50-237-81.eu-west-1.compute.amazonaws.com:28359")
 db = SQLAlchemy(app)
+redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -136,7 +137,7 @@ def inital_data(id):
     print("inital call!")
     computer = Todo.query.get_or_404(id)
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    
     redis_response_name = "directory response" + str(id)
     redis_request_name = "directory request" + str(id)
     redis_server.delete(redis_response_name)
@@ -163,7 +164,7 @@ def check_if_user_exists():
                 if mac_address == current_mac:
                     print("True!")
                     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-                    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+                    
                     
                     return str(current_id)
             new_mac_address = mac_address
@@ -250,7 +251,7 @@ def get_ajax_data(id):
     if request.method == "POST":
         computer = Todo.query.get_or_404(id)
         #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-        redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+        
         redis_response_name = "directory response" + str(id)
         redis_request_name = "directory request" + str(id)
         redis_request_save_name = "directory name" + str(id)
@@ -330,7 +331,7 @@ def get_dir_files(id):
     computer = Todo.query.get_or_404(id)
     print(id)
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    
     """ delete file
     file_to_delete = redis_server.get("delete file" + str(id))
     if file_to_delete is not None and file_to_delete != "":
@@ -384,7 +385,7 @@ def upload_file(name, id):
         computer = Todo.query.get_or_404(id)
         print("in!")
         #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-        redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+        
         redis_server.delete("download" + str(id))
         print(redis_server.get("directory name" + str(id)))
         requested_dir = redis_server.get("directory name" + str(id))
@@ -410,7 +411,7 @@ def upload_file(name, id):
 @app.route("/computers/<int:id>/get-name")
 def send_name(id):
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    
     name = redis_server.get("download" + str(id))
     print(name)
     print("in get-name")
@@ -425,7 +426,7 @@ def check_if_the_file_is_ready(id):
     print("recv")
     s3 = boto3.client('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    
     name = redis_server.get("file-name" + str(id))
     print(name)
     if name != None and name != "None":
@@ -450,7 +451,7 @@ def check_if_the_file_is_ready(id):
 @app.route("/computers/<int:id>/write-file")
 def write_file_to_server(id):
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    
     file_to_put = request.get_data()
     #file-download-storage
     if file_to_put != b"":
@@ -492,7 +493,7 @@ def write_file_to_server(id):
 @celery.task(name="write_file_to_aws")
 def write_file_aws(file_full_name, file_to_put):
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-    redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+    
     #list_downloadable = "downloadable" + str(id)
     #file_to_download = redis_server.lrange(list_downloadable,0, -1)
     #for i in range(0, len(file_to_download)): 
@@ -513,7 +514,7 @@ def no_one_in_db(id):
         else:
             if current_user.is_authenticated:
                 #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-                redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+                
                 redis_response_name = "directory response" + str(id)
                 redis_request_name = "directory request" + str(id)
 
