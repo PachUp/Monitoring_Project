@@ -1,0 +1,450 @@
+
+{
+  "header": {
+    "reportVersion": 2,
+    "event": "Allocation failed - JavaScript heap out of memory",
+    "trigger": "FatalError",
+    "filename": "report.20200520.192006.9640.0.001.json",
+    "dumpEventTime": "2020-05-20T19:20:06Z",
+    "dumpEventTimeStamp": "1589991606260",
+    "processId": 9640,
+    "threadId": null,
+    "cwd": "C:\\Users\\razei\\Documents\\Monitoring_Project",
+    "commandLine": [
+      "C:\\Users\\razei\\AppData\\Local\\heroku\\client\\7.41.1\\bin\\..\\bin\\node.exe",
+      "C:\\Users\\razei\\AppData\\Local\\heroku\\client\\7.41.1\\bin\\..\\bin\\run",
+      "logs",
+      "--tail"
+    ],
+    "nodejsVersion": "v12.16.2",
+    "wordSize": 64,
+    "arch": "x64",
+    "platform": "win32",
+    "componentVersions": {
+      "node": "12.16.2",
+      "v8": "7.8.279.23-node.34",
+      "uv": "1.34.2",
+      "zlib": "1.2.11",
+      "brotli": "1.0.7",
+      "ares": "1.15.0",
+      "modules": "72",
+      "nghttp2": "1.40.0",
+      "napi": "5",
+      "llhttp": "2.0.4",
+      "http_parser": "2.9.3",
+      "openssl": "1.1.1e",
+      "cldr": "36.0",
+      "icu": "65.1",
+      "tz": "2019c",
+      "unicode": "12.1"
+    },
+    "release": {
+      "name": "node",
+      "lts": "Erbium",
+      "headersUrl": "https://nodejs.org/download/release/v12.16.2/node-v12.16.2-headers.tar.gz",
+      "sourceUrl": "https://nodejs.org/download/release/v12.16.2/node-v12.16.2.tar.gz",
+      "libUrl": "https://nodejs.org/download/release/v12.16.2/win-x64/node.lib"
+    },
+    "osName": "Windows_NT",
+    "osRelease": "10.0.18362",
+    "osVersion": "Windows 10 Home",
+    "osMachine": "x86_64",
+    "cpus": [
+      {
+        "model": "Intel(R) Core(TM) i5-3317U CPU @ 1.70GHz",
+        "speed": 1696,
+        "user": 19080421,
+        "nice": 0,
+        "sys": 13340015,
+        "idle": 92189859,
+        "irq": 1099390
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-3317U CPU @ 1.70GHz",
+        "speed": 1696,
+        "user": 18876343,
+        "nice": 0,
+        "sys": 10031140,
+        "idle": 95702437,
+        "irq": 535750
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-3317U CPU @ 1.70GHz",
+        "speed": 1696,
+        "user": 21879437,
+        "nice": 0,
+        "sys": 10374828,
+        "idle": 92355656,
+        "irq": 146156
+      },
+      {
+        "model": "Intel(R) Core(TM) i5-3317U CPU @ 1.70GHz",
+        "speed": 1696,
+        "user": 20797046,
+        "nice": 0,
+        "sys": 9975781,
+        "idle": 93837078,
+        "irq": 145062
+      }
+    ],
+    "networkInterfaces": [
+      {
+        "name": "VirtualBox Host-Only Network #2",
+        "internal": false,
+        "mac": "0a:00:27:00:00:18",
+        "address": "169.254.232.73",
+        "netmask": "255.255.0.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "VirtualBox Host-Only Network #3",
+        "internal": false,
+        "mac": "0a:00:27:00:00:0e",
+        "address": "192.168.244.1",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "Ethernet 4",
+        "internal": false,
+        "mac": "0a:00:27:00:00:0c",
+        "address": "fe80::a8e2:b9d5:a161:1849",
+        "netmask": "ffff:ffff:ffff:ffff::",
+        "family": "IPv6",
+        "scopeid": 12
+      },
+      {
+        "name": "Ethernet 4",
+        "internal": false,
+        "mac": "0a:00:27:00:00:0c",
+        "address": "192.168.56.1",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "Wi-Fi 2",
+        "internal": false,
+        "mac": "50:3e:aa:4c:18:6b",
+        "address": "192.168.1.110",
+        "netmask": "255.255.255.0",
+        "family": "IPv4"
+      },
+      {
+        "name": "Loopback Pseudo-Interface 1",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "::1",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "family": "IPv6",
+        "scopeid": 0
+      },
+      {
+        "name": "Loopback Pseudo-Interface 1",
+        "internal": true,
+        "mac": "00:00:00:00:00:00",
+        "address": "127.0.0.1",
+        "netmask": "255.0.0.0",
+        "family": "IPv4"
+      }
+    ],
+    "host": "DESKTOP-HG63HKI"
+  },
+  "javascriptStack": {
+    "message": "No stack.",
+    "stack": [
+      "Unavailable."
+    ]
+  },
+  "nativeStack": [
+    {
+      "pc": "0x00007ff6db3d2309",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6db3d6869",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6db3d56e8",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6db4fdd82",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dbd1a27e",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dbd02351",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dbbce8ac",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dbbd6831",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dbbcbe03",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dbbca474",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dbbeb67d",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6db9513d1",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc16730d",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc16823d",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc1c3e94",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc0ec2bc",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc182c19",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc0ec2bc",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc0ec2bc",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc0ec2bc",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc1794fc",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc0ec2bc",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc0ec2bc",
+      "symbol": ""
+    },
+    {
+      "pc": "0x00007ff6dc0e55ec",
+      "symbol": ""
+    },
+    {
+      "pc": "0x000000b191688fae",
+      "symbol": ""
+    }
+  ],
+  "javascriptHeap": {
+    "totalMemory": 10350592,
+    "totalCommittedMemory": 10350592,
+    "usedMemory": 9177872,
+    "availableMemory": 2188964192,
+    "memoryLimit": 2197815296,
+    "heapSpaces": {
+      "read_only_space": {
+        "memorySize": 262144,
+        "committedMemory": 262144,
+        "capacity": 32808,
+        "used": 32808,
+        "available": 0
+      },
+      "new_space": {
+        "memorySize": 1048576,
+        "committedMemory": 1048576,
+        "capacity": 1047456,
+        "used": 1047448,
+        "available": 8
+      },
+      "old_space": {
+        "memorySize": 6168576,
+        "committedMemory": 6168576,
+        "capacity": 5991824,
+        "used": 5986200,
+        "available": 5624
+      },
+      "code_space": {
+        "memorySize": 692224,
+        "committedMemory": 692224,
+        "capacity": 440640,
+        "used": 410080,
+        "available": 30560
+      },
+      "map_space": {
+        "memorySize": 1052672,
+        "committedMemory": 1052672,
+        "capacity": 1049520,
+        "used": 633680,
+        "available": 415840
+      },
+      "large_object_space": {
+        "memorySize": 1077248,
+        "committedMemory": 1077248,
+        "capacity": 1064872,
+        "used": 1064872,
+        "available": 0
+      },
+      "code_large_object_space": {
+        "memorySize": 49152,
+        "committedMemory": 49152,
+        "capacity": 2784,
+        "used": 2784,
+        "available": 0
+      },
+      "new_large_object_space": {
+        "memorySize": 0,
+        "committedMemory": 0,
+        "capacity": 1047456,
+        "used": 0,
+        "available": 1047456
+      }
+    }
+  },
+  "resourceUsage": {
+    "userCpuSeconds": 1,
+    "kernelCpuSeconds": 0.359,
+    "cpuConsumptionPercent": 2.09077,
+    "maxRss": 46120960,
+    "pageFaults": {
+      "IORequired": 17678,
+      "IONotRequired": 0
+    },
+    "fsActivity": {
+      "reads": 375,
+      "writes": 5
+    }
+  },
+  "libuv": [
+  ],
+  "workers": [
+  ],
+  "environmentVariables": {
+    "=C:": "C:\\Users\\razei\\Documents\\Monitoring_Project",
+    "ALLUSERSPROFILE": "C:\\ProgramData",
+    "APPDATA": "C:\\Users\\razei\\AppData\\Roaming",
+    "CommonProgramFiles": "C:\\Program Files\\Common Files",
+    "CommonProgramFiles(x86)": "C:\\Program Files (x86)\\Common Files",
+    "CommonProgramW6432": "C:\\Program Files\\Common Files",
+    "COMPUTERNAME": "DESKTOP-HG63HKI",
+    "ComSpec": "C:\\WINDOWS\\system32\\cmd.exe",
+    "DriverData": "C:\\Windows\\System32\\Drivers\\DriverData",
+    "FPS_BROWSER_APP_PROFILE_STRING": "Internet Explorer",
+    "FPS_BROWSER_USER_PROFILE_STRING": "Default",
+    "HEROKU_BINPATH": "C:\\Users\\razei\\AppData\\Local\\heroku\\client\\bin\\heroku",
+    "HEROKU_UPDATE_INSTRUCTIONS": "update with: \"npm update -g heroku\"",
+    "HOMEDRIVE": "C:",
+    "HOMEPATH": "\\Users\\razei",
+    "LOCALAPPDATA": "C:\\Users\\razei\\AppData\\Local",
+    "LOGONSERVER": "\\\\DESKTOP-HG63HKI",
+    "NUMBER_OF_PROCESSORS": "4",
+    "OneDrive": "C:\\Users\\razei\\OneDrive",
+    "OneDriveConsumer": "C:\\Users\\razei\\OneDrive",
+    "OS": "Windows_NT",
+    "Path": "C:\\Users\\razei\\.virtualenvs\\Monitoring_Project-KqGm-z22\\Scripts;C:\\Program Files (x86)\\Razer Chroma SDK\\bin;C:\\Program Files\\Razer Chroma SDK\\bin;C:\\Program Files (x86)\\Razer\\ChromaBroadcast\\bin;C:\\Program Files\\Razer\\ChromaBroadcast\\bin;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\dotnet\\;C:\\Program Files\\Microsoft SQL Server\\130\\Tools\\Binn\\;C:\\Program Files\\nodejs\\;C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\;C:\\Program Files\\PuTTY\\;C:\\Users\\Yonat\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\Yonat\\.dotnet\\tools;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Users\\razei\\AppData\\Local\\Programs\\Python\\Python38\\Scripts\\;C:\\Users\\razei\\AppData\\Local\\Programs\\Python\\Python38\\;C:\\Users\\razei\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\razei\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Program Files (x86)\\GnuWin32\\bin;C:\\Users\\razei\\AppData\\Local\\GitHubDesktop\\bin;C:\\Program Files\\heroku\\bin",
+    "PATHEXT": ".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL",
+    "PIPENV_ACTIVE": "1",
+    "PIP_DISABLE_PIP_VERSION_CHECK": "1",
+    "PIP_PYTHON_PATH": "c:\\users\\razei\\appdata\\local\\programs\\python\\python38\\python.exe",
+    "PROCESSOR_ARCHITECTURE": "AMD64",
+    "PROCESSOR_IDENTIFIER": "Intel64 Family 6 Model 58 Stepping 9, GenuineIntel",
+    "PROCESSOR_LEVEL": "6",
+    "PROCESSOR_REVISION": "3a09",
+    "ProgramData": "C:\\ProgramData",
+    "ProgramFiles": "C:\\Program Files",
+    "ProgramFiles(x86)": "C:\\Program Files (x86)",
+    "ProgramW6432": "C:\\Program Files",
+    "PROMPT": "$P$G",
+    "PSModulePath": "C:\\Users\\razei\\Documents\\WindowsPowerShell\\Modules;C:\\Program Files\\WindowsPowerShell\\Modules;C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules",
+    "PUBLIC": "C:\\Users\\Public",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "SystemDrive": "C:",
+    "SystemRoot": "C:\\WINDOWS",
+    "TEMP": "C:\\Users\\razei\\AppData\\Local\\Temp",
+    "TMP": "C:\\Users\\razei\\AppData\\Local\\Temp",
+    "USERDOMAIN": "DESKTOP-HG63HKI",
+    "USERDOMAIN_ROAMINGPROFILE": "DESKTOP-HG63HKI",
+    "USERNAME": "razei",
+    "USERPROFILE": "C:\\Users\\razei",
+    "VBOX_MSI_INSTALL_PATH": "C:\\Program Files\\Oracle\\VirtualBox\\",
+    "VIRTUAL_ENV": "C:\\Users\\razei\\.virtualenvs\\Monitoring_Project-KqGm-z22",
+    "windir": "C:\\WINDOWS",
+    "TERM_PROGRAM": "vscode",
+    "TERM_PROGRAM_VERSION": "1.45.1",
+    "LANG": "en_US.UTF-8",
+    "COLORTERM": "truecolor",
+    "VSCODE_GIT_IPC_HANDLE": "\\\\.\\pipe\\vscode-git-7cfa89ea77-sock",
+    "GIT_ASKPASS": "c:\\Users\\razei\\AppData\\Local\\Programs\\Microsoft VS Code\\resources\\app\\extensions\\git\\dist\\askpass.sh",
+    "VSCODE_GIT_ASKPASS_NODE": "C:\\Users\\razei\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
+    "VSCODE_GIT_ASKPASS_MAIN": "c:\\Users\\razei\\AppData\\Local\\Programs\\Microsoft VS Code\\resources\\app\\extensions\\git\\dist\\askpass-main.js"
+  },
+  "sharedObjects": [
+    "C:\\Users\\razei\\AppData\\Local\\heroku\\client\\7.41.1\\bin\\node.exe",
+    "C:\\WINDOWS\\SYSTEM32\\ntdll.dll",
+    "C:\\WINDOWS\\System32\\KERNEL32.DLL",
+    "C:\\WINDOWS\\System32\\KERNELBASE.dll",
+    "C:\\WINDOWS\\System32\\WS2_32.dll",
+    "C:\\WINDOWS\\System32\\RPCRT4.dll",
+    "C:\\WINDOWS\\System32\\PSAPI.DLL",
+    "C:\\WINDOWS\\SYSTEM32\\dbghelp.dll",
+    "C:\\WINDOWS\\System32\\ADVAPI32.dll",
+    "C:\\WINDOWS\\System32\\ucrtbase.dll",
+    "C:\\WINDOWS\\System32\\msvcrt.dll",
+    "C:\\WINDOWS\\System32\\sechost.dll",
+    "C:\\WINDOWS\\System32\\USER32.dll",
+    "C:\\WINDOWS\\SYSTEM32\\IPHLPAPI.DLL",
+    "C:\\WINDOWS\\SYSTEM32\\USERENV.dll",
+    "C:\\WINDOWS\\System32\\win32u.dll",
+    "C:\\WINDOWS\\System32\\profapi.dll",
+    "C:\\WINDOWS\\System32\\GDI32.dll",
+    "C:\\WINDOWS\\System32\\gdi32full.dll",
+    "C:\\WINDOWS\\System32\\msvcp_win.dll",
+    "C:\\WINDOWS\\System32\\CRYPT32.dll",
+    "C:\\WINDOWS\\System32\\MSASN1.dll",
+    "C:\\WINDOWS\\System32\\bcrypt.dll",
+    "C:\\WINDOWS\\SYSTEM32\\WINMM.dll",
+    "C:\\WINDOWS\\SYSTEM32\\winmmbase.dll",
+    "C:\\WINDOWS\\System32\\cfgmgr32.dll",
+    "C:\\WINDOWS\\System32\\bcryptPrimitives.dll",
+    "C:\\WINDOWS\\System32\\IMM32.DLL",
+    "C:\\WINDOWS\\System32\\powrprof.dll",
+    "C:\\WINDOWS\\System32\\UMPDC.dll",
+    "C:\\WINDOWS\\SYSTEM32\\CRYPTBASE.DLL",
+    "C:\\WINDOWS\\system32\\uxtheme.dll",
+    "C:\\WINDOWS\\System32\\combase.dll",
+    "C:\\WINDOWS\\system32\\mswsock.dll",
+    "C:\\WINDOWS\\System32\\kernel.appcore.dll",
+    "C:\\WINDOWS\\system32\\napinsp.dll",
+    "C:\\WINDOWS\\system32\\pnrpnsp.dll",
+    "C:\\WINDOWS\\SYSTEM32\\DNSAPI.dll",
+    "C:\\WINDOWS\\System32\\NSI.dll",
+    "C:\\WINDOWS\\System32\\winrnr.dll",
+    "C:\\WINDOWS\\system32\\NLAapi.dll",
+    "C:\\WINDOWS\\system32\\wshbth.dll",
+    "C:\\WINDOWS\\SYSTEM32\\dhcpcsvc6.DLL",
+    "C:\\WINDOWS\\SYSTEM32\\dhcpcsvc.DLL",
+    "C:\\Windows\\System32\\rasadhlp.dll",
+    "C:\\WINDOWS\\System32\\fwpuclnt.dll"
+  ]
+}
