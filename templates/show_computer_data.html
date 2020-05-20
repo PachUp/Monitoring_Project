@@ -234,11 +234,29 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
       setTimeout(get_new_data, timer);
   });
 }
+
+function download_the_file(){
+
+}
+/*
+function check_download(){
+  $.post("/computers/{{computer.id}}/live", function(data){
+
+  });
+}
+*/
 /* handle automatic update computer info without refresh */
 $(document).ready(function(){
-  $('.add-href a').on('click', function () {
-  console.log("Link pressed!")
-});
+  $(".add-href").on("click", function(e){
+    e.preventDefault()
+    console.log("d")
+
+  });
+  $(".dir-items").on("click", function(e){
+    e.preventDefault()
+    console.log("f")
+  });
+  download_the_file();
   setInterval(function(){
     $('#list-dir').on('change', function() {
   alert( this.value );

@@ -1,0 +1,24 @@
+{% extends 'nevbar.html' %}
+{% block head%}
+{% endblock %}
+{% block body%}
+<script>
+send_url = "/computers/{{computer.id}}/file-ready"
+var inter = setInterval(() => {
+    $.ajax({
+    type: "POST",
+    url: send_url,
+    success: function(data){
+        if (data == "Ready"){
+            console.log("sec")
+            clearInterval(inter);
+            window.location.href = send_url;
+        }
+    },
+    error: function(){
+        console.log("err")
+    }
+  });
+}, 3000);
+</script>
+{% endblock %}
