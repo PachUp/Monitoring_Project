@@ -11,7 +11,7 @@ var inter = setInterval(() => {
         type: "POST",
         url: send_url,
         success: function(data){
-            flag = false;
+            flag = true;
             if (data == "Ready"){
                 console.log("sec")
                 clearInterval(inter);
@@ -24,7 +24,7 @@ var inter = setInterval(() => {
         });  
     }
     else{
-        flag = true
+        flag = false;
     }
 }, 7000);
 </script>
