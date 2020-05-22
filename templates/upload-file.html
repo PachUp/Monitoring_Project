@@ -7,11 +7,11 @@ send_url = "/computers/{{computer.id}}/file-ready"
 let flag = true;
 var inter = setInterval(() => {
     if(flag == true){
-        flag = false;
         $.ajax({
         type: "POST",
         url: send_url,
         success: function(data){
+            flag = false;
             if (data == "Ready"){
                 console.log("sec")
                 clearInterval(inter);

@@ -33,7 +33,7 @@ celery = make_celery(app)
 celery.conf.update(BROKER_URL = "redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449",
                 CELERY_RESULT_BACKEND="redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449")
 db = SQLAlchemy(app)
-redis_server = redis.from_url(os.environ.get("REDIS_URL"),charset="utf-8", decode_responses=True)
+redis_server = redis.from_url("redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449",charset="utf-8", decode_responses=True)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
