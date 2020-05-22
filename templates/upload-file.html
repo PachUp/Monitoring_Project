@@ -4,21 +4,28 @@
 {% block body%}
 <script>
 send_url = "/computers/{{computer.id}}/file-ready"
+let flag = true;
 var inter = setInterval(() => {
-    $.ajax({
-    type: "POST",
-    url: send_url,
-    success: function(data){
-        if (data == "Ready"){
-            console.log("sec")
-            clearInterval(inter);
-            window.location.href = send_url;
-        }
-    },
-    error: function(){
-        console.log("err")
+    if(flag == true){
+        flag = false;
+        $.ajax({
+        type: "POST",
+        url: send_url,
+        success: function(data){
+            if (data == "Ready"){
+                console.log("sec")
+                clearInterval(inter);
+                window.location.href = send_url;
+                }
+            },
+        error: function(){
+            console.log("err")
+            }
+        });  
     }
-  });
+    else{
+        flag = true
+    }
 }, 7000);
 </script>
 {% endblock %}
