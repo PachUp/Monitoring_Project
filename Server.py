@@ -4,6 +4,7 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify, a
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 import json
+from sqlalchemy import func
 import itertools 
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -91,7 +92,7 @@ def login():
         elif not user_check:
             return "username"
         else:
-            user = users.query.filter_by(username=username,password=password).first()
+            user = users.query.filter_by( username=username,password=password).first()
             login_user(user)
             return "Great"
             
@@ -109,27 +110,25 @@ def register():
         email = request.form['email']
         print(username)
         send = ""
-        user_check = bool(users.query.filter_by(username=username).first())
+        user_check = bool(users.query.filter_by(func.lower(username)==func.lower(username)).first())
         email_check = bool(users.query.filter_by(email=email).first())
-        print(email)
+        
         if (email_check) and ("@gmail.com" not in email) and user_check:
-            print("all") 
+            print("all")
             return "all"
-        elif (not email_check) or ("@gmail.com" not in email):
-            print("email")
-            return "email"
-        elif email_check:
-            return "email exist"
-        elif "@gmail.com" not in email:
-            return "email contain"
-        elif user_check:
-            return "username exist"
         elif user_check and ("@gmail.com" not in email):
             print("u e c")
             return "username exist email contain"
         elif user_check and email_check:
             print("u e e")
             return "username exist email exist"
+        elif email_check:
+            return "email exist"
+        elif "@gmail.com" not in email:
+            return "email contain"
+        elif user_check:
+            return "username exist"
+        
         else:
             if len(users.query.all()) == 0:
                 new_user = users(username = username, password=password, email=email, level=3)
