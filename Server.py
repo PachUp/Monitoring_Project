@@ -110,7 +110,7 @@ def register():
         email = request.form['email']
         print(username)
         send = ""
-        user_check = bool(users.query.filter_by(func.lower(username)==func.lower(username)).first())
+        user_check = bool(users.query.filter_by(func.lower(username) =func.lower(username)).first())
         email_check = bool(users.query.filter_by(email=email).first())
         
         if (email_check) and ("@gmail.com" not in email) and user_check:
