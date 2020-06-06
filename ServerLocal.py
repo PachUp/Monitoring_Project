@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 import json
 import itertools 
+from sqlalchemy import func
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import psycopg2
@@ -110,7 +111,7 @@ def register():
         email = request.form['email']
         print(username)
         send = ""
-        user_check = bool(users.query.filter_by(username=username).first())
+        user_check = bool(users.query.filter(func.lower(users.username) == func.lower(username)).first())
         email_check = bool(users.query.filter_by(email=email).first())
         
         if (email_check) and ("@gmail.com" not in email) and user_check:
