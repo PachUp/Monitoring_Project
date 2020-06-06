@@ -11,6 +11,11 @@
                     <div id="login-box" class="col-md-12">
                         <form id="login-form" action="">
                             <h3 class="text-center text-info">Register</h3>
+                            <p>
+                                <footer class="blockquote-footer" id="user-exist"><cite title="Source Title">username can not exist twice</cite></footer>
+                                <footer class="blockquote-footer" id="email-contain"><cite title="Source Title">email must contain "@gmail.com"</cite></footer>
+                                <footer class="blockquote-footer" id="email-exist"><cite title="Source Title">email can not exist twice</cite></footer>
+                            </p>
                             <div class="form-group">
                                 <label for="username" class="text-info glyphicon glyphicon-user">Username:</label><br>
                                 <input type="text" name="username" id="username" class="form-control">
@@ -48,13 +53,29 @@ body {
 }
 #login .container #login-row #login-column #login-box {
   margin-top: 120px;
-  max-width: 600px;
-  height: 420px;
+  max-width: 100%;
+  height: 520px;
   border: 1px solid #9C9C9C;
   background-color: #EAEAEA;
 }
 #button-id{
     margin-left: 220px;
+}
+.blockquote-footer{
+    font-size: 100%;
+}
+#id{
+    color: green;
+}
+.form-group.background{
+  background: url(klematis.jpg) repeat;
+  border: 2px solid black;
+}
+.form-group.transbox{
+    margin: 30px;
+  background-color: #ffffff;
+  border: 1px solid black;
+  opacity: 0.6;
 }
 </style>
 <script>
@@ -75,15 +96,45 @@ function myFunction() {
                 url: 'register',
                 data: data,
                 success: function(res){
-                    if(res=="username"){
-                        $("#user-wrong").html("<div class = 'alert-danger'>the username is already used</div>");
+                    if(res == "all"){
+                        $("#user-exist").css("color", "red");
+                        $("#email-exist").css("color", "red");
+                        $("#email-contain").css("color", "red");
+                    }
+                    else if(res == "email contain"){
+                        $("#user-exist").css("color", "green");
+                        $("#email-exist").css("color", "green");
+                        $("#email-contain").css("color", "red");
+                    }
+                    else if(res == "email exist"){
+                        $("#user-exist").css("color", "green");
+                        $("#email-exist").css("color", "red");
+                        $("#email-contain").css("color", "green");
+                    }
+                    else if(res=="username exist"){
+                        $("#user-exist").css("color", "red");
+                        $("#email-exist").css("color", "green");
+                        $("#email-contain").css("color", "green");
                     } 
                     else if(res=="email"){
-                        $("#email-wrong").html("<div class = 'alert-danger'> the email is already used or not a valid email</div>");
+                        $("#user-exist").css("color", "green");
+                        $("#email-exist").css("color", "green");
+                        $("#email-contain").css("color", "red");
+                    }
+                    else if(res == "username exist email contain"){
+                        $("#user-exist").css("color", "red");
+                        $("#email-exist").css("color", "green");
+                        $("#email-contain").css("color", "red");
+                    }
+                    else if(res == "username exist email exist"){
+                        $("#user-exist").css("color", "red");
+                        $("#email-exist").css("color", "red");
+                        $("#email-contain").css("color", "green");
                     }
                     else{
-                        $("#email-wrong").html("great");
-                        $("#user-wrong").html("great");
+                        $("#user-exist").css("color", "green");
+                        $("#email-exist").css("color", "green");
+                        $("#email-contain").css("color", "green");
                         $(location).attr("href", "http://admin-monitor.herokuapp.com/login");
                     }
                 }

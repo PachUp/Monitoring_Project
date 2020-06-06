@@ -7,6 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/show_computer_data.css') }}"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='node_modules/bs4-toast/js/toast.js')}}"></script>
 {% endblock %}
 
 {% block body%}
@@ -246,6 +248,20 @@ function check_download(){
 }
 */
 /* handle automatic update computer info without refresh */
+$.toast({
+  title: 'Notice!',
+  subtitle: '11 mins ago',
+  content: 'This is a toast message.',
+  type: 'info',
+  delay: 5000,
+  img: {
+    src: 'image.png',
+    class: 'rounded',
+    title: '<a href="https://www.jqueryscript.net/tags.php?/Thumbnail/">Thumbnail</a> Title',
+    alt: 'Alternative'
+  },
+  pause_on_hover: false
+});
 $(document).ready(function(){
   $(".add-href").on("click", function(e){
     e.preventDefault()

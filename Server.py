@@ -97,7 +97,7 @@ def login():
             
     if request.method == "GET":
         if current_user.is_authenticated:
-            return redirect('/')
+            return redirect('/') 
         else:
             return render_template('/login.html')
 
@@ -111,10 +111,25 @@ def register():
         send = ""
         user_check = bool(users.query.filter_by(username=username).first())
         email_check = bool(users.query.filter_by(email=email).first())
-        if email_check or "@gmail.com" not in email:
+        print(email)
+        if (email_check) and ("@gmail.com" not in email) and user_check:
+            print("all") 
+            return "all"
+        elif (not email_check) or ("@gmail.com" not in email):
+            print("email")
             return "email"
+        elif email_check:
+            return "email exist"
+        elif "@gmail.com" not in email:
+            return "email contain"
         elif user_check:
-            return "username"
+            return "username exist"
+        elif user_check and ("@gmail.com" not in email):
+            print("u e c")
+            return "username exist email contain"
+        elif user_check and email_check:
+            print("u e e")
+            return "username exist email exist"
         else:
             if len(users.query.all()) == 0:
                 new_user = users(username = username, password=password, email=email, level=3)
@@ -457,7 +472,10 @@ def write_file_to_server(id):
     if file_to_put != b"":
         s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
         name = redis_server.get("download" + str(id))
-        file_name = name.split("\\")[-1]
+        try:
+            file_name = name.split("\\")[-1]
+        except:
+            return ""
         file_type = file_name.split(".")[-1]
         file_name = file_name.split(".")[0]
         file_name = file_name + "2"

@@ -54,6 +54,7 @@ body {
 #button-id{
     margin-top: -43px;
 }
+
 </style>
 <script>
 function myFunction() {
@@ -76,9 +77,13 @@ function myFunction() {
                     console.log(res)
                     if(res=="username"){
                         $("#user-wrong").html("<div class = 'alert-danger'> Wrong username</div>");
+                        $("#pass-wrong").html("<div class = 'alert-danger'></div>");
+                        
                     } 
                     else if(res=="password"){
                         $("#pass-wrong").html("<div class = 'alert-danger'> Wrong password</div>");
+                        $("#user-wrong").html("<div class = 'alert-danger'></div>");
+                        
                     }
                     else{
                         $("#pass-wrong").html("great");
