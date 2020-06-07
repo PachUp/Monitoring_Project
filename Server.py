@@ -82,8 +82,9 @@ def login():
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-        print(username)
-        print(users.query.all())
+        check_box = request.form['CheckBox']
+        print(check_box)
+        print(check_box)
         send = ""
         user_check = bool(users.query.filter_by(username=username).first())
         pass_check = bool(users.query.filter_by(password=password).first())
@@ -92,13 +93,19 @@ def login():
         elif not user_check:
             return "username"
         else:
-            user = users.query.filter_by( username=username,password=password).first()
-            login_user(user)
+            user = users.query.filter_by(username=username,password=password).first()
+            app.permanent_session_lifetime = False
+            if check_box == "True":
+                login_user(user, remember=True)
+            elif check_box == "False":
+                login_user(user, remember=False)
+            else:
+                return "An unexpected error has occurred"
             return "Great"
             
     if request.method == "GET":
         if current_user.is_authenticated:
-            return redirect('/') 
+            return redirect('/')
         else:
             return render_template('/login.html')
 
