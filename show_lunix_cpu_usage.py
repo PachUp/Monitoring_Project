@@ -18,4 +18,4 @@ while True:
     current_idle, current_sum = idle - last_idle, total - last_total
     utilisation = 100.0 * (1.0 - current_idle / current_sum)
     print(utilisation)
-    print(type(utilisation))
+    print(type(utilisation)) 

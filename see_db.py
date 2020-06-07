@@ -11,4 +11,4 @@ class users(db.Model, UserMixin):
         password = db.Column(db.TEXT)
         email = db.Column(db.TEXT)
         level = db.Column(db.INTEGER) #level 1 - regular employee, level 2 - Team leader, level 3 - Manager
-print(users.query.all()[0].password)
+print(users.query.all()[0].password) 
