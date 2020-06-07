@@ -4,6 +4,7 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify, a
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 import json
+import datetime
 from sqlalchemy import func
 import itertools 
 from flask_admin import Admin
@@ -307,6 +308,8 @@ def get_ajax_data(id):
             print("None")
             return "None!"
         else:
+            start_req = datetime.datetime.now()
+            print("res name: ")
             print(redis_server.get(redis_response_name))
             # check in the while loop if when you click on the button there is an existing value
             get_redis_response = redis_server.lrange(redis_response_name,0, -1)
@@ -322,11 +325,15 @@ def get_ajax_data(id):
             print(redis_server.get(redis_response_name))
             try:
                 while(redis_server.get(redis_response_name) is None):
-                    pass
+                    waiting_for_res = datetime.datetime.now()
+                    if(waiting_for_res - start_req > datetime.timedelta(seconds= 5.2)):
+                        return {"dir items": ["Not Found"]}
             except:
                 while(len(get_redis_response) == 0):
+                    waiting_for_res = datetime.datetime.now()
+                    if(waiting_for_res - start_req > datetime.timedelta(seconds= 5.2)):
+                        return {"dir items": ["Not Found"]}
                     get_redis_response = redis_server.lrange(redis_response_name,0, -1)
-                    pass
             print("finished!")
             print("af: ", end="")
             get_redis_response = redis_server.lrange(redis_response_name,0, -1)
@@ -345,6 +352,7 @@ def get_ajax_data(id):
             redis_server.delete(redis_request_name)
             print("end: ", end="")
             return {"dir items": temp_dict_val}
+
 
 @app.route("/computers/<int:id>/get-dir", methods=['POST', 'GET'])
 def get_dir_files(id):
