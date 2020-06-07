@@ -8,7 +8,8 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/show_computer_data.css') }}"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="{{ url_for('static', filename='node_modules/bs4-toast/js/toast.js')}}"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 {% endblock %}
 
 {% block body%}
@@ -108,7 +109,22 @@
   </div>
 </div>
 <script>
-  
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": true,
+  "progressBar": true,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
   /* handle dropdown value */
 var timer = 5000;
 $(".computer-data-dropdown").click(function(){
@@ -205,9 +221,26 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
   var get_new_data = function(){
   $.get("/computers/{{computer.id}}/live" ,function(data){
     var before_change = $("#cpu").html();
-    $("#cpu").text(data['CPU usage procentage']);
-    $("#memory").html(data["Memory usage procentage"]);
-    var cpu = data['CPU usage procentage'];
+    var current_cpu_procentage = data['CPU usage procentage']
+    var last_cpu_procentage = $("#cpu").text();
+    var current_memory_procentage = data["Memory usage procentage"]
+    var last_memory_procentage = $("#memory").html();
+    console.log(current_cpu_procentage)
+    console.log(last_cpu_procentage)
+    $("#cpu").text(current_cpu_procentage);
+    $("#memory").html(current_memory_procentage);
+    if(parseInt(current_cpu_procentage) - parseInt(last_cpu_procentage) >= 50){
+      toastr["error"]("CPU procentage raised by more than 50%!", "CPU procentage:")
+    }
+    if(parseInt(current_memory_procentage) - parseInt(last_memory_procentage) >= 50){
+      toastr["error"]("Memory procentage raised by more than 50%!", "Memory procentage:")
+    }
+    if( parseInt(last_cpu_procentage) -parseInt(current_cpu_procentage) >= 50){
+      toastr["success"]("CPU procentage reduced by more than 50%!", "CPU procentage:")
+    }
+    if( parseInt(last_memory_procentage) - parseInt(current_memory_procentage) >= 50){
+      toastr["success"]("Memory procentage reduced by more than 50%!", "Memory procentage:")
+    }
     var task_status_pid = data['pid'];
     var task_status_name = data['name'];
     var task_status_cpu_percent = data['cpu_percent'];
@@ -217,6 +250,16 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
     const $task_name = $(".task-name");
     const $task_cpu_percent = $(".task-cpu-percent");
     const $task_memory_percent = $(".task-memory-percent");
+    big_cpu_amount = Math.round(current_cpu_procentage/4)
+    var pid_found = true;
+    console.log(task_status_pid.length);
+    console.log($task_pid.length)
+    for(var i = 0; i< $task_pid.length; i++){
+      if(!task_status_pid.includes($task_pid.eq(i).text())){ // only checks for closed pids
+        var msg = "PID number: " + $task_pid.eq(i).text() + " Name: " + $task_name.eq(i).text() + " Has ended!"
+        toastr["error"](msg, "Running Processes:")
+      }
+    }
     for(var i = 0; i< task_status_pid.length; i++){
       $task_pid.eq(i).text(task_status_pid[i]);
       $task_name.eq(i).text(task_status_name[i]);
@@ -248,20 +291,7 @@ function check_download(){
 }
 */
 /* handle automatic update computer info without refresh */
-$.toast({
-  title: 'Notice!',
-  subtitle: '11 mins ago',
-  content: 'This is a toast message.',
-  type: 'info',
-  delay: 5000,
-  img: {
-    src: 'image.png',
-    class: 'rounded',
-    title: '<a href="https://www.jqueryscript.net/tags.php?/Thumbnail/">Thumbnail</a> Title',
-    alt: 'Alternative'
-  },
-  pause_on_hover: false
-});
+
 $(document).ready(function(){
   $(".add-href").on("click", function(e){
     e.preventDefault()

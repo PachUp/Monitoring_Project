@@ -1,6 +1,7 @@
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!------ Include the above in your HEAD tag ---------->
 
 <body>
@@ -24,7 +25,7 @@
                             <div class="form-group">
                                 <label for="password" class="text-info">Password:</label><br>
                                 <input type="password"  name="password" id="password" class="form-control">
-                                <input type="checkbox" onclick="myFunction()">Show Password
+                                <i class="fa fa-eye icon" onclick="myFunction()" id="eye"></i>
                                 <p id="pass-wrong"></p>
                             </div>
                             <div class="form-group">
@@ -67,6 +68,14 @@ body {
 #id{
     color: green;
 }
+.icon {
+  margin-bottom: initial;
+  padding: 8px;
+  background: dodgerblue;
+  color: white;
+  min-width: 45px;
+  text-align: center;
+}
 .form-group.background{
   background: url(klematis.jpg) repeat;
   border: 2px solid black;
@@ -81,6 +90,12 @@ body {
 <script>
 function myFunction() {
   var x = document.getElementById("password");
+  if(document.getElementById("eye").className == "fa fa-eye-slash icon"){
+    document.getElementById("eye").className = "fa fa-eye icon";
+  }
+  else{
+    document.getElementById("eye").className = "fa fa-eye-slash icon";
+  }
   if (x.type === "password") {
     x.type = "text";
   } else {
