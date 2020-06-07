@@ -4,6 +4,7 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify, a
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 import json
+import datetime
 import itertools 
 from sqlalchemy import func
 from flask_admin import Admin
@@ -83,8 +84,9 @@ def login():
     if request.method == "POST":
         username = request.form['username']
         password = request.form['password']
-        print(username)
-        print(users.query.all())
+        check_box = request.form['CheckBox']
+        print(check_box)
+        print(check_box)
         send = ""
         user_check = bool(users.query.filter_by(username=username).first())
         pass_check = bool(users.query.filter_by(password=password).first())
@@ -94,7 +96,13 @@ def login():
             return "username"
         else:
             user = users.query.filter_by(username=username,password=password).first()
-            login_user(user)
+            app.permanent_session_lifetime = False
+            if check_box == "True":
+                login_user(user, remember=True)
+            elif check_box == "False":
+                login_user(user, remember=False)
+            else:
+                return "An unexpected error has occurred"
             return "Great"
             
     if request.method == "GET":
@@ -298,6 +306,8 @@ def get_ajax_data(id):
             print("None")
             return "None!"
         else:
+            start_req = datetime.datetime.now()
+            print("res name: ")
             print(redis_server.get(redis_response_name))
             # check in the while loop if when you click on the button there is an existing value
             get_redis_response = redis_server.lrange(redis_response_name,0, -1)
@@ -313,11 +323,15 @@ def get_ajax_data(id):
             print(redis_server.get(redis_response_name))
             try:
                 while(redis_server.get(redis_response_name) is None):
-                    pass
+                    waiting_for_res = datetime.datetime.now()
+                    if(waiting_for_res - start_req > datetime.timedelta(seconds= 5.2)):
+                        return {"dir items": ["Not Found"]}
             except:
                 while(len(get_redis_response) == 0):
+                    waiting_for_res = datetime.datetime.now()
+                    if(waiting_for_res - start_req > datetime.timedelta(seconds= 5.2)):
+                        return {"dir items": ["Not Found"]}
                     get_redis_response = redis_server.lrange(redis_response_name,0, -1)
-                    pass
             print("finished!")
             print("af: ", end="")
             get_redis_response = redis_server.lrange(redis_response_name,0, -1)
@@ -381,6 +395,7 @@ def get_dir_files(id):
             dir_items = jq["dir list"]
             response_redis_name = "directory response" + str(id)
             redis_server.rpush(response_redis_name, *dir_items)
+            print("dir list:")
             print(jq["dir list"])
             #computer.directory_response = jq["dir list"]
             #db.session.add(computer)

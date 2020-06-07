@@ -225,8 +225,6 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
     var last_cpu_procentage = $("#cpu").text();
     var current_memory_procentage = data["Memory usage procentage"]
     var last_memory_procentage = $("#memory").html();
-    console.log(current_cpu_procentage)
-    console.log(last_cpu_procentage)
     $("#cpu").text(current_cpu_procentage);
     $("#memory").html(current_memory_procentage);
     if(parseInt(current_cpu_procentage) - parseInt(last_cpu_procentage) >= 50){
@@ -252,8 +250,6 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
     const $task_memory_percent = $(".task-memory-percent");
     big_cpu_amount = Math.round(current_cpu_procentage/4)
     var pid_found = true;
-    console.log(task_status_pid.length);
-    console.log($task_pid.length)
     for(var i = 0; i< $task_pid.length; i++){
       if(!task_status_pid.includes($task_pid.eq(i).text())){ // only checks for closed pids
         var msg = "PID number: " + $task_pid.eq(i).text() + " Name: " + $task_name.eq(i).text() + " Has ended!"
