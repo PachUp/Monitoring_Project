@@ -21,7 +21,6 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 #from celery import Celery
 from flask_celery import make_celery
 new_id = -1
-new_mac_address = ""
 change = 5000
 js = ""
 BUCKET = os.environ["S3_BUCKET"]
@@ -218,11 +217,20 @@ def inital_data(id):
     redis_server.delete("directory name" + str(id))
     return ""
 
+
+def add_computer(mac_address, new_id):
+    new_id = len(Todo.query.all()) + 1
+    print(mac_address)
+    print(new_id)
+    new_user = Todo(mac_address=mac_address, id=new_id)
+    db.session.add(new_user)
+    db.session.commit()
+    return new_id
+
 #verify_login
 @app.route('/computers/verify_login', methods=['POST', 'GET'])
 def check_if_user_exists():
     if request.method == 'POST':
-        global new_mac_address
         js = request.get_json()
         print(js)
         if js is not None:
@@ -249,11 +257,10 @@ def check_if_user_exists():
                 if mac_address == current_mac:
                     print("True!")
                     return str(current_id)
-            new_mac_address = mac_address
-            print("Not found!?")
-            return redirect('/computers/add')
+            print("Not found")
+            return add_computer(mac_address, new_id)
         else:
-            print("Empty? wtf")
+            print("Empty, bad request")
     else:   
         return ""
 
@@ -653,22 +660,6 @@ def no_one_in_db(id):
                     return redirect("/")
             else:
                 return redirect("/login")
-
-            
-
-
-@app.route('/computers/add')
-def new_computer():
-    try:
-        new_id = len(Todo.query.all()) + 1
-    except:
-        new_id = 1
-    print(new_mac_address)
-    print(new_id)
-    new_user = Todo(mac_address=new_mac_address, id=new_id)
-    db.session.add(new_user)
-    db.session.commit()
-    return redirect('/computers/verify_login', code=307)
 
 @app.route('/computers/<int:id>/live', methods=['POST', 'GET'])
 def live_info(id):
