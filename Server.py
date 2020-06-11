@@ -227,7 +227,13 @@ def check_if_user_exists():
             mac_address = js['mac_address']
             print("MAC: " + mac_address)
             print(len(Todo.query.all()))
-            for i in range(0,len(Todo.query.all())):
+            check_zero_computers = 0 # if there are 0 computers the for loop won't even happend.
+            if len(Todo.query.all()) == 0:
+                check_zero_computers = 1
+            else:
+                check_zero_computers = 0
+
+            for i in range(0,len(Todo.query.all()) + check_zero_computers):
                 current_id = Todo.query.all()[i].id
                 current_mac = Todo.query.all()[i].mac_address
                 if mac_address == current_mac:
