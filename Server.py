@@ -30,16 +30,16 @@ app = Flask(__name__)
 dotenv.load_dotenv()
 #app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["SQLALCHEMY_DATABASE_URI"]
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["HEROKU_POSTGRESQL_CHARCOAL_URL"]
 print("env var: ")
 print(os.environ["SQLALCHEMY_DATABASE_URI"])
-app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
-app.config["CELERY_BROKER_URL"] =  os.environ["REDIS_DATABASE_URI"]
-app.config["CELERY_RESULT_BACKEND"] = os.environ["REDIS_DATABASE_URI"]
+app.config['SECRET_KEY'] = os.environ["SECRET_KEY_ENV"]
+app.config["CELERY_BROKER_URL"] =  os.environ["REDIS_URL"]
+app.config["CELERY_RESULT_BACKEND"] = os.environ["REDIS_URL"]
 app.config["SESSION_PERMANENT"] = False
 celery = make_celery(app)
-celery.conf.update(BROKER_URL = os.environ["REDIS_DATABASE_URI"],
-                CELERY_RESULT_BACKEND=os.environ["REDIS_DATABASE_URI"])
+celery.conf.update(BROKER_URL = os.environ["REDIS_URL"],
+                CELERY_RESULT_BACKEND=os.environ["REDIS_URL"])
 db = SQLAlchemy(app)
 app.config.update(dict(
     DEBUG = True,
@@ -52,11 +52,11 @@ app.config.update(dict(
 ))
 mail = Mail(app)
 ser = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-redis_server = redis.from_url(os.environ["REDIS_DATABASE_URI"],charset="utf-8", decode_responses=True)
+redis_server = redis.from_url(os.environ["REDIS_URL"],charset="utf-8", decode_responses=True)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
-s3 = boto3.client('s3',aws_access_key_id=os.environ["aws_access_key_id"], aws_secret_access_key= os.environ["aws_secret_access_key"])
+s3 = boto3.client('s3',aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"], aws_secret_access_key= os.environ["AWS_SECRET_ACCESS_KEY"])
 class Todo(db.Model):
     __tablename__ = "Todo"
     id = db.Column(db.Integer, primary_key=True)
