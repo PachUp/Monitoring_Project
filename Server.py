@@ -24,15 +24,13 @@ new_id = -1
 new_mac_address = ""
 change = 5000
 js = ""
-BUCKET = "file-download-storage"
+BUCKET = os.environ["S3_BUCKET"]
 
 app = Flask(__name__)
 dotenv.load_dotenv()
 #app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["HEROKU_POSTGRESQL_CHARCOAL_URL"]
-print("env var: ")
-print(os.environ["SQLALCHEMY_DATABASE_URI"])
 app.config['SECRET_KEY'] = os.environ["SECRET_KEY_ENV"]
 app.config["CELERY_BROKER_URL"] =  os.environ["REDIS_URL"]
 app.config["CELERY_RESULT_BACKEND"] = os.environ["REDIS_URL"]
@@ -233,22 +231,23 @@ def check_if_user_exists():
             print(len(Todo.query.all()))
             check_zero_computers = 0 # if there are 0 computers the for loop won't even happend.
             if len(Todo.query.all()) == 0:
+                print("1")
                 check_zero_computers = 1
             else:
                 check_zero_computers = 0
 
             for i in range(0,len(Todo.query.all()) + check_zero_computers):
+                print("In")
                 if check_zero_computers == 0:
+                    print("checking i")
                     current_id = Todo.query.all()[i].id
                     current_mac = Todo.query.all()[i].mac_address
-                else:
+                elif check_zero_computers == 1:
+                    print("No comp")
                     current_id = 0
                     current_mac = 0
                 if mac_address == current_mac:
                     print("True!")
-                    #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-                    
-                    
                     return str(current_id)
             new_mac_address = mac_address
             print("Not found!?")
