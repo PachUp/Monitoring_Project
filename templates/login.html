@@ -33,7 +33,8 @@
                                 <i class="fa fa-eye icon" onclick="myFunction()" id="eye"></i>
                                 
                                 <div class="text-right">
-                                    <input class="form-check-input up" type="checkbox" id="autoSizingCheck">
+                                    <input class="form-check-input up" type="checkbox" id="autoSizingCheck" checked="checked">
+                                    
                                         <label class="form-check-label up" for="autoSizingCheck">
                                         Remember me
                                         </label>
@@ -133,9 +134,15 @@ function myFunction() {
                         
                     }
                     else{
-                        $("#pass-wrong").html("great");
-                        $("#user-wrong").html("great");
-                        $(location).attr("href", "http://admin-monitor.herokuapp.com/")
+                        if(res =="email"){
+                            $("#user-wrong").html("<div class = 'alert-danger'></div>");
+                            $("#pass-wrong").html("<div class = 'alert-danger'>Please verify your email</div>");
+                        }
+                        else{
+                            $("#pass-wrong").html("great");
+                            $("#user-wrong").html("great");
+                            $(location).attr("href", "http://admin-monitor.herokuapp.com/")
+                        }
                     }
                 }
             });

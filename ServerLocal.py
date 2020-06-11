@@ -15,6 +15,8 @@ import os
 import boto3
 import binascii
 from botocore.errorfactory import ClientError
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 #from celery import Celery
 from flask_celery import make_celery
 new_id = -1
@@ -26,15 +28,28 @@ BUCKET = "file-download-storage"
 app = Flask(__name__)
 #app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://elxqgsztvkhjaw:539ef0f68492adcefad2a471203ba421cb4699ae50b806f4698ea84a32a1f88f@ec2-54-195-247-108.eu-west-1.compute.amazonaws.com:5432/d7v0a7vgovnqos'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://uivkoiklvmepxq:0645866a06af656a780eb209d676aa6fdc2296d3ff44b82259b0dce0cc03e913@ec2-54-75-246-118.eu-west-1.compute.amazonaws.com:5432/d1c775di51cvi5'
 app.config['SECRET_KEY'] = "thisistopsecret"
 app.config["CELERY_BROKER_URL"] =  "redis://localhost:6379/0"
 app.config["CELERY_RESULT_BACKEND"] = "redis://localhost:6379/0"
+app.config["SESSION_PERMANENT"] = False
+
 celery = make_celery(app)
 
 celery.conf.update(BROKER_URL = "redis://localhost:6379/0",
                 CELERY_RESULT_BACKEND="redis://localhost:6379/0")
 db = SQLAlchemy(app)
+app.config.update(dict(
+    DEBUG = True,
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = 'raz.monitor.website@gmail.com',
+    MAIL_PASSWORD = 'AdminMonitor2020',
+))
+mail = Mail(app)
+ser = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 #redis_server = redis.from_url("redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449",charset="utf-8", decode_responses=True)
 redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
 admin = Admin(app,url="/admindb")
@@ -71,8 +86,11 @@ class users(db.Model, UserMixin):
     level = db.Column(db.INTEGER) #level 1 - regular employee, level 2 - Team leader, level 3 - Manager
     computer_id = db.Column(db.Integer, default=-1) 
     allow_to_view_level_2 = db.Column(db.TEXT, default="None")
-admin.add_view(ModelView(users, db.session))
+    email_authentication = db.Column(db.Boolean, default=False, nullable=False)
+    email_authentication_token = db.Column(db.TEXT, default="")
+    registered_date = db.Column(db.DateTime, default=datetime.datetime.now()) #I can't add const to sqlalchemy columns.
 
+admin.add_view(ModelView(users, db.session))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -96,7 +114,10 @@ def login():
             return "username"
         else:
             user = users.query.filter_by(username=username,password=password).first()
+            if user.email_authentication == False:
+                return "email"
             app.permanent_session_lifetime = False
+            
             if check_box == "True":
                 login_user(user, remember=True)
             elif check_box == "False":
@@ -119,6 +140,14 @@ def register():
         email = request.form['email']
         print(username)
         send = ""
+        computer = users.query.filter(func.lower(users.username) == func.lower(username)).first()
+        print(computer)
+        if computer is not None:
+            print("in")
+            now = datetime.datetime.now()
+            if now - computer.registered_date > datetime.timedelta(seconds= 300) and computer.email_authentication is False:
+                db.session.delete(computer)
+                db.session.commit()
         user_check = bool(users.query.filter(func.lower(users.username) == func.lower(username)).first())
         email_check = bool(users.query.filter_by(email=email).first())
         
@@ -137,14 +166,18 @@ def register():
             return "email contain"
         elif user_check:
             return "username exist"
-        
         else:
+            reg_token = ser.dumps(email, salt="email-confirmation")
+            email_msg = Message('Email Confirmation for admin monitor', sender='raz.monitor.website@gmail.com', recipients=[email])
+            mail_link = url_for('email_confirmation', emailToken = reg_token, _external= True)
+            email_msg.body = "Confirmation Link: " + mail_link
+            mail.send(email_msg)
             if len(users.query.all()) == 0:
-                new_user = users(username = username, password=password, email=email, level=3)
+                new_user = users(username = username, password=password, email=email, level=3, email_authentication_token=reg_token)
                 db.session.add(new_user)
                 db.session.commit()
             else:
-                new_user = users(username = username, password=password, email=email, level=1)
+                new_user = users(username = username, password=password, email=email, level=1, email_authentication_token=reg_token)
                 db.session.add(new_user)
                 db.session.commit()
             return redirect('/')
@@ -155,6 +188,18 @@ def register():
             return render_template('/register.html')
 
 
+@app.route("/email/confim/<emailToken>")
+def email_confirmation(emailToken):
+    try:
+        computer = users.query.filter_by(email_authentication_token=emailToken).first()
+        email = ser.loads(emailToken, salt="email-confirmation", max_age=300)
+    except SignatureExpired:
+        return "The Token has ended."
+    print(computer.email_authentication)
+    computer.email_authentication = True
+    computer.email_authentication_token = ""
+    db.session.commit()
+    return "Great!" #create template
 @app.route("/computers/<int:id>/inital-call", methods=['POST'])
 def inital_data(id):
     print("inital call!")

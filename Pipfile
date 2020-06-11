@@ -20,6 +20,8 @@ boto3 = "*"
 botocore = "*"
 celery = "*"
 gevent = "*"
+nexmo = "*"
+flask-mail = "*"
 
 [requires]
 python_version = "3.8.3"

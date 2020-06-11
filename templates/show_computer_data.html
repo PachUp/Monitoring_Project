@@ -228,16 +228,16 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
     $("#cpu").text(current_cpu_procentage);
     $("#memory").html(current_memory_procentage);
     if(parseInt(current_cpu_procentage) - parseInt(last_cpu_procentage) >= 50){
-      toastr["error"]("CPU procentage raised by more than 50%!", "CPU procentage:")
+      toastr["error"]("CPU procentage raised by more than 50% than last time!", "CPU procentage:")
     }
     if(parseInt(current_memory_procentage) - parseInt(last_memory_procentage) >= 50){
-      toastr["error"]("Memory procentage raised by more than 50%!", "Memory procentage:")
+      toastr["error"]("Memory procentage raised by more than 50% than last time!", "Memory procentage:")
     }
     if( parseInt(last_cpu_procentage) -parseInt(current_cpu_procentage) >= 50){
-      toastr["success"]("CPU procentage reduced by more than 50%!", "CPU procentage:")
+      toastr["success"]("CPU procentage reduced by more than 50% than last time!", "CPU procentage:")
     }
     if( parseInt(last_memory_procentage) - parseInt(current_memory_procentage) >= 50){
-      toastr["success"]("Memory procentage reduced by more than 50%!", "Memory procentage:")
+      toastr["success"]("Memory procentage reduced by more than 50% than last time!", "Memory procentage:")
     }
     var task_status_pid = data['pid'];
     var task_status_name = data['name'];
@@ -248,12 +248,22 @@ function change_progress_bar_color(cpu_after_change, memory_after_change){
     const $task_name = $(".task-name");
     const $task_cpu_percent = $(".task-cpu-percent");
     const $task_memory_percent = $(".task-memory-percent");
-    big_cpu_amount = Math.round(current_cpu_procentage/4)
+    var task_pid_arr = new Array($task_pid.length);
+    for(var i = 0; i< $task_pid.length; i++){ // same length
+        task_pid_arr[i] = $task_pid.eq(i).text();
+    }
+    big_cpu_amount = Math.round(current_cpu_procentage/4);
     var pid_found = true;
     for(var i = 0; i< $task_pid.length; i++){
       if(!task_status_pid.includes($task_pid.eq(i).text())){ // only checks for closed pids
         var msg = "PID number: " + $task_pid.eq(i).text() + " Name: " + $task_name.eq(i).text() + " Has ended!"
         toastr["error"](msg, "Running Processes:")
+      }
+    }
+    for(var i = 0; i< task_status_pid.length; i++){
+      if(!task_pid_arr.includes(task_status_pid[i])){ // only checks for new pids
+        var msg = "PID number: " + task_status_pid[i] + " Name: " + task_status_name[i] + " Has added!"
+        toastr["success"](msg, "Running Processes:")
       }
     }
     for(var i = 0; i< task_status_pid.length; i++){
