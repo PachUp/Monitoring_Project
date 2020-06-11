@@ -27,9 +27,11 @@ js = ""
 BUCKET = "file-download-storage"
 
 app = Flask(__name__)
+dotenv.load_dotenv()
 #app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
+print(os.getenv("SQLALCHEMY_DATABASE_URI"))
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 app.config["CELERY_BROKER_URL"] =  os.getenv("REDIS_DATABASE_URI")
 app.config["CELERY_RESULT_BACKEND"] = os.getenv("REDIS_DATABASE_URI")
