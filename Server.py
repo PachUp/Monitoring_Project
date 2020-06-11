@@ -196,7 +196,7 @@ def email_confirmation(emailToken):
         return "The Token has ended."
     print(computer.email_authentication)
     computer.email_authentication = True
-    computer.email_authentication_token = ""
+    computer.email_authentication_token = "Already used!"
     db.session.commit()
     return "Token is good, you can log in now!" #create template
 
