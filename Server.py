@@ -20,8 +20,6 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 #from celery import Celery
 from flask_celery import make_celery
-new_id = -1
-change = 5000
 js = ""
 BUCKET = os.environ["S3_BUCKET"]
 
@@ -53,7 +51,7 @@ redis_server = redis.from_url(os.environ["REDIS_URL"],charset="utf-8", decode_re
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
-s3 = boto3.client('s3',aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"], aws_secret_access_key= os.environ["AWS_SECRET_ACCESS_KEY"])
+s3 = boto3.resource('s3',aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"], aws_secret_access_key= os.environ["AWS_SECRET_ACCESS_KEY"])
 class Todo(db.Model):
     __tablename__ = "Todo"
     id = db.Column(db.Integer, primary_key=True)
@@ -518,9 +516,7 @@ def send_name(id):
 @app.route("/computers/<int:id>/file-ready", methods=['POST', "GET"])
 def check_if_the_file_is_ready(id):
     print("recv")
-    
-    #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-    
+    s3 = boto3.client('s3',aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"], aws_secret_access_key= os.environ["AWS_SECRET_ACCESS_KEY"])
     name = redis_server.get("file-name" + str(id))
     print(name)
     if name != None and name != "None":
