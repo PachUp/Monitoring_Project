@@ -234,8 +234,12 @@ def check_if_user_exists():
                 check_zero_computers = 0
 
             for i in range(0,len(Todo.query.all()) + check_zero_computers):
-                current_id = Todo.query.all()[i].id
-                current_mac = Todo.query.all()[i].mac_address
+                if check_zero_computers == 0:
+                    current_id = Todo.query.all()[i].id
+                    current_mac = Todo.query.all()[i].mac_address
+                else:
+                    current_id = 0
+                    current_mac = 0
                 if mac_address == current_mac:
                     print("True!")
                     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
