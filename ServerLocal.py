@@ -199,7 +199,7 @@ def email_confirmation(emailToken):
     computer.email_authentication = True
     computer.email_authentication_token = ""
     db.session.commit()
-    return "Great!" #create template
+    return "Token is good, you can log in now!" #create template
 @app.route("/computers/<int:id>/inital-call", methods=['POST'])
 def inital_data(id):
     print("inital call!")
@@ -589,53 +589,56 @@ def no_one_in_db(id):
         else:
             if current_user.is_authenticated:
                 #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
-                
-                redis_response_name = "directory response" + str(id)
-                redis_request_name = "directory request" + str(id)
+                computer = Todo.query.get_or_404(id)
+                if computer is not None:
+                    redis_response_name = "directory response" + str(id)
+                    redis_request_name = "directory request" + str(id)
 
-                redis_server.delete(redis_response_name)
-                redis_server.delete(redis_request_name)
-                redis_server.delete("download" + str(id))
-                computer = Todo.query.get_or_404(id)
-                running_processes = computer.running_processes
-                running_processes = json.loads(running_processes)
-                pid = running_processes["task status pid"]
-                name = running_processes["task status name"]
-                cpu_percent = running_processes["task status cpu percent"]
-                memory_percent = running_processes["task status memory percent"]
-                computer = Todo.query.get_or_404(id)
-                all_computers = []
-                for i in range(0, len(Todo.query.all())):
-                    all_computers.append(Todo.query.all()[i].id)
-                if current_user.level == 1:
-                    if current_user.computer_id == id:
-                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest ,level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
-                
-                    else:
-                        return abort(404)
-                elif current_user.level == 2:
-                    if current_user.computer_id == id:
-                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
-                
-                    try:
-                        allow_to_acces = current_user.allow_to_view_level_2.split(',')
-                    except:
-                        allow_to_acces = current_user.allow_to_view_level_2
-                    if len(allow_to_acces) == 1:
-                        print("Abort!")
-                        if allow_to_acces[0] == "None":
+                    redis_server.delete(redis_response_name)
+                    redis_server.delete(redis_request_name)
+                    redis_server.delete("download" + str(id))
+                    computer = Todo.query.get_or_404(id)
+                    running_processes = computer.running_processes
+                    running_processes = json.loads(running_processes)
+                    pid = running_processes["task status pid"]
+                    name = running_processes["task status name"]
+                    cpu_percent = running_processes["task status cpu percent"]
+                    memory_percent = running_processes["task status memory percent"]
+                    computer = Todo.query.get_or_404(id)
+                    all_computers = []
+                    for i in range(0, len(Todo.query.all())):
+                        all_computers.append(Todo.query.all()[i].id)
+                    if current_user.level == 1:
+                        if current_user.computer_id == id:
+                            return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest ,level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                    
+                        else:
                             return abort(404)
-                        elif int(allow_to_acces[0]) == id:
+                    elif current_user.level == 2:
+                        if current_user.computer_id == id:
                             return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
-                
-                    else:
-                        for i in allow_to_acces:
-                            i = int(i)
-                            if i == id:
+                    
+                        try:
+                            allow_to_acces = current_user.allow_to_view_level_2.split(',')
+                        except:
+                            allow_to_acces = current_user.allow_to_view_level_2
+                        if len(allow_to_acces) == 1:
+                            print("Abort!")
+                            if allow_to_acces[0] == "None":
+                                return abort(404)
+                            elif int(allow_to_acces[0]) == id:
                                 return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
-                
-                elif current_user.level == 3:
-                    return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                    
+                        else:
+                            for i in allow_to_acces:
+                                i = int(i)
+                                if i == id:
+                                    return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                    
+                    elif current_user.level == 3:
+                        return render_template('show_computer_data.html', computer=computer, timer=5000, pid=pid, name=name, cpu_percent=cpu_percent, memory_percent=memory_percent, zip=itertools.zip_longest, level_nev = int(current_user.level), computer_list_nev=all_computers) # if I want to send somethign to the client while he sends me all the data (after the client has the id ofcurse)
+                else:
+                    return redirect("/")
             else:
                 return redirect("/login")
             
