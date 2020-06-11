@@ -225,7 +225,7 @@ def add_computer(mac_address, new_id):
     new_user = Todo(mac_address=mac_address, id=new_id)
     db.session.add(new_user)
     db.session.commit()
-    return new_id
+    return str(new_id)
 
 #verify_login
 @app.route('/computers/verify_login', methods=['POST', 'GET'])
