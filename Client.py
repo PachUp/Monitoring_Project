@@ -241,17 +241,16 @@ def main():
     send_request_to = ""
     print(computer_mac_address())
     if status_code == 200:
-        while computer_id == "":
-            send_request_to = "http://admin-monitor.herokuapp.com/computers"
-            req_id = requests.post('http://admin-monitor.herokuapp.com/computers/verify_login',
-                               json={"mac_address": computer_mac_address()})
-            computer_id = req_id.content.decode()
-            print("computer id: " + computer_id)
-            print(type(computer_id))
-            if computer_id != "":
-                send_request_to = send_request_to + "/" + computer_id
+        send_request_to = "http://admin-monitor.herokuapp.com/computers"
+        req_id = requests.post('http://admin-monitor.herokuapp.com/computers/verify_login',
+                            json={"mac_address": computer_mac_address()})
+        computer_id = req_id.content.decode()
+        print("computer id: " + computer_id)
+        print(type(computer_id))
+        if computer_id != "":
+            send_request_to = send_request_to + "/" + computer_id
         requests.post(send_request_to,
-                      json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ": MemoryDetail.ram_usage()})
+                    json={"CPU type: ": CpuDetail.cpu_type(), "Ram usage: ": MemoryDetail.ram_usage()})
         requests.post(send_request_to + "/inital-call")
         
         try:
