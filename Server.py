@@ -30,15 +30,16 @@ app = Flask(__name__)
 dotenv.load_dotenv()
 #app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
-print(os.getenv("SQLALCHEMY_DATABASE_URI"))
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
-app.config["CELERY_BROKER_URL"] =  os.getenv("REDIS_DATABASE_URI")
-app.config["CELERY_RESULT_BACKEND"] = os.getenv("REDIS_DATABASE_URI")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["SQLALCHEMY_DATABASE_URI"]
+print("env var: ")
+print(os.environ["SQLALCHEMY_DATABASE_URI"])
+app.config['SECRET_KEY'] = os.environ["SECRET_KEY"]
+app.config["CELERY_BROKER_URL"] =  os.environ["REDIS_DATABASE_URI"]
+app.config["CELERY_RESULT_BACKEND"] = os.environ["REDIS_DATABASE_URI"]
 app.config["SESSION_PERMANENT"] = False
 celery = make_celery(app)
-celery.conf.update(BROKER_URL = os.getenv("REDIS_DATABASE_URI"),
-                CELERY_RESULT_BACKEND=os.getenv("REDIS_DATABASE_URI"))
+celery.conf.update(BROKER_URL = os.environ["REDIS_DATABASE_URI"],
+                CELERY_RESULT_BACKEND=os.environ["REDIS_DATABASE_URI"])
 db = SQLAlchemy(app)
 app.config.update(dict(
     DEBUG = True,
@@ -46,16 +47,16 @@ app.config.update(dict(
     MAIL_PORT = 587,
     MAIL_USE_TLS = True,
     MAIL_USE_SSL = False,
-    MAIL_USERNAME = os.getenv("MAIL_USERNAME"),
-    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD"),
+    MAIL_USERNAME = os.environ["MAIL_USERNAME"],
+    MAIL_PASSWORD = os.environ["MAIL_PASSWORD"],
 ))
 mail = Mail(app)
 ser = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-redis_server = redis.from_url(os.getenv("REDIS_DATABASE_URI"),charset="utf-8", decode_responses=True)
+redis_server = redis.from_url(os.environ["REDIS_DATABASE_URI"],charset="utf-8", decode_responses=True)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
-s3 = boto3.client('s3',aws_access_key_id=os.getenv("aws_access_key_id"), aws_secret_access_key= os.getenv("aws_secret_access_key"))
+s3 = boto3.client('s3',aws_access_key_id=os.environ["aws_access_key_id"], aws_secret_access_key= os.environ["aws_secret_access_key"])
 class Todo(db.Model):
     __tablename__ = "Todo"
     id = db.Column(db.Integer, primary_key=True)

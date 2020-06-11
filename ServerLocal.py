@@ -11,6 +11,7 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import psycopg2
 import redis
+import dotenv
 import os
 import boto3
 import binascii
@@ -26,18 +27,18 @@ js = ""
 BUCKET = "file-download-storage"
 
 app = Flask(__name__)
-#app.config.from_envvar('APP_SETTINGS')
+dotenv.load_dotenv()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://uivkoiklvmepxq:0645866a06af656a780eb209d676aa6fdc2296d3ff44b82259b0dce0cc03e913@ec2-54-75-246-118.eu-west-1.compute.amazonaws.com:5432/d1c775di51cvi5'
-app.config['SECRET_KEY'] = "thisistopsecret"
-app.config["CELERY_BROKER_URL"] =  "redis://localhost:6379/0"
-app.config["CELERY_RESULT_BACKEND"] = "redis://localhost:6379/0"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
+print("env var: ")
+print(os.getenv("REDIS_DATABASE_URI"))
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+app.config["CELERY_BROKER_URL"] =  os.getenv("REDIS_DATABASE_URI")
+app.config["CELERY_RESULT_BACKEND"] = os.getenv("REDIS_DATABASE_URI")
 app.config["SESSION_PERMANENT"] = False
-
 celery = make_celery(app)
-
-celery.conf.update(BROKER_URL = "redis://localhost:6379/0",
-                CELERY_RESULT_BACKEND="redis://localhost:6379/0")
+celery.conf.update(BROKER_URL = os.getenv("REDIS_DATABASE_URI"),
+                CELERY_RESULT_BACKEND=os.getenv("REDIS_DATABASE_URI"))
 db = SQLAlchemy(app)
 app.config.update(dict(
     DEBUG = True,
@@ -45,13 +46,13 @@ app.config.update(dict(
     MAIL_PORT = 587,
     MAIL_USE_TLS = True,
     MAIL_USE_SSL = False,
-    MAIL_USERNAME = 'raz.monitor.website@gmail.com',
-    MAIL_PASSWORD = 'AdminMonitor2020',
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD"),
 ))
 mail = Mail(app)
 ser = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-#redis_server = redis.from_url("redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449",charset="utf-8", decode_responses=True)
-redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
+redis_server = redis.from_url(os.getenv("REDIS_DATABASE_URI"),charset="utf-8", decode_responses=True)
+
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
