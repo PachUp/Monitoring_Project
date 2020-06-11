@@ -7,6 +7,7 @@ import json
 import datetime
 import itertools 
 from sqlalchemy import func
+import dotenv
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import psycopg2
@@ -28,15 +29,14 @@ BUCKET = "file-download-storage"
 app = Flask(__name__)
 #app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://uivkoiklvmepxq:0645866a06af656a780eb209d676aa6fdc2296d3ff44b82259b0dce0cc03e913@ec2-54-75-246-118.eu-west-1.compute.amazonaws.com:5432/d1c775di51cvi5'
-app.config['SECRET_KEY'] = "thisistopsecret"
-app.config["CELERY_BROKER_URL"] =  "redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449"
-app.config["CELERY_RESULT_BACKEND"] = "redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
+app.config["CELERY_BROKER_URL"] =  os.getenv("REDIS_DATABASE_URI")
+app.config["CELERY_RESULT_BACKEND"] = os.getenv("REDIS_DATABASE_URI")
 app.config["SESSION_PERMANENT"] = False
 celery = make_celery(app)
-
-celery.conf.update(BROKER_URL = "redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449",
-                CELERY_RESULT_BACKEND="redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449")
+celery.conf.update(BROKER_URL = os.getenv("REDIS_DATABASE_URI"),
+                CELERY_RESULT_BACKEND=os.getenv("REDIS_DATABASE_URI"))
 db = SQLAlchemy(app)
 app.config.update(dict(
     DEBUG = True,
@@ -44,15 +44,16 @@ app.config.update(dict(
     MAIL_PORT = 587,
     MAIL_USE_TLS = True,
     MAIL_USE_SSL = False,
-    MAIL_USERNAME = 'raz.monitor.website@gmail.com',
-    MAIL_PASSWORD = 'AdminMonitor2020',
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD"),
 ))
 mail = Mail(app)
 ser = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-redis_server = redis.from_url("redis://h:pb21f80cdd33b165745a56fbab1e6525ca2d57fc2e91536ab978ac536acca8eea@ec2-52-31-111-39.eu-west-1.compute.amazonaws.com:8449",charset="utf-8", decode_responses=True)
+redis_server = redis.from_url(os.getenv("REDIS_DATABASE_URI"),charset="utf-8", decode_responses=True)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
+s3 = boto3.client('s3',aws_access_key_id=os.getenv("aws_access_key_id"), aws_secret_access_key= os.getenv("aws_secret_access_key"))
 class Todo(db.Model):
     __tablename__ = "Todo"
     id = db.Column(db.Integer, primary_key=True)
@@ -431,7 +432,6 @@ def get_dir_files(id):
     file_to_delete = redis_server.get("delete file" + str(id))
     if file_to_delete is not None and file_to_delete != "":
         print(file_to_delete)
-        s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
         try:
             s3.Object(BUCKET, file_to_delete).delete()
         except:
@@ -488,7 +488,6 @@ def upload_file(name, id):
             print("name:::: " + name)
             redis_server.set("file-name" + str(id), name)
             return render_template("upload-file.html", computer = computer)
-            #s3 = boto3.client('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
             #not_found = True
             #return send_file(path, as_attachment=True)
         else:
@@ -510,7 +509,7 @@ def send_name(id):
 @app.route("/computers/<int:id>/file-ready", methods=['POST', "GET"])
 def check_if_the_file_is_ready(id):
     print("recv")
-    s3 = boto3.client('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
+    
     #redis_server = redis.Redis("localhost",charset="utf-8", decode_responses=True)
     
     name = redis_server.get("file-name" + str(id))
@@ -541,7 +540,6 @@ def write_file_to_server(id):
     file_to_put = request.get_data()
     #file-download-storage
     if file_to_put != b"":
-        s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
         name = redis_server.get("download" + str(id))
         try:
             file_name = name.split("\\")[-1]
@@ -563,7 +561,6 @@ def write_file_to_server(id):
         #redis_server.rpush(file_to_download, *file_to_put)
 
         """
-        s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
         s3.Object(BUCKET, file_full_name).put(Body=file_to_put)
         redis_server.delete("download" + str(id))
         """
@@ -588,7 +585,6 @@ def write_file_aws(file_full_name, file_to_put):
     #for i in range(0, len(file_to_download)): 
     #    file_to_download[i] = int(file_to_download[i]) 
     file_to_put = binascii.a2b_base64(file_to_put)
-    s3 = boto3.resource('s3',aws_access_key_id="AKIA5GAERK2YCVL7RNZ5", aws_secret_access_key= "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")
     print("SEnding!")
     s3.Object(BUCKET, file_full_name).put(Body=file_to_put)
     return "Request sent!"
