@@ -84,6 +84,10 @@ class users(db.Model, UserMixin):
     level = db.Column(db.INTEGER) #level 1 - regular employee, level 2 - Team leader, level 3 - Manager
     computer_id = db.Column(db.Integer, default=-1) 
     allow_to_view_level_2 = db.Column(db.TEXT, default="None")
+    email_authentication = db.Column(db.Boolean, default=False, nullable=False)
+    email_authentication_token = db.Column(db.TEXT, default="")
+    registered_date = db.Column(db.DateTime, default=datetime.datetime.now()) #I can't add const to sqlalchemy columns.
+
 admin.add_view(ModelView(users, db.session))
 
 
