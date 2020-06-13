@@ -23,6 +23,7 @@ gevent = "*"
 nexmo = "*"
 flask-mail = "*"
 python-dotenv = "*"
+pyotp = "*"
 
 [requires]
 python_version = "3.8.3"

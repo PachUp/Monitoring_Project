@@ -8,6 +8,8 @@ import datetime
 import itertools 
 from sqlalchemy import func
 import dotenv
+
+import pyotp
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 import psycopg2
@@ -699,7 +701,16 @@ def live_info(id):
         return json_txt
         # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
 
-
+sec = ""
+@app.route("/2fa", methods=["POST", "GET"])
+@login_required
+def fa():
+    secret = pyotp.random_base32()
+    sec = secret
+    URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
+    totp = pyotp.TOTP(sec)
+    print(totp.now())
+    return secret
 
 def get_admin_panel_data():
     users_username = []
