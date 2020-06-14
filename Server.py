@@ -29,7 +29,7 @@ app = Flask(__name__)
 dotenv.load_dotenv()
 #app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["HEROKU_POSTGRESQL_IVORY_URL"]
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["HEROKU_POSTGRESQL_PINK_URL"]
 app.config['SECRET_KEY'] = os.environ["SECRET_KEY_ENV"]
 app.config["CELERY_BROKER_URL"] =  os.environ["REDIS_URL"]
 app.config["CELERY_RESULT_BACKEND"] = os.environ["REDIS_URL"]
@@ -90,6 +90,7 @@ class users(db.Model, UserMixin):
     registered_date = db.Column(db.DateTime, default=datetime.datetime.now()) #I can't add const to sqlalchemy columns.
     fa2 = db.Column(db.TEXT, default="")
     corrent_2fa_id = db.Column(db.Boolean, default=False, nullable=False)
+    login_form_before_2fa = db.Column(db.Boolean, default=False, nullable=False) # check if the user completed the form before accesing the 2fa page
 
 admin.add_view(ModelView(users, db.session))
 
@@ -730,9 +731,14 @@ def fa():
 
 @app.route("/get-the-new-code", methods=["POST"])
 def new_code():
-    user = request.get_json()
-    user = user["user"]
+    user = request.get_data()
+    print(user)
+    print(type(user))
+    user = user.decode()
+    user = users.query.filter_by(id=fa2).first()
     current_code = pyotp.TOTP(user.fa2)
+    user.login_form_before_2fa = False #after 30 seconds, it's closed!
+    db.session.commit()
     return current_code.now()
 
 
@@ -748,20 +754,29 @@ def check_2fa():
             user = users.query.filter_by(id=fa2).first()
         except:
             return "An unexpected error has occured!"
-        current_code = pyotp.TOTP(user.fa2)
-        print(current_code)
-        return render_template("/check-2fa.html", fa2=current_code.now(), user=user, code=current_code)
+        try:
+            current_code = pyotp.TOTP(user.fa2)
+            print(current_code)
+        except:
+            return redirect("/")
+        if user.login_form_before_2fa == True:
+            return render_template("/check-2fa.html", fa2=current_code.now(), user=user, code=current_code)
+        else:
+            return redirect("/")
     else:
         try:
-            json_req = request.get_json()
+            id_user = request.get_data()
         except:
             return "An unexpected error has occured!"
-        print(json_req)
-        user = json_req["user"]
+        print(id_user)
+        user = users.query.filter_by(id=id_user.decode()).first()
         user.fa2 = True
         db.session.commit()
+        user.login_form_before_2fa = False
+        db.session.commit()
         login_user(user, remember=True) #when remeber me is an option make sure that this function will get this var too.
-        return redirect("/")
+        print(user)
+        return ""
 
 
 def get_admin_panel_data():

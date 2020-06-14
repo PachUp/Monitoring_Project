@@ -6,6 +6,8 @@
 {% block body%}
 <p id="center-me">2FA verification</p>
 <br>
+<p id="center-me">You have 30 seconds to fill this form, otherwise you'll need to login again.</p>
+<br>
 <p id="center-me">Hello, you enabled 2FA verification.</p>
 <br>
 <p id="center-me">Please enter the code in order to precede.</p>
@@ -29,21 +31,20 @@
     var inter = setInterval(function(){
         let check_status = "{{code.verify(" + fa2 + ")}}";
         console.log(check_status)
+        console.log(typeof(check_status))
         if(!check_status){
+            console.log("SEnding")
             $.ajax({
                type: "POST",
                url: "/get-the-new-code",
-               data: {"user" : "{{user}}"},
-               dataType: "json",
-               contentType: "application/json",
-               success: function(res){
-                console.log(res)
-                current_code = res;
-                clearInterval(inter);
-               }
+               data: "{{user.id}}",
+               //success: function(res){
+               // console.log(res)
+               // current_code = res;
+               //}
             });
         }
-    }, 10000);
+    }, 30000);
     $(".btn").click(function(){
         var input = $("#2fa").val()
         var data = false;
@@ -53,17 +54,15 @@
             $.ajax({
                 type: "POST",
                 url: "/check-2fa",
-                data: {"user" : "{{user}}"},
-                dataType: "json",
-                contentType: "application/json",
+                data: "{{user.id}}",
                 success: function(res){
                     $(location).attr("href", "http://admin-monitor.herokuapp.com/")
                 }
             });
         }
         else{
-            console.log(current_code)
             data = false;
+            console.log(current_code)
             $("#answer").html("<div class = 'alert-danger'>Wrong code</div>");
         }
     });

@@ -31,7 +31,7 @@ BUCKET = "file-download-storage"
 app = Flask(__name__)
 dotenv.load_dotenv()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://clmmyftjxnbbce:134671ec83eb4b90bfb3fdad17f8688f9dff34182311e4be231862eba8a5c88c@ec2-54-247-79-178.eu-west-1.compute.amazonaws.com:5432/d65op38k68s8ps'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://afpuvpwsymfnpe:18550867cd095c58db4411b4a5e73384570d25437145feb1b1c95074535b5b9c@ec2-54-247-78-30.eu-west-1.compute.amazonaws.com:5432/ddr5e26q1irjbr'
 app.config['SECRET_KEY'] = "thisistopsecret"
 app.config["CELERY_BROKER_URL"] =  "redis://localhost:6379/0"
 app.config["CELERY_RESULT_BACKEND"] = "redis://localhost:6379/0"
@@ -92,6 +92,7 @@ class users(db.Model, UserMixin):
     registered_date = db.Column(db.DateTime, default=datetime.datetime.now()) #I can't add const to sqlalchemy columns.
     fa2 = db.Column(db.TEXT, default="")
     corrent_2fa_id = db.Column(db.Boolean, default=False, nullable=False)
+    login_form_before_2fa = db.Column(db.Boolean, default=False, nullable=False) # check if the user completed the form before accesing the 2fa page
 
 admin.add_view(ModelView(users, db.session))
 
@@ -125,6 +126,8 @@ def login():
             print(user.fa2)
             if user.fa2 != "":
                 if user.corrent_2fa_id == False:
+                    user.login_form_before_2fa = True
+                    db.session.commit()
                     print("Is false")
                     return str(user.id)
             if check_box == "True": #always true for now
@@ -142,6 +145,19 @@ def login():
             return render_template('/login.html')
 
 
+@app.route("/get-the-new-code", methods=["POST"])
+def new_code():
+    user = request.get_data()
+    print(user)
+    print(type(user))
+    user = user.decode()
+    user = users.query.filter_by(id=fa2).first()
+    current_code = pyotp.TOTP(user.fa2)
+    user.login_form_before_2fa = False #after 30 seconds, it's closed!
+    db.session.commit()
+    return current_code.now()
+
+
 @app.route("/check-2fa", methods=['POST', "GET"])# maybe check if the code exist
 def check_2fa():
     if request.method == "GET":
@@ -154,19 +170,30 @@ def check_2fa():
             user = users.query.filter_by(id=fa2).first()
         except:
             return "An unexpected error has occured!"
-        current_code = pyotp.TOTP(user.fa2)
-        print(current_code)
-        return render_template("/check-2fa.html", fa2=current_code.now(), user=user)
+        try:
+            current_code = pyotp.TOTP(user.fa2)
+            print(current_code)
+        except:
+            return redirect("/")
+        if user.login_form_before_2fa == True:
+            return render_template("/check-2fa.html", fa2=current_code.now(), user=user, code=current_code)
+        else:
+            return redirect("/")
     else:
         try:
-            json_req = request.get_json()
+            id_user = request.get_data()
         except:
             return "An unexpected error has occured!"
-        user = json_req["user"]
+        print(id_user)
+        user = users.query.filter_by(id=id_user.decode()).first()
         user.fa2 = True
         db.session.commit()
+        user.login_form_before_2fa = False
+        db.session.commit()
         login_user(user, remember=True) #when remeber me is an option make sure that this function will get this var too.
-        return redirect("/")
+        print(user)
+        return ""
+
         
 
 @app.route('/register', methods=['POST', 'GET'])
