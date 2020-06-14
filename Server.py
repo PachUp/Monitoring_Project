@@ -203,13 +203,12 @@ def register():
 @app.route("/email/confim/<emailToken>")
 def email_confirmation(emailToken):
     try:
-        computer = users.query.filter_by(email_authentication_token=emailToken).first()
+        user = users.query.filter_by(email_authentication_token=emailToken).first()
         email = ser.loads(emailToken, salt="email-confirmation", max_age=300)
     except SignatureExpired:
         return "The Token has ended."
-    print(computer.email_authentication)
-    computer.email_authentication = True
-    computer.email_authentication_token = "Already used!"
+    user.email_authentication = True
+    user.email_authentication_token = "Already used!"
     db.session.commit()
     return "Token is good, you can log in now!" #create template
 
@@ -749,12 +748,12 @@ def new_code():
 def check_2fa():
     if request.method == "GET":
         try:
-            fa2 = request.args.get("id")
+            user_id = request.args.get("id")
         except:
             return "An unexpected error has occured!"
-        print(fa2)
+        print(user_id)
         try:
-            user = users.query.filter_by(id=fa2).first()
+            user = users.query.filter_by(id=user_id).first()
         except:
             return "An unexpected error has occured!"
         try:
@@ -773,7 +772,7 @@ def check_2fa():
             return "An unexpected error has occured!"
         print(id_user)
         user = users.query.filter_by(id=id_user.decode()).first()
-        user.fa2 = True
+        user.corrent_2fa_id = True
         db.session.commit()
         user.login_form_before_2fa = False
         db.session.commit()
