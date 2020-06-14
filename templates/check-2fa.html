@@ -33,13 +33,17 @@
             $.ajax({
                type: "POST",
                url: "/get-the-new-code",
-               data: {user : "{{user}}"},
+               data: {"user" : "{{user}}"},
+               dataType: "json",
+               contentType: "application/json",
                success: function(res){
+                console.log(res)
                 current_code = res;
+                clearInterval(inter);
                }
             });
         }
-    }, 1000);
+    }, 10000);
     $(".btn").click(function(){
         var input = $("#2fa").val()
         var data = false;
@@ -49,7 +53,9 @@
             $.ajax({
                 type: "POST",
                 url: "/check-2fa",
-                data: {user : "{{user}}"},
+                data: {"user" : "{{user}}"},
+                dataType: "json",
+                contentType: "application/json",
                 success: function(res){
                     $(location).attr("href", "http://admin-monitor.herokuapp.com/")
                 }
