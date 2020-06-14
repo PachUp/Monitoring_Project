@@ -88,6 +88,8 @@ class users(db.Model, UserMixin):
     email_authentication = db.Column(db.Boolean, default=False, nullable=False)
     email_authentication_token = db.Column(db.TEXT, default="")
     registered_date = db.Column(db.DateTime, default=datetime.datetime.now()) #I can't add const to sqlalchemy columns.
+    fa2 = db.Column(db.TEXT, default="")
+    corrent_2fa_id = db.Column(db.Boolean, default=False, nullable=False)
 
 admin.add_view(ModelView(users, db.session))
 
