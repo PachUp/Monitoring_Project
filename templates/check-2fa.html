@@ -32,7 +32,7 @@
         let check_status = "{{code.verify(" + fa2 + ")}}";
         console.log(check_status)
         console.log(typeof(check_status))
-        if(!check_status){
+        if(check_status == "False"){
             console.log("SEnding")
             $.ajax({
                type: "POST",
