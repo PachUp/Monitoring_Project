@@ -28,7 +28,8 @@
     $(".btn").click(function(){
         var input = $("#2fa").val()
         var data = false;
-        if("{{user.fa2}}" == input){
+        if("{{fa2}}" == input){
+            $("#answer").html("<div class = 'alert-danger'>Corrent code! I'll redirect you to the main page in a few seconds!</div>");
             data = true
             $.ajax({
                 type: "POST",
@@ -40,7 +41,9 @@
             });
         }
         else{
+            console.log("wrong")
             data = false;
+            $("#answer").html("<div class = 'alert-danger'>Wrong code</div>");
         }
     });
 </script>

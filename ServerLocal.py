@@ -117,18 +117,16 @@ def login():
             return "username"
         else:
             user = users.query.filter_by(username=username,password=password).first()
-            user.fa2 = False
+            user.corrent_2fa_id = False
             db.session.commit()
             if user.email_authentication == False:
                 return "email"
             app.permanent_session_lifetime = False
+            print(user.fa2)
             if user.fa2 != "":
                 if user.corrent_2fa_id == False:
-                    return render_template("check-2fa", user=user)
-                else:
-                    pass
-            else:
-                pass
+                    print("Is false")
+                    return str(user.id)
             if check_box == "True": #always true for now
                 login_user(user, remember=True)
             elif check_box == "False": #disabled for now
@@ -144,18 +142,31 @@ def login():
             return render_template('/login.html')
 
 
-@app.route("/check-2fa", methods=['POST'])
+@app.route("/check-2fa", methods=['POST', "GET"])# maybe check if the code exist
 def check_2fa():
-    try:
-        json_req = request.get_json()
-    except:
-        return "An unexpected error has occured!"
-    user = json_req["user"]
-    user.fa2 = True
-    db.session.commit()
-    login_user(user, remember=True) #when remeber me is an option make sure that this function will get this var too.
-    return redirect("/")
-    
+    if request.method == "GET":
+        try:
+            fa2 = request.args.get("id")
+        except:
+            return "An unexpected error has occured!"
+        print(fa2)
+        try:
+            user = users.query.filter_by(id=fa2).first()
+        except:
+            return "An unexpected error has occured!"
+        current_code = pyotp.TOTP(user.fa2)
+        return render_template("/check-2fa.html", fa2=current_code.now(), user=user)
+    else:
+        try:
+            json_req = request.get_json()
+        except:
+            return "An unexpected error has occured!"
+        user = json_req["user"]
+        user.fa2 = True
+        db.session.commit()
+        login_user(user, remember=True) #when remeber me is an option make sure that this function will get this var too.
+        return redirect("/")
+        
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -280,6 +291,8 @@ def fa():
             totp = pyotp.TOTP(secret)
             secret = str(secret)
             print(totp.now())
+            current_user.fa2 = secret
+            db.session.commit()
             return URI
         else:
             return "You already have 2fa enabled!"

@@ -138,10 +138,14 @@ function myFunction() {
                             $("#user-wrong").html("<div class = 'alert-danger'></div>");
                             $("#pass-wrong").html("<div class = 'alert-danger'>Please verify your email</div>");
                         }
-                        else{
+                        else if(res=="Great"){
                             $("#pass-wrong").html("great");
                             $("#user-wrong").html("great");
                             $(location).attr("href", "http://admin-monitor.herokuapp.com/")
+                        }
+                        else{
+                            console.log("Else")
+                            window.location = "http://admin-monitor.herokuapp.com/check-2fa?id=" + res;
                         }
                     }
                 }
