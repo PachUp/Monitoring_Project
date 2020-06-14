@@ -728,7 +728,7 @@ def fa():
     else:
         return "You already have 2fa enabled!"
 
-@app.route("/get-the-new-code", methods="POST")
+@app.route("/get-the-new-code", methods=["POST"])
 def new_code():
     user = request.get_json()
     user = user["user"]
