@@ -322,7 +322,7 @@ def fa():
             db.session.commit()
             return URI
         else:
-            return "You already have 2fa enabled!"
+            return "enabled"
 
 def no_one_in_db_code(id):
     global js

@@ -230,7 +230,6 @@ def inital_data(id):
 
 
 def add_computer(mac_address, new_id):
-    new_id = len(Todo.query.all()) + 1
     print(mac_address)
     print(new_id)
     new_user = Todo(mac_address=mac_address, id=new_id)
@@ -269,6 +268,7 @@ def check_if_user_exists():
                     print("True!")
                     return str(current_id)
             print("Not found")
+            new_id = len(Todo.query.all()) + 1
             return add_computer(mac_address, new_id)
         else:
             print("Empty, bad request")
@@ -729,7 +729,7 @@ def fa():
             db.session.commit()
             return URI
         else:
-            return "You already have 2fa enabled!"
+            return "enabled"
 
 @app.route("/get-the-new-code", methods=["POST"])
 def new_code():
