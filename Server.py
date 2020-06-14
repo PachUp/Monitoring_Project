@@ -125,6 +125,8 @@ def login():
             print(user.fa2)
             if user.fa2 != "":
                 if user.corrent_2fa_id == False:
+                    user.login_form_before_2fa = True
+                    db.session.commit()
                     print("Is false")
                     return str(user.id)
             if check_box == "True": #always true for now
@@ -716,18 +718,19 @@ def live_info(id):
 def fa():
     if request.method == "GET":
         return render_template("2fa.html")
-    if current_user.fa2 == "":
-        secret = pyotp.random_base32()
-        sec = secret
-        URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
-        totp = pyotp.TOTP(secret)
-        secret = str(secret)
-        print(totp.now())
-        current_user.fa2 = secret
-        db.session.commit()
-        return URI
     else:
-        return "You already have 2fa enabled!"
+        if current_user.fa2 == "":
+            secret = pyotp.random_base32()
+            sec = secret
+            URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
+            totp = pyotp.TOTP(secret)
+            secret = str(secret)
+            print(totp.now())
+            current_user.fa2 = secret
+            db.session.commit()
+            return URI
+        else:
+            return "You already have 2fa enabled!"
 
 @app.route("/get-the-new-code", methods=["POST"])
 def new_code():
