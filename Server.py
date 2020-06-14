@@ -740,9 +740,14 @@ def check_2fa():
             user = users.query.filter_by(id=fa2).first()
         except:
             return "An unexpected error has occured!"
-        current_code = pyotp.TOTP(user.fa2)
-        print(current_code)
-        return render_template("/check-2fa.html", fa2=current_code.now(), user=user)
+        user_check = bool(users.query.filter_by(username=user.username).first())
+        if user_check:
+            current_code = pyotp.TOTP(user.fa2)
+            print(current_code.now())
+            print(user.username)
+            return render_template("/check-2fa.html", fa2=current_code.now(), user=user)
+        else:
+            return "ID - not found"
     else:
         try:
             json_req = request.get_json()
