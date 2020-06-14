@@ -13,6 +13,7 @@ import psycopg2
 import redis
 import dotenv
 import pyotp
+from flask_qrcode import QRcode
 import os
 import boto3
 import binascii
@@ -51,7 +52,7 @@ app.config.update(dict(
 mail = Mail(app)
 ser = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 redis_server = redis.from_url("redis://localhost:6379/0",charset="utf-8", decode_responses=True)
-
+QRcode(app)
 admin = Admin(app,url="/admindb")
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -240,16 +241,22 @@ def check_if_user_exists():
     else:   
         return ""
 
-sec = ""
-@app.route("/2fa", methods=["POST", "GET"])
+
+@app.route("/2fa", methods=["POST", "GET"]) # must use NTP time. 
+#check if the user already has 2fa
+#add 2fa to the db
 @login_required
 def fa():
-    secret = pyotp.random_base32()
-    sec = secret
-    URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
-    totp = pyotp.TOTP(sec)
-    print(totp.now())
-    return secret
+    if request.method == "GET":
+        return render_template("2fa.html")
+    else:
+        secret = pyotp.random_base32()
+        sec = secret
+        URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
+        totp = pyotp.TOTP(secret)
+        secret = str(secret)
+        print(totp.now())
+        return URI
 
 def no_one_in_db_code(id):
     global js

@@ -1,0 +1,59 @@
+{% extends 'nevbar.html' %}
+{% block head%}
+<script type="text/javascript" src="{{ url_for('static', filename='JsBarcode.all.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='qrcode.min.js') }}" defer></script>
+{% endblock %}
+
+{% block body%}
+<h1 id="center-me">Welcome to the 2FA page</h1>
+<div class="row justify-content-center">
+    <button type="button" class="btn btn-outline-primary center-me center-block" id="button" data-toggle="modal" data-target="#QRModal">Click me to enable 2FA</button>
+</div>
+<p id="center-me">Note: Once you enable 2FA you will not be able to cancel it.</p>
+<p id="center-me">Every time you log in you'll need to type the code</p>
+<p id="center-me">Please install Google's Authenticator </p>
+<div class="modal fade" id="QRModal" tabindex="-1" role="dialog" aria-labelledby="QRModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="QRModalLabel">QR</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div id="barcode"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Ok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<style>
+#center-me{
+  align-items: center;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  justify-content: center;
+}
+.modal-lg{
+  max-width: 17% ;
+}
+</style>
+<script>
+    $("#button").click(function(){
+        $.post("/2fa", function(data){
+            console.log("Clicked")
+            var qrcode = new QRCode(document.querySelector("#barcode"), { // have to select a query like this
+              text: data,
+              width: 128,
+              height: 128,
+              colorDark : "#000000",
+              colorLight : "#ffffff",
+              correctLevel : QRCode.CorrectLevel.H
+          });
+        });
+    });
+</script>
+{% endblock %}

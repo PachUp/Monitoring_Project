@@ -24,6 +24,7 @@ nexmo = "*"
 flask-mail = "*"
 python-dotenv = "*"
 pyotp = "*"
+flask-qrcode = "*"
 
 [requires]
 python_version = "3.8.3"
