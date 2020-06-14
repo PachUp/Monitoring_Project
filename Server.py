@@ -734,11 +734,11 @@ def fa():
 
 @app.route("/get-the-new-code", methods=["POST"])
 def new_code():
-    user = request.get_data()
-    print(user)
-    print(type(user))
-    user = user.decode()
-    user = users.query.filter_by(id=fa2).first()
+    user_id = request.get_data()
+    print(user_id)
+    print(type(user_id))
+    user_id = user_id.decode()
+    user = users.query.filter_by(id=user_id).first()
     current_code = pyotp.TOTP(user.fa2)
     user.login_form_before_2fa = False #after 30 seconds, it's closed!
     db.session.commit()

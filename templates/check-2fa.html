@@ -6,7 +6,7 @@
 {% block body%}
 <p id="center-me">2FA verification</p>
 <br>
-<p id="center-me">You have 30 seconds to fill this form, otherwise you'll need to login again.</p>
+<p id="center-me">You have 30 seconds to fill this form, otherwise you'll need to login again(for security measures).</p>
 <br>
 <p id="center-me">Hello, you enabled 2FA verification.</p>
 <br>
@@ -38,10 +38,11 @@
                type: "POST",
                url: "/get-the-new-code",
                data: "{{user.id}}",
-               //success: function(res){
-               // console.log(res)
-               // current_code = res;
-               //}
+               success: function(res){
+                console.log(res)
+                current_code = res;
+                $(location).attr("href", "http://admin-monitor.herokuapp.com/login")
+               }
             });
         }
     }, 30000);
