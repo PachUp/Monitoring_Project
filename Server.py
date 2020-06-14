@@ -114,13 +114,19 @@ def login():
             return "username"
         else:
             user = users.query.filter_by(username=username,password=password).first()
+            user.corrent_2fa_id = False
+            db.session.commit()
             if user.email_authentication == False:
                 return "email"
             app.permanent_session_lifetime = False
-            
-            if check_box == "True":
+            print(user.fa2)
+            if user.fa2 != "":
+                if user.corrent_2fa_id == False:
+                    print("Is false")
+                    return str(user.id)
+            if check_box == "True": #always true for now
                 login_user(user, remember=True)
-            elif check_box == "False":
+            elif check_box == "False": #disabled for now
                 login_user(user, remember=False)
             else:
                 return "An unexpected error has occurred"
@@ -131,6 +137,7 @@ def login():
             return redirect('/')
         else:
             return render_template('/login.html')
+
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -701,16 +708,47 @@ def live_info(id):
         return json_txt
         # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
 
-sec = ""
-@app.route("/2fa", methods=["POST", "GET"])
+@app.route("/2fa", methods=["POST"]) # must use NTP time.
 @login_required
 def fa():
-    secret = pyotp.random_base32()
-    sec = secret
-    URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
-    totp = pyotp.TOTP(sec)
-    print(totp.now())
-    return secret
+    if current_user.fa2 == "":
+        secret = pyotp.random_base32()
+        sec = secret
+        URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
+        totp = pyotp.TOTP(secret)
+        secret = str(secret)
+        print(totp.now())
+        current_user.fa2 = secret
+        db.session.commit()
+        return URI
+    else:
+        return "You already have 2fa enabled!"
+
+@app.route("/check-2fa", methods=['POST', "GET"])# maybe check if the code exist
+def check_2fa():
+    if request.method == "GET":
+        try:
+            fa2 = request.args.get("id")
+        except:
+            return "An unexpected error has occured!"
+        print(fa2)
+        try:
+            user = users.query.filter_by(id=fa2).first()
+        except:
+            return "An unexpected error has occured!"
+        current_code = pyotp.TOTP(user.fa2)
+        return render_template("/check-2fa.html", fa2=current_code.now(), user=user)
+    else:
+        try:
+            json_req = request.get_json()
+        except:
+            return "An unexpected error has occured!"
+        user = json_req["user"]
+        user.fa2 = True
+        db.session.commit()
+        login_user(user, remember=True) #when remeber me is an option make sure that this function will get this var too.
+        return redirect("/")
+
 
 def get_admin_panel_data():
     users_username = []
