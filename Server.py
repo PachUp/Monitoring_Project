@@ -713,6 +713,8 @@ def live_info(id):
 @app.route("/2fa", methods=["POST"]) # must use NTP time.
 @login_required
 def fa():
+    if request.method == "GET":
+        return render_template("2fa.html")
     if current_user.fa2 == "":
         secret = pyotp.random_base32()
         sec = secret
