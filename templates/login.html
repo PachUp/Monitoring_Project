@@ -33,10 +33,10 @@
                                 <i class="fa fa-eye icon" onclick="myFunction()" id="eye"></i>
                                 
                                 <div class="text-right">
-                                    <input class="form-check-input up" type="checkbox" id="autoSizingCheck" checked="checked">
+                                    <input class="form-check-input up" type="checkbox" id="autoSizingCheck" checked="checked" disabled>
                                     
-                                        <label class="form-check-label up" for="autoSizingCheck">
-                                        Remember me
+                                        <label class="form-check-label up" for="autoSizingCheck" >
+                                        Remember me(off)
                                         </label>
                                 </div>
                             </div>
@@ -111,10 +111,10 @@ function myFunction() {
         $("#button-id").click(function(){
             var data = $("form").serialize();
             if ($('#autoSizingCheck').is(':checked')){
-                data = data + "&CheckBox=" + "True" // maybe change in the future(that's why I have the +)
+                data = data + "&CheckBox=" + "True" // maybe change in the future(that's why I have the +), option is disabled for now
             }
             else{
-                data = data + "&CheckBox=" + "False" // maybe change in the future(that's why I have the +)
+                data = data + "&CheckBox=" + "True" // maybe change in the future(that's why I have the +), option is disabled for now
             }
             console.log(data);
             $.ajax({

@@ -31,7 +31,7 @@ BUCKET = "file-download-storage"
 app = Flask(__name__)
 dotenv.load_dotenv()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://uivkoiklvmepxq:0645866a06af656a780eb209d676aa6fdc2296d3ff44b82259b0dce0cc03e913@ec2-54-75-246-118.eu-west-1.compute.amazonaws.com:5432/d1c775di51cvi5'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ybhupwxvjvhhzc:e6df4d4aa7ce04b41a8cbf2c9b3de437e7cd38be0cf1b54f95cd263dd9371839@ec2-54-247-79-178.eu-west-1.compute.amazonaws.com:5432/d65dpmgu192h3v'
 app.config['SECRET_KEY'] = "thisistopsecret"
 app.config["CELERY_BROKER_URL"] =  "redis://localhost:6379/0"
 app.config["CELERY_RESULT_BACKEND"] = "redis://localhost:6379/0"
@@ -90,6 +90,8 @@ class users(db.Model, UserMixin):
     email_authentication = db.Column(db.Boolean, default=False, nullable=False)
     email_authentication_token = db.Column(db.TEXT, default="")
     registered_date = db.Column(db.DateTime, default=datetime.datetime.now()) #I can't add const to sqlalchemy columns.
+    fa2 = db.Column(db.TEXT, default="")
+    corrent_2fa_id = db.Column(db.Boolean, default=False, nullable=False)
 
 admin.add_view(ModelView(users, db.session))
 
@@ -115,13 +117,21 @@ def login():
             return "username"
         else:
             user = users.query.filter_by(username=username,password=password).first()
+            user.fa2 = False
+            db.session.commit()
             if user.email_authentication == False:
                 return "email"
             app.permanent_session_lifetime = False
-            
-            if check_box == "True":
+            if user.fa2 != "":
+                if user.corrent_2fa_id == False:
+                    return render_template("check-2fa", user=user)
+                else:
+                    pass
+            else:
+                pass
+            if check_box == "True": #always true for now
                 login_user(user, remember=True)
-            elif check_box == "False":
+            elif check_box == "False": #disabled for now
                 login_user(user, remember=False)
             else:
                 return "An unexpected error has occurred"
@@ -132,6 +142,20 @@ def login():
             return redirect('/')
         else:
             return render_template('/login.html')
+
+
+@app.route("/check-2fa", methods=['POST'])
+def check_2fa():
+    try:
+        json_req = request.get_json()
+    except:
+        return "An unexpected error has occured!"
+    user = json_req["user"]
+    user.fa2 = True
+    db.session.commit()
+    login_user(user, remember=True) #when remeber me is an option make sure that this function will get this var too.
+    return redirect("/")
+    
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
@@ -242,21 +266,23 @@ def check_if_user_exists():
         return ""
 
 
-@app.route("/2fa", methods=["POST", "GET"]) # must use NTP time. 
-#check if the user already has 2fa
-#add 2fa to the db
+@app.route("/2fa", methods=["POST", "GET"]) # must use NTP time.
 @login_required
 def fa():
     if request.method == "GET":
+
         return render_template("2fa.html")
     else:
-        secret = pyotp.random_base32()
-        sec = secret
-        URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
-        totp = pyotp.TOTP(secret)
-        secret = str(secret)
-        print(totp.now())
-        return URI
+        if current_user.fa2 == "":
+            secret = pyotp.random_base32()
+            sec = secret
+            URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
+            totp = pyotp.TOTP(secret)
+            secret = str(secret)
+            print(totp.now())
+            return URI
+        else:
+            return "You already have 2fa enabled!"
 
 def no_one_in_db_code(id):
     global js

@@ -1,0 +1,49 @@
+{% extends 'nevbar.html' %}
+{% block head%}
+
+{% endblock %}
+
+{% block body%}
+<p id="center-me">2FA verification</p>
+<br>
+<p id="center-me">Hello, you enabled 2FA verification.</p>
+<br>
+<p id="center-me">Please enter the code in order to precede.</p>
+<div class="form-group" id="center-me">
+    <label>ID:</label>
+    <input type="text" class="form-control" id="2fa">
+    <button type="button" class="btn btn-success" id="center-me">Go!</button>
+    <p id="answer"></p>
+</div>
+
+<style>
+#center-me{
+  align-items: center;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  justify-content: center;
+}
+</style>
+<script>
+    $(".btn").click(function(){
+        var input = $("#2fa").val()
+        var data = false;
+        if("{{user.fa2}}" == input){
+            data = true
+            $.ajax({
+                type: "POST",
+                url: "/check-2fa",
+                data: {"user" : "{{user}}"},
+                success: function(res){
+                    $(location).attr("href", "http://admin-monitor.herokuapp.com/")
+                }
+            });
+        }
+        else{
+            data = false;
+        }
+    });
+</script>
+
+
+{% endblock %}
