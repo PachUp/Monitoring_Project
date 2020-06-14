@@ -33,7 +33,7 @@
             $.ajax({
                type: "POST",
                url: "/get-the-new-code",
-               data: {"user" : "{{user}}"},
+               data: {user : "{{user}}"},
                success: function(res){
                 current_code = res;
                }
@@ -49,7 +49,7 @@
             $.ajax({
                 type: "POST",
                 url: "/check-2fa",
-                data: {"user" : "{{user}}"},
+                data: {user : "{{user}}"},
                 success: function(res){
                     $(location).attr("href", "http://admin-monitor.herokuapp.com/")
                 }
