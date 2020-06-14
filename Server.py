@@ -741,6 +741,7 @@ def check_2fa():
         except:
             return "An unexpected error has occured!"
         current_code = pyotp.TOTP(user.fa2)
+        print(current_code)
         return render_template("/check-2fa.html", fa2=current_code.now(), user=user)
     else:
         try:
