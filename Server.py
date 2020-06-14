@@ -710,7 +710,7 @@ def live_info(id):
         return json_txt
         # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
 
-@app.route("/2fa", methods=["POST"]) # must use NTP time.
+@app.route("/2fa", methods=["POST", "GET"]) # must use NTP time.
 @login_required
 def fa():
     if request.method == "GET":
