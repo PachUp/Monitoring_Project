@@ -25,10 +25,25 @@
 }
 </style>
 <script>
+    var current_code = "{{fa2}}"
+    var inter = setInterval(function(){
+        let check_status = "{{code.verify(" + fa2 + ")}}";
+        console.log(check_status)
+        if(!check_status){
+            $.ajax({
+               type: "POST",
+               url: "/get-the-new-code",
+               data: {"user" : "{{user}}"},
+               success: function(res){
+                current_code = res;
+               }
+            });
+        }
+    }, 1000);
     $(".btn").click(function(){
         var input = $("#2fa").val()
         var data = false;
-        if("{{fa2}}" == input){
+        if(current_code == input){
             $("#answer").html("<div class = 'alert-danger'>Corrent code! I'll redirect you to the main page in a few seconds!</div>");
             data = true
             $.ajax({
@@ -41,7 +56,7 @@
             });
         }
         else{
-            console.log("{{fa2}}")
+            console.log(current_code)
             data = false;
             $("#answer").html("<div class = 'alert-danger'>Wrong code</div>");
         }

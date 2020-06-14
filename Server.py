@@ -728,6 +728,14 @@ def fa():
     else:
         return "You already have 2fa enabled!"
 
+@app.route("/get-the-new-code", methods="POST")
+def new_code():
+    user = request.get_json()
+    user = user["user"]
+    current_code = pyotp.TOTP(user.fa2)
+    return current_code.now()
+
+
 @app.route("/check-2fa", methods=['POST', "GET"])# maybe check if the code exist
 def check_2fa():
     if request.method == "GET":
@@ -740,19 +748,15 @@ def check_2fa():
             user = users.query.filter_by(id=fa2).first()
         except:
             return "An unexpected error has occured!"
-        user_check = bool(users.query.filter_by(username=user.username).first())
-        if user_check:
-            current_code = pyotp.TOTP(user.fa2)
-            print(current_code.now())
-            print(user.username)
-            return render_template("/check-2fa.html", fa2=current_code.now(), user=user)
-        else:
-            return "ID - not found"
+        current_code = pyotp.TOTP(user.fa2)
+        print(current_code)
+        return render_template("/check-2fa.html", fa2=current_code.now(), user=user, code=current_code)
     else:
         try:
             json_req = request.get_json()
         except:
             return "An unexpected error has occured!"
+        print(json_req)
         user = json_req["user"]
         user.fa2 = True
         db.session.commit()
