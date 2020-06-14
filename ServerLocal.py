@@ -31,7 +31,7 @@ BUCKET = "file-download-storage"
 app = Flask(__name__)
 dotenv.load_dotenv()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://ybhupwxvjvhhzc:e6df4d4aa7ce04b41a8cbf2c9b3de437e7cd38be0cf1b54f95cd263dd9371839@ec2-54-247-79-178.eu-west-1.compute.amazonaws.com:5432/d65dpmgu192h3v'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://clmmyftjxnbbce:134671ec83eb4b90bfb3fdad17f8688f9dff34182311e4be231862eba8a5c88c@ec2-54-247-79-178.eu-west-1.compute.amazonaws.com:5432/d65op38k68s8ps'
 app.config['SECRET_KEY'] = "thisistopsecret"
 app.config["CELERY_BROKER_URL"] =  "redis://localhost:6379/0"
 app.config["CELERY_RESULT_BACKEND"] = "redis://localhost:6379/0"

@@ -29,7 +29,7 @@ app = Flask(__name__)
 dotenv.load_dotenv()
 #app.config.from_envvar('APP_SETTINGS')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["HEROKU_POSTGRESQL_AQUA_URL"]
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["HEROKU_POSTGRESQL_IVORY_URL"]
 app.config['SECRET_KEY'] = os.environ["SECRET_KEY_ENV"]
 app.config["CELERY_BROKER_URL"] =  os.environ["REDIS_URL"]
 app.config["CELERY_RESULT_BACKEND"] = os.environ["REDIS_URL"]
