@@ -15,23 +15,23 @@ toastr.options = {
     "hideMethod": "fadeOut"
   }
 $("#cancel-button").click(function(){
-$.ajax({
-    type: "POST",
-    url: "/2fa",
-    data: "cancel",
-    success: function(data){
-    if(data == "True"){ // data can not be boolean (unable to send boolean res type)
-        $("#cancel-msg").html("<div class = 'alert-success align-middle'></div>");
-        
-        toastr["success"]("You have disabled 2FA.", "2FA Disabled!")
-    }
-    else{
-        $("#cancel-msg").html("<div class = 'alert-danger align-middle'></div>");
-        toastr["error"]("2FA is not enabled. You can't cancel 2FA if it's not enabled.", "2FA is not enabled!")
-        
-    }
-    }
-});
+    $.ajax({
+        type: "POST",
+        url: "/2fa",
+        data: "cancel",
+        success: function(data){
+        if(data == "True"){ // data can not be boolean (unable to send boolean res type)
+            $("#cancel-msg").html("<div class = 'alert-success align-middle'></div>");
+            
+            toastr["success"]("You have disabled 2FA.", "2FA Disabled!")
+        }
+        else{
+            $("#cancel-msg").html("<div class = 'alert-danger align-middle'></div>");
+            toastr["error"]("2FA is not enabled. You can't cancel 2FA if it's not enabled.", "2FA is not enabled!")
+            
+        }
+        }
+    });
 });
 $("#enable-button").click(function(){
     $.post("/2fa", function(data){
