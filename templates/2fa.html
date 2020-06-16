@@ -51,7 +51,7 @@
         url: "/2fa",
         data: "cancel",
         success: function(data){
-          if(data == True){
+          if(data == "True"){ // data can not be boolean (unable to send boolean res type)
             $("#cancel-msg").html("<div class = 'alert-success'>2FA Disabled!</div>");
           }
           else{
