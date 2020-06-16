@@ -757,41 +757,37 @@ def new_code():
     return current_code.now()
 
 
-@app.route("/check-2fa", methods=['POST', "GET"])# maybe check if the code exist
-def check_2fa():
+@app.route("/2fa", methods=["POST", "GET"]) # must use NTP time.
+@login_required
+def fa():
     if request.method == "GET":
-        try:
-            user_id = request.args.get("id")
-        except:
-            return "An unexpected error has occured!"
-        print(user_id)
-        try:
-            user = users.query.filter_by(id=user_id).first()
-        except:
-            return "An unexpected error has occured!"
-        try:
-            current_code = pyotp.TOTP(user.fa2)
-            print(current_code)
-        except:
-            return redirect("/")
-        if user.login_form_before_2fa == True:
-            return render_template("/check-2fa.html", fa2=current_code.now(), user=user, code=current_code)
-        else:
-            return redirect("/")
+        all_computers = []
+        for i in range(0, len(Todo.query.all())):
+            all_computers.append(Todo.query.all()[i].id)
+        return render_template("2fa.html", computer_list_nev= all_computers, level_nev= int(current_user.level))
     else:
-        try:
-            id_user = request.get_data()
-        except:
-            return "An unexpected error has occured!"
-        print(id_user)
-        user = users.query.filter_by(id=id_user.decode()).first()
-        user.corrent_2fa_id = True
-        db.session.commit()
-        user.login_form_before_2fa = False
-        db.session.commit()
-        login_user(user, remember=True) #when remeber me is an option make sure that this function will get this var too.
-        print(user)
-        return ""
+        data = request.get_data()
+        print(data)
+        if current_user.fa2 == "" and data == b'':
+            secret = pyotp.random_base32()
+            sec = secret
+            URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
+            totp = pyotp.TOTP(secret)
+            secret = str(secret)
+            print(totp.now())
+            current_user.fa2 = secret
+            db.session.commit()
+            return URI
+        else:
+            if data.decode() == "cancel" and current_user.fa2 != "":
+                current_user.fa2 = ""
+                current_user.corrent_2fa_id = False
+                current_user.login_form_before_2fa = False
+                db.session.commit()
+                return "True"# means that the 2fa is enabled and it will disable it now. 
+            else:
+                return "False" # means that the 2fa is disabled
+            return "enabled"
 
 
 def get_admin_panel_data():
