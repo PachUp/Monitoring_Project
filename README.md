@@ -17,5 +17,5 @@ password: user123
 To run the server on localhost:  
 • put your own configuration values  
 • client URL needs to be changed to your localhost URL  
-• change all the links in the HTML pages from http://admin-monitor.herokuapp.com/... to your localhost(127.0.0.1/...).  
+• change all the links in the HTML pages from http://admin-monitor.herokuapp.com/ to your localhost(http://127.0.0.1/).  
 • ofcourse, download all the libraries
