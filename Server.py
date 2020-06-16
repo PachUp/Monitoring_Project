@@ -716,7 +716,10 @@ def live_info(id):
 @login_required
 def fa():
     if request.method == "GET":
-        return render_template("2fa.html")
+        all_computers = []
+        for i in range(0, len(Todo.query.all())):
+            all_computers.append(Todo.query.all()[i].id)
+        return render_template("2fa.html", computer_list_nev= all_computers, level_nev= int(current_user.level))
     else:
         if current_user.fa2 == "":
             secret = pyotp.random_base32()
