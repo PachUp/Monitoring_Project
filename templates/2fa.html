@@ -1,6 +1,8 @@
 {% extends 'nevbar.html' %}
 {% block head%}
 <script type="text/javascript" src="{{ url_for('static', filename='qrcode.min.js') }}" defer></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 {% endblock %}
 
 {% block body%}
@@ -8,11 +10,10 @@
 <div class="row justify-content-center">
     <button type="button" class="btn btn-outline-primary center-me center-block" id="enable-button" data-toggle="modal" data-target="#QRModal">Click me to enable 2FA</button>
 </div>
+<br>
 <div class="row justify-content-center">
   <button type="button" class="btn btn-outline-danger center-me center-block" id="cancel-button">Click me to disable 2FA</button>
 </div>
-<p id="cancel-msg"></p>
-<p id="center-me">Note: Once you enable 2FA you will not be able to cancel it.</p>
 <p id="center-me">Every time you log in you'll need to type the code</p>
 <p id="center-me">Please install Google's Authenticator </p>
 <div class="modal fade" id="QRModal" tabindex="-1" role="dialog" aria-labelledby="QRModalLabel" aria-hidden="true">
@@ -47,6 +48,22 @@
    text-align: center;
 </style>
 <script>
+  toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": true,
+  "progressBar": true,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "10000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
     $("#cancel-button").click(function(){
       $.ajax({
         type: "POST",
@@ -54,10 +71,14 @@
         data: "cancel",
         success: function(data){
           if(data == "True"){ // data can not be boolean (unable to send boolean res type)
-            $("#cancel-msg").html("<div class = 'alert-success align-middle'>2FA Disabled!</div>");
+            $("#cancel-msg").html("<div class = 'alert-success align-middle'></div>");
+            
+            toastr["success"]("You have disabled 2FA.", "2FA Disabled!")
           }
           else{
-            $("#cancel-msg").html("<div class = 'alert-danger align-middle'>2FA is not enabled!</div>");
+            $("#cancel-msg").html("<div class = 'alert-danger align-middle'></div>");
+            toastr["error"]("2FA is not enabled. You can cancel 2FA if it's not even enabled.", "2FA is not enabled!")
+            
           }
         }
       });

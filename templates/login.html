@@ -1,7 +1,9 @@
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 <!------ Include the above in your HEAD tag ---------->
 
 <body>
@@ -19,7 +21,6 @@
                                     <i class="fa fa-user icon"></i>
                                   </div>
                                 <input type="text" name="username" id="username" class="form-control">
-                                <p id="user-wrong"></p>
                             </div>
                             <div class="form-group">
                                 <label  for="password" class="text-info">Password:</label><br>
@@ -29,7 +30,6 @@
                                     </div>
                                     <input  type="password" name="password" id="password" class="form-control">
                                 </div>
-                                <p id="pass-wrong"></p>
                                 <i class="fa fa-eye icon" onclick="myFunction()" id="eye"></i>
                                 
                                 <div class="text-right">
@@ -93,6 +93,22 @@ body {
 
 </style>
 <script>
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": true,
+  "progressBar": true,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "5000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
 function myFunction() {
   var x = document.getElementById("password");
   if(document.getElementById("eye").className == "fa fa-eye-slash icon"){
@@ -124,23 +140,24 @@ function myFunction() {
                 success: function(res){
                     console.log(res)
                     if(res=="username"){
-                        $("#user-wrong").html("<div class = 'alert-danger'> This username doesn't exist.</div>");
-                        $("#pass-wrong").html("<div class = 'alert-danger'></div>");
+                        
+                        toastr["error"]("This username is not in my database. Perhaps your mail toekn has ended and someone else took it.", "This username doesn't exist")
                         
                     } 
                     else if(res=="password"){
-                        $("#pass-wrong").html("<div class = 'alert-danger'> Wrong password</div>");
-                        $("#user-wrong").html("<div class = 'alert-danger'></div>");
+                        
+                        toastr["error"]("Not the right password. Please try again.", "Wrong password")
                         
                     }
                     else{
                         if(res =="email"){
-                            $("#user-wrong").html("<div class = 'alert-danger'></div>");
-                            $("#pass-wrong").html("<div class = 'alert-danger'>Please verify your email</div>");
+                            toastr["error"]("Check your primary mail box or junk. You will have to verify your email before you login. If the token has ended, you'll need to sign up again.", "Please verify your email")
+                            
                         }
                         else if(res=="Great"){
                             $("#pass-wrong").html("great");
                             $("#user-wrong").html("great");
+                            toastr["success"]("Login you in!", "Success!")
                             $(location).attr("href", "http://admin-monitor.herokuapp.com/")
                         }
                         else{
