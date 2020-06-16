@@ -53,7 +53,7 @@
         var input = $("#2fa").val()
         var data = false;
         if(current_code == input){
-            $("#answer").html("<div class = 'alert-danger'>Corrent code! I'll redirect you to the main page in a few seconds!</div>");
+            $("#answer").html("<div class = 'alert-danger align-middle'>Corrent code! I'll redirect you to the main page in a few seconds!</div>");
             data = true
             $.ajax({
                 type: "POST",
@@ -66,7 +66,7 @@
         }
         else{
             data = false;
-            $("#answer").html("<div class = 'alert-danger'>Wrong code</div>");
+            $("#answer").html("<div class = 'alert-danger align-middle'>Wrong code</div>");
         }
     });
 </script>

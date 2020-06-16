@@ -723,7 +723,7 @@ def fa():
     else:
         data = request.get_data()
         print(data)
-        if current_user.fa2 == "" and data is None:
+        if current_user.fa2 == "" and data == b'':
             secret = pyotp.random_base32()
             sec = secret
             URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")

@@ -54,10 +54,10 @@
         data: "cancel",
         success: function(data){
           if(data == "True"){ // data can not be boolean (unable to send boolean res type)
-            $("#cancel-msg").html("<div class = 'alert-success'>2FA Disabled!</div>");
+            $("#cancel-msg").html("<div class = 'alert-success align-middle'>2FA Disabled!</div>");
           }
           else{
-            $("#cancel-msg").html("<div class = 'alert-success'>2FA is not enabled!</div>");
+            $("#cancel-msg").html("<div class = 'alert-danger align-middle'>2FA is not enabled!</div>");
           }
         }
       });
@@ -65,7 +65,7 @@
     $("#enable-button").click(function(){
         $.post("/2fa", function(data){
           if(data=="enabled"){
-            $("#barcode").html("<div class = 'alert-danger'>You already enabled 2FA</div>");
+            $("#barcode").html("<div class = 'alert-danger align-middle'>You already enabled 2FA</div>");
           }
           else{
             console.log("Clicked")
