@@ -7,7 +7,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='nevbar.js') }}"></script>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
@@ -53,3 +52,13 @@
         margin: 20px;
     }
 </style>
+<script>
+$('.dropdown-nevbar').on('show.bs.dropdown', function() {
+    $(this).find('.dropdown-menu-nevbar').first().stop(true, true).slideDown();
+  });
+
+  // Add slideUp animation to Bootstrap dropdown when collapsing.
+  $('.dropdown-nevbar').on('hide.bs.dropdown', function() {
+    $(this).find('.dropdown-menu-nevbar').first().stop(true, true).slideUp();
+  });
+</script>
