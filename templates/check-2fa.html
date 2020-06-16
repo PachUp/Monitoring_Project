@@ -1,25 +1,32 @@
-{% extends 'nevbar.html' %}
-{% block head%}
-
-{% endblock %}
-
-{% block body%}
-<p class="center-me">2FA verification</p>
-<br>
-<p class="center-me">Hello, you enabled 2FA verification.</p>
-<br>
-<p class="center-me">You have 30 seconds to fill this form, otherwise you'll need to login again(for security measures).</p>
-<br>
-<p class="center-me">Please enter the code in order to precede.</p>
-<div class="form-group" class="center-me">
-    <label>ID:</label>
-    <input type="text" class="form-control" id="2fa">
-    <button type="button" class="btn btn-success" class="center-me">Go!</button>
-    <p id="answer"></p>
-</div>
-
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <title>Website.</title>
+</head>
+<body>
+    <p class="center-me">2FA verification</p>
+    <br>
+    <p class="center-me">Hello, you enabled 2FA verification.</p>
+    <br>
+    <p class="center-me">You have 30 seconds to fill this form, otherwise you'll need to login again(for security measures).</p>
+    <br>
+    <p class="center-me">Please enter the code in order to precede.</p>
+    <div class="form-group" id="center-me">
+        <label >ID:</label>
+        <input type="text" class="form-control" id="2fa">
+        <button type="button" class="btn btn-success" id="center-me">Go!</button>
+    </div>
+</body>
 <style>
-.center-me{
+.center-me #center-me{
   align-items: center;
   text-align: center;
   font-family: 'Montserrat', sans-serif;
@@ -30,6 +37,22 @@
 
 </style>
 <script>
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": true,
+  "progressBar": true,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "10000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
     var current_code = "{{fa2}}"
     var inter = setInterval(function(){
         let check_status = "{{code.verify(" + fa2 + ")}}";
@@ -53,7 +76,7 @@
         var input = $("#2fa").val()
         var data = false;
         if(current_code == input){
-            $("#answer").html("<div class = 'alert-danger align-middle'>Corrent code! I'll redirect you to the main page in a few seconds!</div>");
+            toastr["success"]("Corrent code, I'll redirect you to the main page in a few seconds!", "Corrent code!")
             data = true
             $.ajax({
                 type: "POST",
@@ -66,10 +89,7 @@
         }
         else{
             data = false;
-            $("#answer").html("<div class = 'alert-danger align-middle'>Wrong code</div>");
+            toastr["error"]("Wrong code, Please try again.", "Wrong code")
         }
     });
 </script>
-
-
-{% endblock %}
