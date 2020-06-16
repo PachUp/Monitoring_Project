@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='nevbar.js') }}"></script>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
@@ -15,7 +16,7 @@
     {% block head%}{% endblock %}
 </head>
 <body>
-    <div class="nav this-is-navbar" >
+    <div class="bs-example this-is-navbar" >
         <nav class="navbar navbar-expand-md navbar-light bg-light this-is-navbar">
             <a class="navbar-brand this-is-navbar">admin-monitor</a>
             <button type="button" class="navbar-toggler this-is-navbar" data-toggle="collapse" data-target="#navbarCollapse">
@@ -36,7 +37,7 @@
                     {% if level_nev == 3 %}
                     <a href="http://admin-monitor.herokuapp.com/admin-panel" class="nav-item nav-link this-is-navbar">Admin panel</a>
                     {%endif%}
-                    <a href="http://admin-monitor.herokuapp.com/2fa" class="nav-item nav-link this-is-navbar">Enable 2FA</a>
+                    <a href="http://admin-monitor.herokuapp.com/2fa" class="nav-item nav-link this-is-navbar">2FA</a>
                 </div>
                 <div class="navbar-nav this-is-navbar">
                     <a href="http://admin-monitor.herokuapp.com/logout" class="nav-item nav-link this-is-navbar">Logout</a>
@@ -48,17 +49,7 @@
 </body>
 </html>
 <style>
-    .nav{
+    .bs-example{
         margin: 20px;
     }
 </style>
-<script>
-$('.dropdown-nevbar').on('show.bs.dropdown', function() {
-    $(this).find('.dropdown-menu-nevbar').first().stop(true, true).slideDown();
-  });
-
-  // Add slideUp animation to Bootstrap dropdown when collapsing.
-  $('.dropdown-nevbar').on('hide.bs.dropdown', function() {
-    $(this).find('.dropdown-menu-nevbar').first().stop(true, true).slideUp();
-  });
-</script>
