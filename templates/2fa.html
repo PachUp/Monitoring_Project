@@ -6,8 +6,12 @@
 {% block body%}
 <h1 id="center-me">Welcome to the 2FA page</h1>
 <div class="row justify-content-center">
-    <button type="button" class="btn btn-outline-primary center-me center-block" id="button" data-toggle="modal" data-target="#QRModal">Click me to enable 2FA</button>
+    <button type="button" class="btn btn-outline-primary center-me center-block" id="enable-button" data-toggle="modal" data-target="#QRModal">Click me to enable 2FA</button>
 </div>
+<div class="row justify-content-center">
+  <button type="button" class="btn btn-outline-warning center-me center-block" id="cancel-button">Click me to disable 2FA</button>
+</div>
+<p id="cancel-msg"></p>
 <p id="center-me">Note: Once you enable 2FA you will not be able to cancel it.</p>
 <p id="center-me">Every time you log in you'll need to type the code</p>
 <p id="center-me">Please install Google's Authenticator </p>
@@ -41,7 +45,22 @@
 }
 </style>
 <script>
-    $("#button").click(function(){
+    $("#cancel-button").click(function(){
+      $.ajax({
+        type: "POST",
+        url: "/2fa",
+        data: "cancel",
+        success: function(data){
+          if(data == True){
+            $("#cancel-msg").html("<div class = 'alert-success'>FA2 Disabled!</div>");
+          }
+          else{
+            $("#cancel-msg").html("<div class = 'alert-success'>An unexpected has occurred</div>");
+          }
+        }
+      });
+    });
+    $("#enable-button").click(function(){
         $.post("/2fa", function(data){
           if(data=="enabled"){
             $("#barcode").html("<div class = 'alert-danger'>You already enabled 2FA.</div>");
