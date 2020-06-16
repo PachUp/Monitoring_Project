@@ -721,28 +721,25 @@ def fa():
             all_computers.append(Todo.query.all()[i].id)
         return render_template("2fa.html", computer_list_nev= all_computers, level_nev= int(current_user.level))
     else:
-        if current_user.fa2 == "":
-            data = request.get_data()
-            print(data)
-            if data is None:
-                secret = pyotp.random_base32()
-                sec = secret
-                URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
-                totp = pyotp.TOTP(secret)
-                secret = str(secret)
-                print(totp.now())
-                current_user.fa2 = secret
-                db.session.commit()
-                return URI
+        data = request.get_data()
+        print(data)
+        if current_user.fa2 == "" and data is None:
+            secret = pyotp.random_base32()
+            sec = secret
+            URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
+            totp = pyotp.TOTP(secret)
+            secret = str(secret)
+            print(totp.now())
+            current_user.fa2 = secret
+            db.session.commit()
+            return URI
+        else:
             elif data.decode() == "cancel":
                 current_user.fa2 = ""
                 current_user.corrent_2fa_id = False
                 current_user.login_form_before_2fa = False
                 db.session.commit()
                 return True
-            else:
-                return False
-        else:
             return "enabled"
 
 @app.route("/get-the-new-code", methods=["POST"])
