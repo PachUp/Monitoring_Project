@@ -2,6 +2,7 @@
 **Notes**:  
 • The HTML html percentage is also the CSS and JS in the project  
 • The python percentage should be less but there is a file for running the site on localhost and modifying the site in heroku.  
+  
 **configuration values**:  
 os.environ["HEROKU_POSTGRESQL_PINK_URL"] - The URI for the database  
 os.environ["SECRET_KEY_ENV"] - the keyword for the encryption of the cookies  
