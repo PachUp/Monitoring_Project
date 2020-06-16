@@ -43,6 +43,8 @@
 .modal-lg{
   max-width: 16% ;
 }
+.alert-message {
+   text-align: center;
 </style>
 <script>
     $("#cancel-button").click(function(){
@@ -55,7 +57,7 @@
             $("#cancel-msg").html("<div class = 'alert-success'>2FA Disabled!</div>");
           }
           else{
-            $("#cancel-msg").html("<div class = 'alert-success'>An unexpected has occurred</div>");
+            $("#cancel-msg").html("<div class = 'alert-success'>2FA is not enabled!</div>");
           }
         }
       });

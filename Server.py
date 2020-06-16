@@ -734,12 +734,14 @@ def fa():
             db.session.commit()
             return URI
         else:
-            if data.decode() == "cancel":
+            if data.decode() == "cancel" and current_user.fa2 != "":
                 current_user.fa2 = ""
                 current_user.corrent_2fa_id = False
                 current_user.login_form_before_2fa = False
                 db.session.commit()
-                return "True"
+                return "True"# means that the 2fa is enabled and it will disable it now. 
+            else:
+                return "False" # means that the 2fa is disabled
             return "enabled"
 
 @app.route("/get-the-new-code", methods=["POST"])

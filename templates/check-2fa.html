@@ -4,27 +4,30 @@
 {% endblock %}
 
 {% block body%}
-<p id="center-me">2FA verification</p>
+<p class="center-me">2FA verification</p>
 <br>
-<p id="center-me">Hello, you enabled 2FA verification.</p>
+<p class="center-me">Hello, you enabled 2FA verification.</p>
 <br>
-<p id="center-me">You have 30 seconds to fill this form, otherwise you'll need to login again(for security measures).</p>
+<p class="center-me">You have 30 seconds to fill this form, otherwise you'll need to login again(for security measures).</p>
 <br>
-<p id="center-me">Please enter the code in order to precede.</p>
-<div class="form-group" id="center-me">
+<p class="center-me">Please enter the code in order to precede.</p>
+<div class="form-group" class="center-me">
     <label>ID:</label>
     <input type="text" class="form-control" id="2fa">
-    <button type="button" class="btn btn-success" id="center-me">Go!</button>
+    <button type="button" class="btn btn-success" class="center-me">Go!</button>
     <p id="answer"></p>
 </div>
 
 <style>
-#center-me{
+.center-me{
   align-items: center;
   text-align: center;
   font-family: 'Montserrat', sans-serif;
   justify-content: center;
 }
+.alert-message {
+   text-align: center;
+
 </style>
 <script>
     var current_code = "{{fa2}}"
