@@ -734,7 +734,7 @@ def fa():
             db.session.commit()
             return URI
         else:
-            elif data.decode() == "cancel":
+            if data.decode() == "cancel":
                 current_user.fa2 = ""
                 current_user.corrent_2fa_id = False
                 current_user.login_form_before_2fa = False
