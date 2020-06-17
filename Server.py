@@ -8,7 +8,6 @@ import datetime
 import itertools 
 from sqlalchemy import func
 import dotenv
-
 import pyotp
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -711,38 +710,6 @@ def live_info(id):
         
         return json_txt
         # return render_template("damn.html", jso= json.dumps(json_txt) , timer=5000), 200, {'Content-Type': 'Content-Type: application/javascript; charset=utf-8'}
-
-@app.route("/2fa", methods=["POST", "GET"]) # must use NTP time.
-@login_required
-def fa():
-    if request.method == "GET":
-        all_computers = []
-        for i in range(0, len(Todo.query.all())):
-            all_computers.append(Todo.query.all()[i].id)
-        return render_template("2fa.html", computer_list_nev= all_computers, level_nev= int(current_user.level))
-    else:
-        data = request.get_data()
-        print(data)
-        if current_user.fa2 == "" and data == b'':
-            secret = pyotp.random_base32()
-            sec = secret
-            URI = pyotp.totp.TOTP(secret).provisioning_uri(current_user.email, issuer_name="Monitoring")
-            totp = pyotp.TOTP(secret)
-            secret = str(secret)
-            print(totp.now())
-            current_user.fa2 = secret
-            db.session.commit()
-            return URI
-        else:
-            if data.decode() == "cancel" and current_user.fa2 != "":
-                current_user.fa2 = ""
-                current_user.corrent_2fa_id = False
-                current_user.login_form_before_2fa = False
-                db.session.commit()
-                return "True"# means that the 2fa is enabled and it will disable it now. 
-            else:
-                return "False" # means that the 2fa is disabled
-            return "enabled"
 
 @app.route("/get-the-new-code", methods=["POST"])
 def new_code():
