@@ -752,7 +752,7 @@ def fa():
                 current_user.login_form_before_2fa = False
                 db.session.commit()
                 return "True"# means that the 2fa is enabled and it will disable it now. 
-            else:
+            elif data.decode() == "cancel" and current_user.fa2 == "":
                 return "False" # means that the 2fa is disabled
             return "enabled"
 
