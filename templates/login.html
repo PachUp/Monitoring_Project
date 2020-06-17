@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <!------ Include the above in your HEAD tag ---------->
 <head>
     <meta charset="UTF-8">
@@ -46,10 +47,14 @@
                                 </div>
                             </div>
                         </form>
+                        
+                        <div class="col-lg-20">
                         <div class="text-right">
                             <a href="/register" class="btn btn-outline-info" id="reg">Register here</a>
                         </div>
-                        <input type="submit" name="submit" class="btn btn-info btn-md" id="button-id" value="submit">
+                    </div>
+                        <div class="g-recaptcha btn-cap" data-sitekey="6LfTCaYZAAAAAAn89yBdihYAlDUgZTQt2rTper5N" id="recaptcha"></div> <!--this is the site key it could be visible-->
+                        <input type="submit" name="submit" class="btn btn-info btn-md btn-cap" id="button-id" value="submit">
                     </div>
                 </div>
             </div>
@@ -60,23 +65,16 @@
 </body>
 <style>
 body {
-  margin: 0;
-  padding: 0;
   background-color: #17a2b8;
   height: 100vh;
 }
 #login .container #login-row #login-column #login-box {
   margin-top: 120px;
-  max-width: 600px;
-  height: 370px;
+  max-width: 700px;
+  height: 425px;
   border: 1px solid #9C9C9C;
   background-color: #EAEAEA;
 }
-#button-id{
-    margin-top: -37px;
-    padding-bottom: 2%;
-}
-
 .up{
     margin-top: -30px;
 }
@@ -91,11 +89,22 @@ body {
   min-width: 50px;
   text-align: center;
 }
+.btn-cap{
+    margin-top: -40;
+}
+#recaptcha{
+    position: absolute;
+    bottom: 70px;
+}
+#reg{
+    margin-top: 99;
+}
+#button-id{
+    
+}
 .fa-lock{
     width: 1px;
 }
-
-
 </style>
 <script>
 toastr.options = {
@@ -130,6 +139,8 @@ function myFunction() {
 }
     $(document).ready(function(){
         $("#button-id").click(function(){
+            var res = grecaptcha.getResponse();
+            console.log(res);
             var data = $("form").serialize();
             if ($('#autoSizingCheck').is(':checked')){
                 data = data + "&CheckBox=" + "True" // maybe change in the future(that's why I have the +), option is disabled for now
