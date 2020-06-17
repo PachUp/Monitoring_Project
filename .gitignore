@@ -31,3 +31,4 @@ static/jquery.js
 static/JsBarcode.all.js
 virusScan.py
 virusScan.py
+static/qrcode.min.js

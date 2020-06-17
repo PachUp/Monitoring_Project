@@ -726,7 +726,7 @@ def new_code():
 
 @app.route("/2fa", methods=["POST", "GET"]) # must use NTP time.
 @login_required
-def fa():
+def fa2():
     if request.method == "GET":
         all_computers = []
         for i in range(0, len(Todo.query.all())):

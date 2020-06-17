@@ -91,6 +91,7 @@
           }
           else{
             console.log("Clicked")
+            $("#barcode").html("<div class = 'alert-danger align-middle'></div>");
             var qrcode = new QRCode(document.querySelector("#barcode"), { // have to select a query like this
               text: data,
               width: 128,
