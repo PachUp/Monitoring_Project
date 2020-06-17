@@ -756,6 +756,43 @@ def fa():
                 return "False" # means that the 2fa is disabled
             return "enabled"
 
+@app.route("/check-2fa", methods=['POST', "GET"])# maybe check if the code exist
+def check_2fa():
+    if request.method == "GET":
+        try:
+            fa2 = request.args.get("id")
+        except:
+            return "An unexpected error has occured!"
+        print(fa2)
+        try:
+            user = users.query.filter_by(id=fa2).first()
+        except:
+            return "An unexpected error has occured!"
+        try:
+            current_code = pyotp.TOTP(user.fa2)
+            print(current_code)
+        except:
+            return redirect("/")
+        if user.login_form_before_2fa == True:
+            return render_template("/check-2fa.html", fa2=current_code.now(), user=user, code=current_code)
+        else:
+            return redirect("/")
+    else:
+        try:
+            id_user = request.get_data()
+        except:
+            return "An unexpected error has occured!"
+        print(id_user)
+        user = users.query.filter_by(id=id_user.decode()).first()
+        user.fa2 = True
+        db.session.commit()
+        user.login_form_before_2fa = False
+        db.session.commit()
+        login_user(user, remember=True) #when remeber me is an option make sure that this function will get this var too.
+        print(user)
+        return ""
+
+
 
 def get_admin_panel_data():
     users_username = []
