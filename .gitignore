@@ -28,7 +28,6 @@ report.20200520.192006.9640.0.001.json
 static/node_modules/
 .env
 static/jquery.js
-static/qrcode.min.js
 static/JsBarcode.all.js
 virusScan.py
 virusScan.py
