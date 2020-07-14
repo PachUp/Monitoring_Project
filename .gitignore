@@ -37,4 +37,4 @@ redis-practice.py
 dump.rdb
 package-lock.json
 config.cfg
-__pycache__
+/__pycache__
