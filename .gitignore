@@ -38,3 +38,5 @@ dump.rdb
 package-lock.json
 config.cfg
 /__pycache__
+dump.rdb
+package-lock.json
