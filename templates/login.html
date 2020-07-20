@@ -154,15 +154,17 @@ function myFunction() {
                     success: function(res){
                         console.log(res)
                         if(res=="username"){
+                            grecaptcha.reset();
                             toastr["error"]("This username is not in my database. Perhaps your mail toekn has ended and someone else took it.", "This username doesn't exist")
                         } 
                         else if(res=="password"){
-                            
+                            grecaptcha.reset();
                             toastr["error"]("Not the right password. Please try again.", "Wrong password")
                             
                         }
                         else{
                             if(res =="email"){
+                                grecaptcha.reset();
                                 toastr["error"]("Check your primary mail box or junk. You will have to verify your email before you login. If the token has ended, you'll need to sign up again.", "Please verify your email")
                                 
                             }
