@@ -32,3 +32,11 @@ static/JsBarcode.all.js
 virusScan.py
 virusScan.py
 static/qrcode.min.js
+report.20200520.192006.9640.0.001.json
+redis-practice.py
+dump.rdb
+package-lock.json
+config.cfg
+/__pycache__
+dump.rdb
+package-lock.json
