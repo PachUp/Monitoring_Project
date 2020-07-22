@@ -27,8 +27,8 @@ toastr.options = {
   "hideMethod": "fadeOut"
 }
 console.log("{{folder}}")
-if("{{folder}}" == true){
-    toastr["error"]("The chosen file is a folder. You have to choose a file!", "This is a folder!")
+if("{{folder}}" == "True"){
+    toastr["error"]("This is a folder. You have to choose a file!", "This is a folder!")
 }
 else{
     toastr["success"]("Downloading the file! please wait.", "Downloading...")

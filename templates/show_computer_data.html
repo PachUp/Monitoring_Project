@@ -32,7 +32,6 @@
     <br>
     <br>
     <br>
-    
     <div class="boxes">
       <button type="button" class="btn btn-primary" id="box">
           id:  <span class="badge badge-light">{{computer.id}}</span>
@@ -96,6 +95,11 @@
       <br>
       <br>
       <br>
+      <div type="button" class="alert alert-primary alert-dismissible fade show" data-dismiss="alert">
+        NOTE: You can only download files, not folders
+      </div>
+      <br>
+      <p>Enter a path:</p> 
       <br>
         <div class="input-group mb-3">
           <input type="text" class="form-control" placeholder="Enter directory" aria-label="Enter directory" aria-describedby="basic-addon2" value="C:/" id="dir-val">
@@ -142,7 +146,7 @@ $("#dir-button").click(function(){
     data: data,
     success: function(dir_items){
       dir_items = dir_items["dir items"]
-      if(dir_items == "The computer is not online" || dir_items == "Not found"){
+      if(dir_items == "The computer is offline" || dir_items == "Not found"){
         $("br").remove(".dir-items")
         $(".dir-items").remove()
         $(".add-href").remove()

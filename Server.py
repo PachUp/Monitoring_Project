@@ -404,12 +404,12 @@ def get_ajax_data(id):
                 while(redis_server.get(redis_response_name) is None):
                     waiting_for_res = datetime.datetime.now()
                     if(waiting_for_res - start_req > datetime.timedelta(seconds= 5.2)):
-                        return {"dir items": ["The computer is not online"]}
+                        return {"dir items": ["The computer is offline"]}
             except:
                 while(len(get_redis_response) == 0):
                     waiting_for_res = datetime.datetime.now()
                     if(waiting_for_res - start_req > datetime.timedelta(seconds= 5.2)):
-                        return {"dir items": ["The computer is not online"]}
+                        return {"dir items": ["The computer is offline"]}
                     get_redis_response = redis_server.lrange(redis_response_name,0, -1)
             print("finished!")
             print("af: ", end="")
@@ -505,7 +505,7 @@ def upload_file(name, id):
             file_type = name.split(".")[-1]
             folder = False
             print(file_type)
-            if file_type is None or file_type == "" or file_type == actual_name + "2":
+            if file_type is None or file_type == "" or actual_name == file_type:
                 folder = True
             print(folder)
             name = actual_name + "2" + "." + file_type
