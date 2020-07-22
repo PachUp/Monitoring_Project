@@ -95,7 +95,9 @@
       <br>
       <br>
       <br>
-      <p>NOTE: You can only download files, not folders</p> 
+      <div type="button" class="alert alert-primary alert-dismissible fade show" data-dismiss="alert">
+        NOTE: You can only download files, not folders
+      </div>
       <br>
       <p>Enter a path:</p> 
       <br>
@@ -144,7 +146,7 @@ $("#dir-button").click(function(){
     data: data,
     success: function(dir_items){
       dir_items = dir_items["dir items"]
-      if(dir_items == "The computer is not online" || dir_items == "Not found"){
+      if(dir_items == "The computer is offline" || dir_items == "Not found"){
         $("br").remove(".dir-items")
         $(".dir-items").remove()
         $(".add-href").remove()
