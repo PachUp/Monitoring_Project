@@ -142,7 +142,7 @@ $("#dir-button").click(function(){
     data: data,
     success: function(dir_items){
       dir_items = dir_items["dir items"]
-      if(dir_items == "The computer is not online or the path was not found"){
+      if(dir_items == "The computer is not online" || dir_items == "Not found"){
         $("#list-dir").append(dir_items)
       }
       else{
