@@ -146,7 +146,7 @@ $("#dir-button").click(function(){
         $("br").remove(".dir-items")
         $(".dir-items").remove()
         $(".add-href").remove()
-        $("#list-dir").append(dir_items)
+        $("#list-dir").append("<il class='dir-items'>" + dir_items + "</il>")
       }
       else{
         console.log(dir_items)
