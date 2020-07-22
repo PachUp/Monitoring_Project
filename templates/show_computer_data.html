@@ -143,6 +143,9 @@ $("#dir-button").click(function(){
     success: function(dir_items){
       dir_items = dir_items["dir items"]
       if(dir_items == "The computer is not online" || dir_items == "Not found"){
+        $("br").remove(".dir-items")
+        $(".dir-items").remove()
+        $(".add-href").remove()
         $("#list-dir").append(dir_items)
       }
       else{
