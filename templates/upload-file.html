@@ -1,8 +1,37 @@
 {% extends 'nevbar.html' %}
 {% block head%}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 {% endblock %}
 {% block body%}
+{% if folder %}
+    <p></p>
+{% else %}
+    <p></p>
+{% endif %}
 <script>
+toastr.options = {
+  "closeButton": true,
+  "debug": false,
+  "newestOnTop": true,
+  "progressBar": true,
+  "positionClass": "toast-top-right",
+  "preventDuplicates": false,
+  "showDuration": "300",
+  "hideDuration": "1000",
+  "timeOut": "7000",
+  "extendedTimeOut": "1000",
+  "showEasing": "swing",
+  "hideEasing": "linear",
+  "showMethod": "fadeIn",
+  "hideMethod": "fadeOut"
+}
+if("{{folder}}"){
+    toastr["error"]("The chosen file is a folder. You have to choose a file!", "This is a folder!")
+}
+else{
+    toastr["success"]("Downloading the file! please wait.", "Downloading...")
+}
 send_url = "/computers/{{computer.id}}/file-ready"
 let flag = true;
 var counter = 0;
@@ -20,6 +49,7 @@ var inter = setInterval(() => {
             if (data == "Ready"){
                 console.log("sec")
                 clearInterval(inter);
+                toastr["success"]('Your file was downloaded! <a href="http://admin-monitor.herokuapp.com/" target="_blank">Click me to go to the default page</a>', "Downloaded!")
                 window.location.href = send_url;
                 }
             },

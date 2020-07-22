@@ -404,12 +404,12 @@ def get_ajax_data(id):
                 while(redis_server.get(redis_response_name) is None):
                     waiting_for_res = datetime.datetime.now()
                     if(waiting_for_res - start_req > datetime.timedelta(seconds= 5.2)):
-                        return {"dir items": ["Not Found"]}
+                        return {"dir items": ["The computer is not online or the path was not found"]}
             except:
                 while(len(get_redis_response) == 0):
                     waiting_for_res = datetime.datetime.now()
                     if(waiting_for_res - start_req > datetime.timedelta(seconds= 5.2)):
-                        return {"dir items": ["Not Found"]}
+                        return {"dir items": ["The computer is not online or the path was not found"]}
                     get_redis_response = redis_server.lrange(redis_response_name,0, -1)
             print("finished!")
             print("af: ", end="")
@@ -503,10 +503,13 @@ def upload_file(name, id):
             redirct_to = "/computer/" + str(id) + "/get-name"
             actual_name = name.split(".")[0]
             file_type = name.split(".")[-1]
+            folder = False
+            if file_type is None or file_type == "":
+                folder = True
             name = actual_name + "2" + "." + file_type
             print("name:::: " + name)
             redis_server.set("file-name" + str(id), name)
-            return render_template("upload-file.html", computer = computer)
+            return render_template("upload-file.html", computer = computer, folder = folder)
             #not_found = True
             #return send_file(path, as_attachment=True)
         else:
