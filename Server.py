@@ -505,7 +505,7 @@ def upload_file(name, id):
             file_type = name.split(".")[-1]
             folder = False
             print(file_type)
-            if file_type is None or file_type == "" or file_type == actual_name + "2":
+            if file_type is None or file_type == "" or actual_name == file_type + "2":
                 folder = True
             print(folder)
             name = actual_name + "2" + "." + file_type
