@@ -1,7 +1,7 @@
 ﻿# Monitoring_Project
 **Notes**  
-• The HTML html percentage is includes the CSS and JS percentage in the project  
-• The python percentage should be less but there is a file for running the site on localhost and modifying the site in heroku.  
+• The HTML html percentage includes the CSS and JS percentage in the project  
+• The python percentage should be less but there is a file for running the site on localhost.  
 • all of the javascript is in the html files. The reason is because jinja2 doesn't support .js type files. So the javascript of the all the files must be inside the html files.
 
 ---
