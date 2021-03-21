@@ -40,3 +40,7 @@ config.cfg
 /__pycache__
 dump.rdb
 package-lock.json
+report.20200520.192006.9640.0.001.json
+redis-practice.py
+dump.rdb
+config.cfg
